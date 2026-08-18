@@ -108,7 +108,7 @@
 <div id="appShell" class="hidden min-h-screen w-full flex bg-white">
 
   <!-- =========================================================
-       SIDEBAR NAVIGATION (Dark Slate Theme)
+        SIDEBAR NAVIGATION (Dark Slate Theme)
   ========================================================= -->
   <aside class="w-64 bg-slate-900 text-slate-300 flex flex-col shrink-0 border-r border-slate-800 select-none">
     <!-- Brand / Header -->
@@ -210,7 +210,7 @@
   </aside>
 
   <!-- =========================================================
-       MAIN CONTENT AREA
+        MAIN CONTENT AREA
   ========================================================= -->
   <div class="flex-1 flex flex-col min-w-0 overflow-y-auto">
     <!-- Top Header Bar -->
@@ -235,7 +235,7 @@
     <main class="max-w-7xl w-full mx-auto px-6 py-6 space-y-8 flex-1">
 
       <!-- =========================================================
-           CREDENTIAL WARNING
+            CREDENTIAL WARNING
       ========================================================= -->
       <div id="credentialWarning" class="hidden rounded-xl border border-amber-500/40 bg-amber-500/10 px-4 py-3 text-sm text-amber-700">
         <strong class="font-semibold">Supabase not configured.</strong>
@@ -244,7 +244,7 @@
       </div>
 
       <!-- =========================================================
-           MODULE: DASHBOARD
+            MODULE: DASHBOARD
       ========================================================= -->
       <section id="moduleDashboard" class="space-y-6">
         <div>
@@ -289,95 +289,40 @@
       </section>
 
       <!-- =========================================================
-           MODULE: SCHEDULE MANAGEMENT
+            MODULE: SCHEDULE MANAGEMENT
       ========================================================= -->
       <section id="moduleSchedule" class="hidden space-y-6">
         <div class="flex items-center justify-between">
           <div>
-            <h3 class="text-base font-semibold text-slate-900">Work Schedules &amp; Shifts</h3>
-            <p class="text-xs text-slate-500 mt-0.5">Create and assign work shifts and rest days across employees.</p>
+            <h3 class="text-base font-semibold text-slate-900">Work Schedules &amp; Monthly Roster</h3>
+            <p class="text-xs text-slate-500 mt-0.5">Select an employee below to manage their complete monthly shifts, rest days, and lock statuses.</p>
           </div>
         </div>
 
-        <!-- Add Schedule Form -->
-        <div class="rounded-xl border border-slate-300 bg-slate-50 p-5">
-          <h4 class="text-sm font-semibold text-slate-900 mb-3">Assign / Create Schedule</h4>
-          <form id="scheduleForm" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4" novalidate>
-            <div class="flex flex-col gap-1">
-              <label class="text-xs font-medium text-slate-500">Employee</label>
-              <select id="schedEmployeeId" required class="bg-white border border-slate-300 rounded-lg px-3 py-2 text-sm text-slate-900 focus:outline-none focus:ring-2 focus:ring-amber-500/65">
-                <option value="">Select Employee...</option>
-              </select>
-            </div>
-            <div class="flex flex-col gap-1">
-              <label class="text-xs font-medium text-slate-500">Schedule Date</label>
-              <input id="schedDate" type="date" required class="bg-white border border-slate-300 rounded-lg px-3 py-2 text-sm text-slate-900 focus:outline-none focus:ring-2 focus:ring-amber-500/65" />
-            </div>
-            <div class="flex flex-col gap-1">
-              <label class="text-xs font-medium text-slate-500">Shift Type</label>
-              <select id="schedShiftName" class="bg-white border border-slate-300 rounded-lg px-3 py-2 text-sm text-slate-900 focus:outline-none focus:ring-2 focus:ring-amber-500/65">
-                <option value="Regular Shift">Regular Shift</option>
-                <option value="Morning Shift">Morning Shift</option>
-                <option value="Afternoon Shift">Afternoon Shift</option>
-                <option value="Night Shift">Night Shift</option>
-                <option value="Rest Day">Rest Day</option>
-                <option value="Custom Shift">Custom Shift</option>
-              </select>
-            </div>
-            <div class="flex flex-col gap-1">
-              <label class="text-xs font-medium text-slate-500">Start Time</label>
-              <input id="schedStartTime" type="time" value="08:00" class="bg-white border border-slate-300 rounded-lg px-3 py-2 text-sm text-slate-900 focus:outline-none focus:ring-2 focus:ring-amber-500/65" />
-            </div>
-            <div class="flex flex-col gap-1">
-              <label class="text-xs font-medium text-slate-500">End Time</label>
-              <input id="schedEndTime" type="time" value="17:00" class="bg-white border border-slate-300 rounded-lg px-3 py-2 text-sm text-slate-900 focus:outline-none focus:ring-2 focus:ring-amber-500/65" />
-            </div>
-            <div class="flex flex-col gap-1">
-              <label class="text-xs font-medium text-slate-500">Break Start</label>
-              <input id="schedBreakStart" type="time" value="12:00" class="bg-white border border-slate-300 rounded-lg px-3 py-2 text-sm text-slate-900 focus:outline-none focus:ring-2 focus:ring-amber-500/65" />
-            </div>
-            <div class="flex flex-col gap-1">
-              <label class="text-xs font-medium text-slate-500">Break End</label>
-              <input id="schedBreakEnd" type="time" value="13:00" class="bg-white border border-slate-300 rounded-lg px-3 py-2 text-sm text-slate-900 focus:outline-none focus:ring-2 focus:ring-amber-500/65" />
-            </div>
-            <div class="flex flex-col gap-1">
-              <label class="text-xs font-medium text-slate-500">Notes</label>
-              <input id="schedNotes" type="text" placeholder="Optional notes" class="bg-white border border-slate-300 rounded-lg px-3 py-2 text-sm text-slate-900 focus:outline-none focus:ring-2 focus:ring-amber-500/65" />
-            </div>
-            <div class="lg:col-span-4 flex justify-end">
-              <button type="submit" class="bg-amber-500 hover:bg-amber-400 text-slate-900 font-semibold text-sm px-5 py-2.5 rounded-lg transition-colors">
-                Save Schedule
-              </button>
-            </div>
-          </form>
-        </div>
-
-        <!-- Schedule List Table -->
+        <!-- Employee List View for Scheduling -->
         <div class="rounded-xl border border-slate-300 bg-slate-50 overflow-hidden">
           <div class="px-5 py-4 border-b border-slate-300 flex items-center justify-between">
-            <h4 class="text-base font-semibold text-slate-900">Assigned Schedules</h4>
+            <h4 class="text-base font-semibold text-slate-900">Active Workforce Schedules</h4>
           </div>
           <div class="overflow-x-auto">
             <table class="w-full text-sm border-collapse">
               <thead>
                 <tr class="bg-slate-100 text-slate-500 text-xs uppercase tracking-wide">
-                  <th class="text-left px-4 py-3 border-b border-slate-300">Employee</th>
-                  <th class="text-left px-4 py-3 border-b border-slate-300">Date</th>
-                  <th class="text-left px-4 py-3 border-b border-slate-300">Shift Name</th>
-                  <th class="text-left px-4 py-3 border-b border-slate-300">Time Window</th>
-                  <th class="text-left px-4 py-3 border-b border-slate-300">Break</th>
-                  <th class="text-left px-4 py-3 border-b border-slate-300">Notes</th>
-                  <th class="text-center px-4 py-3 border-b border-slate-300">Action</th>
+                  <th class="text-left px-4 py-3 border-b border-slate-300">Emp. Number</th>
+                  <th class="text-left px-4 py-3 border-b border-slate-300">Employee Name</th>
+                  <th class="text-left px-4 py-3 border-b border-slate-300">Department / Title</th>
+                  <th class="text-center px-4 py-3 border-b border-slate-300">Lock Status</th>
+                  <th class="text-center px-4 py-3 border-b border-slate-300">Actions</th>
                 </tr>
               </thead>
-              <tbody id="scheduleTableBody" class="divide-y divide-slate-200"></tbody>
+              <tbody id="scheduleEmployeeTableBody" class="divide-y divide-slate-200"></tbody>
             </table>
           </div>
         </div>
       </section>
 
       <!-- =========================================================
-           MODULE: ATTENDANCE MANAGEMENT
+            MODULE: ATTENDANCE MANAGEMENT
       ========================================================= -->
       <section id="moduleAttendance" class="hidden space-y-6">
         <div class="flex items-center justify-between">
@@ -461,7 +406,7 @@
       </section>
 
       <!-- =========================================================
-           MODULE: OVERTIME MANAGEMENT
+            MODULE: OVERTIME MANAGEMENT
       ========================================================= -->
       <section id="moduleOvertime" class="hidden space-y-6">
         <div class="flex items-center justify-between">
@@ -530,7 +475,7 @@
       </section>
 
       <!-- =========================================================
-           MODULE: LEAVE MANAGEMENT
+            MODULE: LEAVE MANAGEMENT
       ========================================================= -->
       <section id="moduleLeave" class="hidden space-y-6">
         <div class="flex items-center justify-between">
@@ -607,7 +552,7 @@
       </section>
 
       <!-- =========================================================
-           MODULE: PAYROLL MANAGEMENT
+            MODULE: PAYROLL MANAGEMENT
       ========================================================= -->
       <section id="modulePayroll" class="hidden space-y-8">
         <!-- Summary Cards -->
@@ -789,7 +734,7 @@
       </section>
 
       <!-- =========================================================
-           MODULE: INACTIVE EMPLOYEES
+            MODULE: INACTIVE EMPLOYEES
       ========================================================= -->
       <section id="moduleInactive" class="hidden space-y-6">
         <div>
@@ -820,6 +765,60 @@
       </section>
 
     </main>
+  </div>
+</div>
+
+<!-- =========================================================
+     MONTHLY SCHEDULE MANAGEMENT MODAL
+========================================================= -->
+<div id="monthlyScheduleModal" class="hidden fixed inset-0 z-50 items-center justify-center bg-black/60 px-4">
+  <div class="bg-white border border-slate-300 rounded-xl max-w-5xl w-full max-h-[90vh] flex flex-col p-6 space-y-4 overflow-hidden shadow-2xl">
+    <div class="flex items-center justify-between border-b border-slate-200 pb-3">
+      <div>
+        <h3 id="monthlyScheduleModalTitle" class="text-slate-900 font-semibold text-lg">Monthly Work Schedule</h3>
+        <p id="monthlyScheduleModalSubtitle" class="text-xs text-slate-500">Configure shifts and rest days for the entire month.</p>
+      </div>
+      <div class="flex items-center gap-3">
+        <div id="scheduleLockIndicator" class="flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-medium border">
+          <!-- Dynamically set via JS -->
+        </div>
+        <button id="toggleLockBtn" class="px-3 py-1.5 text-xs font-medium rounded-lg border border-slate-300 text-slate-700 hover:bg-slate-100 transition-colors">
+          🔒 Toggle Lock
+        </button>
+        <button id="closeScheduleModalBtn" class="text-slate-400 hover:text-slate-700 p-1 font-bold text-lg">✕</button>
+      </div>
+    </div>
+
+    <!-- Month Selector -->
+    <div class="flex items-center gap-3 bg-slate-50 p-3 rounded-lg border border-slate-200">
+      <label class="text-xs font-medium text-slate-600">Select Month:</label>
+      <input id="scheduleMonthPicker" type="month" class="bg-white border border-slate-300 rounded-md px-3 py-1 text-sm text-slate-900 focus:outline-none focus:ring-2 focus:ring-amber-500/65" />
+    </div>
+
+    <!-- Monthly Days Table -->
+    <div class="flex-1 overflow-y-auto border border-slate-200 rounded-lg">
+      <table class="w-full text-sm border-collapse">
+        <thead>
+          <tr class="bg-slate-100 text-slate-600 text-xs uppercase tracking-wide sticky top-0 z-10">
+            <th class="text-left px-4 py-2.5 border-b border-slate-200">Date</th>
+            <th class="text-left px-4 py-2.5 border-b border-slate-200">Day</th>
+            <th class="text-center px-4 py-2.5 border-b border-slate-200">Rest Day</th>
+            <th class="text-left px-4 py-2.5 border-b border-slate-200">Shift Type</th>
+            <th class="text-left px-4 py-2.5 border-b border-slate-200">Start / End Time</th>
+            <th class="text-left px-4 py-2.5 border-b border-slate-200">Break Window</th>
+            <th class="text-left px-4 py-2.5 border-b border-slate-200">Notes</th>
+          </tr>
+        </thead>
+        <tbody id="monthlyScheduleTableBody" class="divide-y divide-slate-200">
+          <!-- Populated dynamically -->
+        </tbody>
+      </table>
+    </div>
+
+    <div class="flex justify-end gap-2 pt-2 border-t border-slate-200">
+      <button id="scheduleModalCancelBtn" class="px-4 py-2 text-sm rounded-lg border border-slate-300 text-slate-600 hover:bg-slate-100 transition-colors">Close</button>
+      <button id="scheduleModalSaveBtn" class="px-5 py-2 text-sm rounded-lg bg-amber-500 hover:bg-amber-400 text-slate-900 font-semibold transition-colors">Save Monthly Schedule</button>
+    </div>
   </div>
 </div>
 
@@ -876,12 +875,13 @@ const EMPLOYEES_TABLE = 'employees';
 ========================================================= */
 let activeEmployeesCache = [];
 let inactiveEmployeesCache = [];
-let schedulesCache = [];
+let schedulesCache = {}; // Map: employee_id -> { month: 'YYYY-MM', locked: boolean, days: { 'YYYY-MM-DD': { isRestDay, shiftName, startTime, endTime, breakStart, breakEnd, notes } } }
 let attendanceCache = [];
 let overtimeCache = [];
 let leaveCache = [];
 
 let pendingSeparationId = null;
+let currentScheduleEmployeeId = null;
 
 /* =========================================================
    STATUTORY CONSTANTS (Philippines)
@@ -934,6 +934,17 @@ function formatDate(dateStr) {
   const d = new Date(dateStr + 'T00:00:00');
   if (isNaN(d.getTime())) return '—';
   return d.toLocaleDateString('en-PH', { year: 'numeric', month: 'short', day: 'numeric' });
+}
+
+function setDefaultDates() {
+  const todayStr = new Date().toISOString().split('T')[0];
+  const dateInputs = ['attDate', 'otDate', 'leaveStartDate', 'leaveEndDate', 'hireDate', 'sepDate'];
+  dateInputs.forEach(id => {
+    const el = document.getElementById(id);
+    if (el && !el.value) {
+      el.value = todayStr;
+    }
+  });
 }
 
 /* =========================================================
@@ -1113,6 +1124,10 @@ function switchModule(targetId) {
     inactive: 'Inactive Employee Records'
   };
   document.getElementById('pageTitle').textContent = titles[targetId] || 'HRIS Platform';
+
+  if (targetId === 'schedule') {
+    renderScheduleEmployeeList();
+  }
 }
 
 /* =========================================================
@@ -1141,6 +1156,9 @@ async function fetchEmployees() {
     updatePayrollModule();
     updateInactiveModule();
     populateEmployeeDropdowns();
+    if (!document.getElementById('moduleSchedule').classList.contains('hidden')) {
+      renderScheduleEmployeeList();
+    }
   } catch (err) {
     console.error('fetchEmployees error:', err);
     setConnectionStatus('error');
@@ -1163,10 +1181,9 @@ function updateDashboardOverview() {
 
   document.getElementById('dashTotalActive').textContent = totalActive.toLocaleString('en-PH');
   document.getElementById('dashTotalInactive').textContent = totalInactive.toLocaleString('en-PH');
-  document.getElementById('dashPresentToday').textContent = totalActive; // simulated full attendance for active
+  document.getElementById('dashPresentToday').textContent = totalActive;
   document.getElementById('dashAbsentToday').textContent = 0;
   
-  // Pending counts
   const pendingOTCount = overtimeCache.filter(o => o.status === 'Pending').length;
   const pendingLeaveCount = leaveCache.filter(l => l.status === 'Pending').length;
 
@@ -1175,7 +1192,6 @@ function updateDashboardOverview() {
 
   document.getElementById('dashEstimatedCost').textContent = formatCurrency(totalGross);
 
-  // Badge updates in sidebar
   const badgeOT = document.getElementById('badgeOvertime');
   if (pendingOTCount > 0) {
     badgeOT.textContent = pendingOTCount;
@@ -1194,38 +1210,248 @@ function updateDashboardOverview() {
 }
 
 /* =========================================================
-   SCHEDULE MANAGEMENT MODULE
+   SCHEDULE MANAGEMENT ENHANCEMENT
 ========================================================= */
-function renderSchedules() {
-  const tbody = document.getElementById('scheduleTableBody');
-  if (schedulesCache.length === 0) {
-    tbody.innerHTML = `<tr><td colspan="7" class="px-4 py-8 text-center text-slate-400">No work schedules created yet.</td></tr>`;
+function renderScheduleEmployeeList() {
+  const tbody = document.getElementById('scheduleEmployeeTableBody');
+  if (!tbody) return;
+
+  if (activeEmployeesCache.length === 0) {
+    tbody.innerHTML = `<tr><td colspan="5" class="px-4 py-8 text-center text-slate-400">No active employees found.</td></tr>`;
     return;
   }
 
-  tbody.innerHTML = schedulesCache.map(s => {
-    const emp = activeEmployeesCache.find(e => e.id === s.employee_id) || {};
-    const empName = `${emp.first_name || ''} ${emp.last_name || ''}`.trim() || 'Unknown';
+  tbody.innerHTML = activeEmployeesCache.map(emp => {
+    const fullName = `${emp.first_name || ''} ${emp.last_name || ''}`.trim();
+    const currentMonthKey = new Date().toISOString().slice(0, 7);
+    const empSched = schedulesCache[emp.id] || {};
+    const monthSched = empSched[currentMonthKey] || { locked: false };
+    const isLocked = monthSched.locked;
+
+    const lockBadge = isLocked 
+      ? `<span class="inline-flex items-center gap-1 text-xs px-2.5 py-1 rounded-full bg-rose-500/15 text-rose-700 border border-rose-500/30">🔒 Locked</span>`
+      : `<span class="inline-flex items-center gap-1 text-xs px-2.5 py-1 rounded-full bg-emerald-500/15 text-emerald-700 border border-emerald-500/30">🔓 Unlocked</span>`;
+
     return `
       <tr class="hover:bg-slate-100 transition-colors">
-        <td class="px-4 py-3 font-medium text-slate-900">${escapeHtml(empName)}</td>
-        <td class="px-4 py-3 text-slate-600">${formatDate(s.schedule_date)}</td>
-        <td class="px-4 py-3 text-slate-700">${escapeHtml(s.shift_name)}</td>
-        <td class="px-4 py-3 font-mono-tabular text-slate-600">${escapeHtml(s.start_time)} → ${escapeHtml(s.end_time)}</td>
-        <td class="px-4 py-3 font-mono-tabular text-slate-500">${escapeHtml(s.break_start || '—')} - ${escapeHtml(s.break_end || '—')}</td>
-        <td class="px-4 py-3 text-slate-500 text-xs">${escapeHtml(s.notes || '—')}</td>
+        <td class="px-4 py-3 font-mono-tabular text-slate-700">${escapeHtml(emp.employee_number)}</td>
+        <td class="px-4 py-3 font-medium text-slate-900">${escapeHtml(fullName)}</td>
+        <td class="px-4 py-3 text-slate-600">
+          <div>${escapeHtml(emp.job_title)}</div>
+          <div class="text-xs text-slate-400">${escapeHtml(emp.department)}</div>
+        </td>
+        <td class="px-4 py-3 text-center">${lockBadge}</td>
         <td class="px-4 py-3 text-center">
-          <button onclick="deleteSchedule('${s.id}')" class="text-xs px-2 py-1 rounded border border-rose-300 text-rose-700 hover:bg-rose-50">Delete</button>
+          <button onclick="openMonthlyScheduleModal('${emp.id}')" class="text-xs px-3 py-1.5 rounded-lg bg-amber-500 hover:bg-amber-400 text-slate-900 font-semibold transition-colors">
+            Manage Schedule
+          </button>
         </td>
       </tr>
     `;
   }).join('');
 }
 
-function deleteSchedule(id) {
-  schedulesCache = schedulesCache.filter(s => s.id !== id);
-  renderSchedules();
-  showToast('Schedule removed.', 'info');
+function openMonthlyScheduleModal(employeeId) {
+  currentScheduleEmployeeId = employeeId;
+  const emp = activeEmployeesCache.find(e => e.id === employeeId);
+  if (!emp) return;
+
+  const fullName = `${emp.first_name || ''} ${emp.last_name || ''}`.trim();
+  document.getElementById('monthlyScheduleModalTitle').textContent = `Monthly Schedule: ${fullName}`;
+  document.getElementById('monthlyScheduleModalSubtitle').textContent = `Employee # ${emp.employee_number} — ${emp.job_title}`;
+
+  const currentMonth = new Date().toISOString().slice(0, 7);
+  const monthPicker = document.getElementById('scheduleMonthPicker');
+  monthPicker.value = currentMonth;
+
+  renderMonthlyScheduleDays(employeeId, currentMonth);
+
+  const modal = document.getElementById('monthlyScheduleModal');
+  modal.classList.remove('hidden');
+  modal.classList.add('flex');
+}
+
+function closeMonthlyScheduleModal() {
+  currentScheduleEmployeeId = null;
+  const modal = document.getElementById('monthlyScheduleModal');
+  modal.classList.add('hidden');
+  modal.classList.remove('flex');
+  renderScheduleEmployeeList();
+}
+
+function renderMonthlyScheduleDays(employeeId, monthStr) {
+  const tbody = document.getElementById('monthlyScheduleTableBody');
+  if (!tbody) return;
+
+  if (!schedulesCache[employeeId]) {
+    schedulesCache[employeeId] = {};
+  }
+  if (!schedulesCache[employeeId][monthStr]) {
+    schedulesCache[employeeId][monthStr] = { locked: false, days: {} };
+  }
+
+  const monthData = schedulesCache[employeeId][monthStr];
+  const isLocked = monthData.locked;
+
+  // Update Lock Indicator & Button
+  const lockIndicator = document.getElementById('scheduleLockIndicator');
+  if (isLocked) {
+    lockIndicator.className = 'flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-medium bg-rose-500/10 text-rose-700 border border-rose-500/30';
+    lockIndicator.innerHTML = '🔒 Schedule Locked (Edits Disabled)';
+    document.getElementById('toggleLockBtn').textContent = '🔓 Unlock Schedule';
+    document.getElementById('scheduleModalSaveBtn').disabled = true;
+    document.getElementById('scheduleModalSaveBtn').classList.add('opacity-50', 'cursor-not-allowed');
+  } else {
+    lockIndicator.className = 'flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-medium bg-emerald-500/10 text-emerald-700 border border-emerald-500/30';
+    lockIndicator.innerHTML = '🔓 Schedule Unlocked (Editable)';
+    document.getElementById('toggleLockBtn').textContent = '🔒 Lock Schedule';
+    document.getElementById('scheduleModalSaveBtn').disabled = false;
+    document.getElementById('scheduleModalSaveBtn').classList.remove('opacity-50', 'cursor-not-allowed');
+  }
+
+  // Calculate days in month
+  const [year, month] = monthStr.split('-').map(Number);
+  const daysInMonth = new Date(year, month, 0).getDate();
+
+  let html = '';
+  for (let d = 1; d <= daysInMonth; d++) {
+    const dayStr = String(d).padStart(2, '0');
+    const dateKey = `${monthStr}-${dayStr}`;
+    const dateObj = new Date(year, month - 1, d);
+    const dayName = dateObj.toLocaleDateString('en-PH', { weekday: 'short' });
+
+    const dayRecord = monthData.days[dateKey] || {
+      isRestDay: dayName === 'Sat' || dayName === 'Sun',
+      shiftName: 'Regular Shift',
+      startTime: '08:00',
+      endTime: '17:00',
+      breakStart: '12:00',
+      breakEnd: '13:00',
+      notes: ''
+    };
+
+    const rowBgClass = dayRecord.isRestDay ? 'bg-amber-500/10' : 'hover:bg-slate-50';
+
+    html += `
+      <tr class="${rowBgClass} transition-colors" data-date="${dateKey}">
+        <td class="px-4 py-2.5 font-mono-tabular text-slate-700 whitespace-nowrap">${dateKey}</td>
+        <td class="px-4 py-2.5 text-slate-500 font-medium">${dayName}</td>
+        <td class="px-4 py-2.5 text-center">
+          <input type="checkbox" class="rest-day-checkbox w-4 h-4 text-amber-500 rounded border-slate-300 focus:ring-amber-500" ${dayRecord.isRestDay ? 'checked' : ''} ${isLocked ? 'disabled' : ''} onchange="handleRestDayChange(this, '${dateKey}')" />
+        </td>
+        <td class="px-4 py-2.5">
+          <select class="shift-name-select bg-white border border-slate-300 rounded px-2 py-1 text-xs text-slate-900 focus:outline-none focus:ring-1 focus:ring-amber-500" ${isLocked || dayRecord.isRestDay ? 'disabled' : ''}>
+            <option value="Regular Shift" ${dayRecord.shiftName === 'Regular Shift' ? 'selected' : ''}>Regular Shift</option>
+            <option value="Morning Shift" ${dayRecord.shiftName === 'Morning Shift' ? 'selected' : ''}>Morning Shift</option>
+            <option value="Afternoon Shift" ${dayRecord.shiftName === 'Afternoon Shift' ? 'selected' : ''}>Afternoon Shift</option>
+            <option value="Night Shift" ${dayRecord.shiftName === 'Night Shift' ? 'selected' : ''}>Night Shift</option>
+            <option value="Rest Day" ${dayRecord.shiftName === 'Rest Day' || dayRecord.isRestDay ? 'selected' : ''}>Rest Day</option>
+          </select>
+        </td>
+        <td class="px-4 py-2.5">
+          <div class="flex items-center gap-1 font-mono-tabular">
+            <input type="time" class="start-time-input bg-white border border-slate-300 rounded px-1.5 py-1 text-xs text-slate-900" value="${escapeHtml(dayRecord.startTime)}" ${isLocked || dayRecord.isRestDay ? 'disabled' : ''} />
+            <span class="text-slate-400">→</span>
+            <input type="time" class="end-time-input bg-white border border-slate-300 rounded px-1.5 py-1 text-xs text-slate-900" value="${escapeHtml(dayRecord.endTime)}" ${isLocked || dayRecord.isRestDay ? 'disabled' : ''} />
+          </div>
+        </td>
+        <td class="px-4 py-2.5">
+          <div class="flex items-center gap-1 font-mono-tabular text-xs text-slate-500">
+            <input type="time" class="break-start-input bg-white border border-slate-300 rounded px-1 py-0.5 text-xs text-slate-900" value="${escapeHtml(dayRecord.breakStart)}" ${isLocked || dayRecord.isRestDay ? 'disabled' : ''} />
+            <span>-</span>
+            <input type="time" class="break-end-input bg-white border border-slate-300 rounded px-1 py-0.5 text-xs text-slate-900" value="${escapeHtml(dayRecord.breakEnd)}" ${isLocked || dayRecord.isRestDay ? 'disabled' : ''} />
+          </div>
+        </td>
+        <td class="px-4 py-2.5">
+          <input type="text" class="notes-input w-full bg-white border border-slate-300 rounded px-2 py-1 text-xs text-slate-900 placeholder-slate-400" value="${escapeHtml(dayRecord.notes)}" placeholder="${dayRecord.isRestDay ? 'Rest Day' : 'Notes'}" ${isLocked ? 'disabled' : ''} />
+        </td>
+      </tr>
+    `;
+  }
+
+  tbody.innerHTML = html;
+}
+
+function handleRestDayChange(checkbox, dateKey) {
+  const row = checkbox.closest('tr');
+  const shiftSelect = row.querySelector('.shift-name-select');
+  const startTimeInput = row.querySelector('.start-time-input');
+  const endTimeInput = row.querySelector('.end-time-input');
+  const breakStartInput = row.querySelector('.break-start-input');
+  const breakEndInput = row.querySelector('.break-end-input');
+
+  if (checkbox.checked) {
+    row.classList.add('bg-amber-500/10');
+    shiftSelect.value = 'Rest Day';
+    shiftSelect.disabled = true;
+    startTimeInput.disabled = true;
+    endTimeInput.disabled = true;
+    breakStartInput.disabled = true;
+    breakEndInput.disabled = true;
+  } else {
+    row.classList.remove('bg-amber-500/10');
+    shiftSelect.value = 'Regular Shift';
+    shiftSelect.disabled = false;
+    startTimeInput.disabled = false;
+    endTimeInput.disabled = false;
+    breakStartInput.disabled = false;
+    breakEndInput.disabled = false;
+  }
+}
+
+function toggleCurrentScheduleLock() {
+  if (!currentScheduleEmployeeId) return;
+  const monthStr = document.getElementById('scheduleMonthPicker').value;
+  if (!schedulesCache[currentScheduleEmployeeId] || !schedulesCache[currentScheduleEmployeeId][monthStr]) return;
+
+  const monthData = schedulesCache[currentScheduleEmployeeId][monthStr];
+  monthData.locked = !monthData.locked;
+  renderMonthlyScheduleDays(currentScheduleEmployeeId, monthStr);
+  showToast(monthData.locked ? 'Schedule locked successfully.' : 'Schedule unlocked.', monthData.locked ? 'warning' : 'success');
+}
+
+function saveCurrentMonthlySchedule() {
+  if (!currentScheduleEmployeeId) return;
+  const monthStr = document.getElementById('scheduleMonthPicker').value;
+  if (!schedulesCache[currentScheduleEmployeeId]) {
+    schedulesCache[currentScheduleEmployeeId] = {};
+  }
+  if (!schedulesCache[currentScheduleEmployeeId][monthStr]) {
+    schedulesCache[currentScheduleEmployeeId][monthStr] = { locked: false, days: {} };
+  }
+
+  const monthData = schedulesCache[currentScheduleEmployeeId][monthStr];
+  if (monthData.locked) {
+    showToast('Cannot modify locked schedule.', 'error');
+    return;
+  }
+
+  const tbody = document.getElementById('monthlyScheduleTableBody');
+  const rows = tbody.querySelectorAll('tr');
+
+  rows.forEach(row => {
+    const dateKey = row.getAttribute('data-date');
+    const isRestDay = row.querySelector('.rest-day-checkbox').checked;
+    const shiftName = row.querySelector('.shift-name-select').value;
+    const startTime = row.querySelector('.start-time-input').value;
+    const endTime = row.querySelector('.end-time-input').value;
+    const breakStart = row.querySelector('.break-start-input').value;
+    const breakEnd = row.querySelector('.break-end-input').value;
+    const notes = row.querySelector('.notes-input').value;
+
+    monthData.days[dateKey] = {
+      isRestDay,
+      shiftName: isRestDay ? 'Rest Day' : shiftName,
+      startTime,
+      endTime,
+      breakStart,
+      breakEnd,
+      notes
+    };
+  });
+
+  showToast('Monthly schedule successfully saved.', 'success');
+  closeMonthlyScheduleModal();
 }
 
 /* =========================================================
@@ -1579,7 +1805,7 @@ async function confirmSeparation() {
    POPULATE DROPDOWNS
 ========================================================= */
 function populateEmployeeDropdowns() {
-  const selects = ['schedEmployeeId', 'attEmployeeId', 'otEmployeeId', 'leaveEmployeeId'];
+  const selects = ['attEmployeeId', 'otEmployeeId', 'leaveEmployeeId'];
   selects.forEach(id => {
     const select = document.getElementById(id);
     if (!select) return;
@@ -1612,26 +1838,15 @@ function registerEventListeners() {
   // Employee Add Form
   document.getElementById('employeeForm').addEventListener('submit', handleEmployeeFormSubmit);
 
-  // Schedule Form
-  document.getElementById('scheduleForm').addEventListener('submit', (e) => {
-    e.preventDefault();
-    const empId = document.getElementById('schedEmployeeId').value;
-    if (!empId) { showToast('Please select an employee.', 'warning'); return; }
-    
-    schedulesCache.push({
-      id: 'sch_' + Date.now(),
-      employee_id: empId,
-      schedule_date: document.getElementById('schedDate').value || new Date().toISOString().split('T')[0],
-      shift_name: document.getElementById('schedShiftName').value,
-      start_time: document.getElementById('schedStartTime').value,
-      end_time: document.getElementById('schedEndTime').value,
-      break_start: document.getElementById('schedBreakStart').value,
-      break_end: document.getElementById('schedBreakEnd').value,
-      notes: document.getElementById('schedNotes').value
-    });
-    renderSchedules();
-    showToast('Schedule successfully created.', 'success');
-    e.target.reset();
+  // Monthly Schedule Modal Controls
+  document.getElementById('closeScheduleModalBtn').addEventListener('click', closeMonthlyScheduleModal);
+  document.getElementById('scheduleModalCancelBtn').addEventListener('click', closeMonthlyScheduleModal);
+  document.getElementById('toggleLockBtn').addEventListener('click', toggleCurrentScheduleLock);
+  document.getElementById('scheduleModalSaveBtn').addEventListener('click', saveCurrentMonthlySchedule);
+  document.getElementById('scheduleMonthPicker').addEventListener('change', (e) => {
+    if (currentScheduleEmployeeId) {
+      renderMonthlyScheduleDays(currentScheduleEmployeeId, e.target.value);
+    }
   });
 
   // Attendance Form
@@ -1738,6 +1953,7 @@ function showAppShell(session) {
   document.getElementById('appShell').classList.remove('hidden');
   document.getElementById('sidebarAdminEmail').textContent = session.user.email || '';
   setConnectionStatus(credentialsArePlaceholders() ? 'unconfigured' : 'connecting');
+  setDefaultDates();
   fetchEmployees();
   switchModule('dashboard');
 }
@@ -1773,6 +1989,7 @@ async function handleEmployeeFormSubmit(evt) {
     showToast('Employee successfully added.', 'success');
     form.reset();
     form.allowance.value = '0';
+    setDefaultDates();
     await fetchEmployees();
   } catch (err) {
     console.error('createEmployee error:', err);
@@ -1785,6 +2002,7 @@ async function handleEmployeeFormSubmit(evt) {
 ========================================================= */
 async function init() {
   registerEventListeners();
+  setDefaultDates();
 
   if (credentialsArePlaceholders()) {
     setConnectionStatus('unconfigured');
