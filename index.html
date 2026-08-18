@@ -1,0 +1,951 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>HRIS — Philippine Payroll & Statutory Compliance</title>
+
+<!-- Tailwind CSS CDN -->
+<script src="https://cdn.tailwindcss.com"></script>
+
+<!-- Supabase JS Client CDN -->
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
+
+<style>
+  :root {
+    --accent: #f59e0b; /* amber-500, used sparingly as the signature accent */
+  }
+  html, body { background-color: #ffffff; }
+  ::-webkit-scrollbar { height: 10px; width: 10px; }
+  ::-webkit-scrollbar-track { background: #f1f5f9; }
+  ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 9999px; }
+  ::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
+
+  @keyframes toast-in {
+    from { opacity: 0; transform: translateY(-8px) translateX(8px); }
+    to { opacity: 1; transform: translateY(0) translateX(0); }
+  }
+  .toast-anim { animation: toast-in 0.25s ease-out; }
+
+  @keyframes pulse-dot {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.35; }
+  }
+  .pulse-dot { animation: pulse-dot 1.6s ease-in-out infinite; }
+
+  .font-mono-tabular { font-variant-numeric: tabular-nums; }
+
+  .skeleton {
+    background: linear-gradient(90deg, #e2e8f0 25%, #f1f5f9 37%, #e2e8f0 63%);
+    background-size: 400% 100%;
+    animation: skeleton-loading 1.4s ease infinite;
+  }
+  @keyframes skeleton-loading {
+    0% { background-position: 100% 50%; }
+    100% { background-position: 0 50%; }
+  }
+
+  table.roster th { position: sticky; top: 0; z-index: 5; }
+</style>
+</head>
+
+<body class="bg-white text-slate-900 min-h-screen antialiased">
+
+<!-- =========================================================
+     TOAST / NOTIFICATION CONTAINER
+========================================================= -->
+<div id="toastContainer" class="fixed top-4 right-4 z-50 flex flex-col gap-2 w-[92vw] max-w-sm"></div>
+
+<!-- =========================================================
+     HEADER
+========================================================= -->
+<header class="border-b border-slate-200 bg-white/95 backdrop-blur sticky top-0 z-40">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 py-4 flex items-center justify-between gap-4">
+    <div class="flex items-center gap-3">
+      <div class="w-10 h-10 rounded-lg bg-amber-500/10 border border-amber-500/30 flex items-center justify-center text-amber-400 font-bold text-lg">
+        K
+      </div>
+      <div>
+        <h1 class="text-lg sm:text-xl font-semibold text-slate-900 tracking-tight">HRIS</h1>
+        <p class="text-xs sm:text-sm text-slate-500">Philippine Payroll &amp; Statutory Compliance</p>
+      </div>
+    </div>
+    <div id="connectionStatus" class="flex items-center gap-2 text-xs sm:text-sm bg-slate-100 border border-slate-300 rounded-full px-3 py-1.5">
+      <span id="connectionDot" class="w-2 h-2 rounded-full bg-slate-500 pulse-dot"></span>
+      <span id="connectionText" class="text-slate-600">Connecting…</span>
+    </div>
+  </div>
+</header>
+
+<main class="max-w-7xl mx-auto px-4 sm:px-6 py-6 space-y-8">
+
+  <!-- =========================================================
+       CREDENTIAL WARNING (shown if placeholders not replaced)
+  ========================================================= -->
+  <div id="credentialWarning" class="hidden rounded-xl border border-amber-500/40 bg-amber-500/10 px-4 py-3 text-sm text-amber-700">
+    <strong class="font-semibold">Supabase not configured.</strong>
+    Replace <code class="bg-slate-100 px-1 py-0.5 rounded text-amber-700">SUPABASE_URL</code> and
+    <code class="bg-slate-100 px-1 py-0.5 rounded text-amber-700">SUPABASE_KEY</code> near the top of the
+    <code class="bg-slate-100 px-1 py-0.5 rounded text-amber-700">&lt;script&gt;</code> tag with your project's values.
+  </div>
+
+  <!-- =========================================================
+       DASHBOARD SUMMARY CARDS
+  ========================================================= -->
+  <section>
+    <h2 class="text-sm font-semibold uppercase tracking-wider text-slate-500 mb-3">Payroll Overview</h2>
+    <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3">
+
+      <div class="rounded-xl border border-slate-300 bg-slate-50 p-4">
+        <p class="text-xs text-slate-500 mb-1">Total Employees</p>
+        <p id="cardTotalEmployees" class="text-2xl font-semibold text-slate-900 font-mono-tabular">0</p>
+      </div>
+
+      <div class="rounded-xl border border-slate-300 bg-slate-50 p-4">
+        <p class="text-xs text-slate-500 mb-1">Total Gross Payroll</p>
+        <p id="cardGrossPayroll" class="text-2xl font-semibold text-slate-900 font-mono-tabular">₱0.00</p>
+      </div>
+
+      <div class="rounded-xl border border-slate-300 bg-slate-50 p-4">
+        <p class="text-xs text-slate-500 mb-1">Employee Deductions</p>
+        <p id="cardEeDeductions" class="text-2xl font-semibold text-rose-700 font-mono-tabular">₱0.00</p>
+      </div>
+
+      <div class="rounded-xl border border-slate-300 bg-slate-50 p-4">
+        <p class="text-xs text-slate-500 mb-1">Employer Liability</p>
+        <p id="cardErLiability" class="text-2xl font-semibold text-amber-700 font-mono-tabular">₱0.00</p>
+      </div>
+
+      <div class="rounded-xl border border-slate-300 bg-slate-50 p-4">
+        <p class="text-xs text-slate-500 mb-1">Est. Net Payroll</p>
+        <p id="cardNetPayroll" class="text-2xl font-semibold text-emerald-700 font-mono-tabular">₱0.00</p>
+      </div>
+
+      <div class="rounded-xl border border-slate-300 bg-slate-50 p-4">
+        <p class="text-xs text-slate-500 mb-1">SIL Eligible</p>
+        <p id="cardSilEligible" class="text-2xl font-semibold text-sky-700 font-mono-tabular">0</p>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- =========================================================
+       EMPLOYEE REGISTRATION FORM
+  ========================================================= -->
+  <section class="rounded-xl border border-slate-300 bg-slate-50">
+    <div class="px-5 py-4 border-b border-slate-300">
+      <h2 class="text-base font-semibold text-slate-900">Add Employee</h2>
+      <p class="text-xs text-slate-500 mt-0.5">New profiles are added to the roster and appear immediately below.</p>
+    </div>
+
+    <form id="employeeForm" class="p-5 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4" novalidate>
+
+      <div class="flex flex-col gap-1">
+        <label for="firstName" class="text-xs font-medium text-slate-500">First Name</label>
+        <input id="firstName" name="firstName" type="text" required
+          class="bg-white border border-slate-300 rounded-lg px-3 py-2 text-sm text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-amber-500/60 focus:border-amber-500/60"
+          placeholder="Juan" />
+      </div>
+
+      <div class="flex flex-col gap-1">
+        <label for="lastName" class="text-xs font-medium text-slate-500">Last Name</label>
+        <input id="lastName" name="lastName" type="text" required
+          class="bg-white border border-slate-300 rounded-lg px-3 py-2 text-sm text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-amber-500/60 focus:border-amber-500/60"
+          placeholder="Dela Cruz" />
+      </div>
+
+      <div class="flex flex-col gap-1">
+        <label for="email" class="text-xs font-medium text-slate-500">Corporate Email</label>
+        <input id="email" name="email" type="email" required
+          class="bg-white border border-slate-300 rounded-lg px-3 py-2 text-sm text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-amber-500/60 focus:border-amber-500/60"
+          placeholder="juan.delacruz@company.com" />
+      </div>
+
+      <div class="flex flex-col gap-1">
+        <label for="hireDate" class="text-xs font-medium text-slate-500">Hire Date</label>
+        <input id="hireDate" name="hireDate" type="date" required
+          class="bg-white border border-slate-300 rounded-lg px-3 py-2 text-sm text-slate-900 focus:outline-none focus:ring-2 focus:ring-amber-500/60 focus:border-amber-500/60" />
+      </div>
+
+      <div class="flex flex-col gap-1">
+        <label for="department" class="text-xs font-medium text-slate-500">Department</label>
+        <input id="department" name="department" type="text" required
+          class="bg-white border border-slate-300 rounded-lg px-3 py-2 text-sm text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-amber-500/60 focus:border-amber-500/60"
+          placeholder="Operations" />
+      </div>
+
+      <div class="flex flex-col gap-1">
+        <label for="jobTitle" class="text-xs font-medium text-slate-500">Job Title</label>
+        <input id="jobTitle" name="jobTitle" type="text" required
+          class="bg-white border border-slate-300 rounded-lg px-3 py-2 text-sm text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-amber-500/60 focus:border-amber-500/60"
+          placeholder="Payroll Officer" />
+      </div>
+
+      <div class="flex flex-col gap-1">
+        <label for="basicSalary" class="text-xs font-medium text-slate-500">Monthly Basic Salary (₱)</label>
+        <input id="basicSalary" name="basicSalary" type="number" min="0" step="0.01" required
+          class="bg-white border border-slate-300 rounded-lg px-3 py-2 text-sm text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-amber-500/60 focus:border-amber-500/60"
+          placeholder="25000.00" />
+      </div>
+
+      <div class="flex flex-col gap-1">
+        <label for="allowance" class="text-xs font-medium text-slate-500">Monthly Allowance (₱)</label>
+        <input id="allowance" name="allowance" type="number" min="0" step="0.01" value="0"
+          class="bg-white border border-slate-300 rounded-lg px-3 py-2 text-sm text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-amber-500/60 focus:border-amber-500/60"
+          placeholder="0.00" />
+      </div>
+
+      <div class="lg:col-span-4 flex items-center justify-end gap-3 pt-1">
+        <span id="formError" class="text-xs text-rose-400 hidden"></span>
+        <button id="submitBtn" type="submit"
+          class="inline-flex items-center gap-2 bg-amber-500 hover:bg-amber-400 disabled:bg-slate-300 disabled:cursor-not-allowed text-slate-900 font-semibold text-sm px-5 py-2.5 rounded-lg transition-colors">
+          <svg id="submitSpinner" class="hidden animate-spin h-4 w-4" viewBox="0 0 24 24" fill="none">
+            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"></path>
+          </svg>
+          <span id="submitBtnLabel">Add Employee</span>
+        </button>
+      </div>
+    </form>
+  </section>
+
+  <!-- =========================================================
+       EMPLOYEE ROSTER
+  ========================================================= -->
+  <section class="rounded-xl border border-slate-300 bg-slate-50">
+    <div class="px-5 py-4 border-b border-slate-300 flex items-center justify-between">
+      <div>
+        <h2 class="text-base font-semibold text-slate-900">Employee Payroll Roster</h2>
+        <p class="text-xs text-slate-500 mt-0.5">Estimated Net Pay shown below is <strong>before withholding tax</strong>.</p>
+      </div>
+      <button id="refreshBtn" title="Refresh"
+        class="text-slate-500 hover:text-slate-900 border border-slate-300 hover:border-slate-400 rounded-lg p-2 transition-colors">
+        <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+        </svg>
+      </button>
+    </div>
+
+    <!-- Loading state -->
+    <div id="rosterLoading" class="p-5 space-y-2">
+      <div class="skeleton h-10 rounded-lg"></div>
+      <div class="skeleton h-10 rounded-lg"></div>
+      <div class="skeleton h-10 rounded-lg"></div>
+    </div>
+
+    <!-- Empty state -->
+    <div id="rosterEmpty" class="hidden p-10 text-center">
+      <p class="text-slate-600 font-medium">No employee profiles found.</p>
+      <p class="text-slate-400 text-sm mt-1">Add your first employee above.</p>
+    </div>
+
+    <!-- Error state -->
+    <div id="rosterError" class="hidden p-10 text-center">
+      <p class="text-rose-700 font-medium">Unable to load employee records.</p>
+      <p class="text-slate-400 text-sm mt-1">Check your Supabase configuration and try again.</p>
+    </div>
+
+    <!-- Table -->
+    <div id="rosterTableWrap" class="hidden overflow-x-auto">
+      <table class="roster w-full text-sm border-collapse min-w-[1700px]">
+        <thead>
+          <tr class="bg-slate-100 text-slate-500 text-xs uppercase tracking-wide">
+            <th class="text-left px-3 py-2.5 border-b border-slate-300">Employee</th>
+            <th class="text-left px-3 py-2.5 border-b border-slate-300">Department / Title</th>
+            <th class="text-left px-3 py-2.5 border-b border-slate-300">Hire Date</th>
+            <th class="text-right px-3 py-2.5 border-b border-slate-300">Basic Salary</th>
+            <th class="text-right px-3 py-2.5 border-b border-slate-300">Allowance</th>
+            <th class="text-right px-3 py-2.5 border-b border-slate-300">Gross Comp.</th>
+            <th class="text-right px-3 py-2.5 border-b border-slate-300 bg-rose-500/5">SSS EE</th>
+            <th class="text-right px-3 py-2.5 border-b border-slate-300 bg-rose-500/5">PhilHealth EE</th>
+            <th class="text-right px-3 py-2.5 border-b border-slate-300 bg-rose-500/5">Pag-IBIG EE</th>
+            <th class="text-right px-3 py-2.5 border-b border-slate-300 bg-rose-500/5">Total EE Ded.</th>
+            <th class="text-right px-3 py-2.5 border-b border-slate-300 bg-amber-500/5">SSS ER</th>
+            <th class="text-right px-3 py-2.5 border-b border-slate-300 bg-amber-500/5">EC</th>
+            <th class="text-right px-3 py-2.5 border-b border-slate-300 bg-amber-500/5">PhilHealth ER</th>
+            <th class="text-right px-3 py-2.5 border-b border-slate-300 bg-amber-500/5">Pag-IBIG ER</th>
+            <th class="text-right px-3 py-2.5 border-b border-slate-300 bg-amber-500/5">Total ER Liab.</th>
+            <th class="text-left px-3 py-2.5 border-b border-slate-300">SIL Status</th>
+            <th class="text-right px-3 py-2.5 border-b border-slate-300">Months Worked</th>
+            <th class="text-right px-3 py-2.5 border-b border-slate-300">13th-Month Accrual</th>
+            <th class="text-right px-3 py-2.5 border-b border-slate-300 bg-emerald-500/5">Net Monthly</th>
+            <th class="text-right px-3 py-2.5 border-b border-slate-300 bg-emerald-500/5">Net Semi-Monthly</th>
+            <th class="text-center px-3 py-2.5 border-b border-slate-300">Actions</th>
+          </tr>
+        </thead>
+        <tbody id="rosterTableBody" class="divide-y divide-slate-200"></tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- =========================================================
+       DISCLAIMER
+  ========================================================= -->
+  <footer class="text-xs text-slate-400 leading-relaxed border-t border-slate-200 pt-5 pb-10">
+    <p>
+      <strong class="text-slate-500">Disclaimer:</strong>
+      Payroll calculations are provided for informational and estimation purposes. Philippine statutory
+      contribution schedules, salary credit tables, tax rules, and labor regulations may change. Verify
+      current requirements with SSS, PhilHealth, Pag-IBIG, DOLE, and qualified payroll/accounting
+      professionals before using this system for actual payroll processing.
+    </p>
+  </footer>
+
+</main>
+
+<!-- =========================================================
+     CUSTOM CONFIRM MODAL (for delete/separate action)
+========================================================= -->
+<div id="confirmModal" class="hidden fixed inset-0 z-50 items-center justify-center bg-black/60 px-4">
+  <div class="bg-slate-100 border border-slate-300 rounded-xl max-w-sm w-full p-5">
+    <h3 class="text-slate-900 font-semibold text-base">Remove / Separate Profile</h3>
+    <p id="confirmModalText" class="text-sm text-slate-500 mt-2">Are you sure you want to remove this employee profile? This cannot be undone.</p>
+    <div class="flex justify-end gap-2 mt-5">
+      <button id="confirmCancelBtn" class="px-4 py-2 text-sm rounded-lg border border-slate-300 text-slate-600 hover:bg-slate-100 transition-colors">Cancel</button>
+      <button id="confirmOkBtn" class="px-4 py-2 text-sm rounded-lg bg-rose-600 hover:bg-rose-500 text-white font-medium transition-colors">Remove</button>
+    </div>
+  </div>
+</div>
+
+<script>
+/* =========================================================
+   SUPABASE CONFIGURATION
+   Replace the two placeholder values below with your own
+   Supabase project URL and anon/public API key.
+   Find these in: Supabase Dashboard → Project Settings → API
+========================================================= */
+const SUPABASE_URL = 'https://vdhloboribrqofhifluu.supabase.co';
+const SUPABASE_KEY = 'sb_publishable_VsbbODbWKrv2g9HUKz7EzA_wUh9bXzm';
+
+/*
+ * SECURITY NOTE:
+ * - SUPABASE_KEY above must be the "anon" / "public" key only.
+ *   This key is safe to expose in client-side code by design.
+ * - NEVER place a Supabase "service_role" key in this file — that key
+ *   bypasses Row Level Security (RLS) and must stay server-side only.
+ * - In production, configure Row Level Security (RLS) policies on the
+ *   `employees` table so that only authorized/authenticated requests
+ *   can select, insert, update, or delete records. Without RLS, anyone
+ *   with the anon key (i.e. anyone who loads this page) can read/write
+ *   the table.
+ */
+
+const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+const EMPLOYEES_TABLE = 'employees';
+
+/* =========================================================
+   STATUTORY CONSTANTS (Philippines)
+========================================================= */
+const SSS_RATE_TOTAL = 0.15;
+const SSS_RATE_EE = 0.05;
+const SSS_RATE_ER = 0.10;
+const SSS_MAX_MSC = 35000;
+const SSS_EC_LOW_MSC_THRESHOLD = 15000;
+const SSS_EC_LOW = 10;
+const SSS_EC_HIGH = 30;
+
+const PHILHEALTH_RATE_TOTAL = 0.05;
+const PHILHEALTH_RATE_EE = 0.025;
+const PHILHEALTH_RATE_ER = 0.025;
+const PHILHEALTH_MIN_BASE = 10000;
+const PHILHEALTH_MAX_BASE = 100000;
+
+const PAGIBIG_RATE_EE = 0.02;
+const PAGIBIG_RATE_ER = 0.02;
+const PAGIBIG_MAX_BASE = 10000;
+const PAGIBIG_MAX_EE = 200;
+const PAGIBIG_MAX_ER = 200;
+
+const SIL_ELIGIBILITY_DAYS = 365;
+
+/* =========================================================
+   UTILITIES
+========================================================= */
+
+function formatCurrency(value) {
+  const safeValue = Number.isFinite(value) ? value : 0;
+  return new Intl.NumberFormat('en-PH', {
+    style: 'currency',
+    currency: 'PHP',
+  }).format(safeValue);
+}
+
+function escapeHtml(str) {
+  if (str === null || str === undefined) return '';
+  return String(str)
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#039;');
+}
+
+function formatDate(dateStr) {
+  if (!dateStr) return '—';
+  const d = new Date(dateStr + 'T00:00:00');
+  if (isNaN(d.getTime())) return '—';
+  return d.toLocaleDateString('en-PH', { year: 'numeric', month: 'short', day: 'numeric' });
+}
+
+/* =========================================================
+   PAYROLL CALCULATION ENGINE
+========================================================= */
+
+function calculateEmployeePayroll(employee) {
+  const basicSalary = Number(employee.monthly_basic_salary) || 0;
+  const allowance = Number(employee.allowance_allowance) || 0;
+
+  // --- Gross Monthly Compensation ---
+  const grossMonthlyCompensation = basicSalary + allowance;
+
+  // --- SSS ---
+  const sssMsc = Math.min(basicSalary, SSS_MAX_MSC);
+  const sssEmployee = sssMsc * SSS_RATE_EE;
+  const sssEmployer = sssMsc * SSS_RATE_ER;
+  const sssEmployerEc = sssMsc < SSS_EC_LOW_MSC_THRESHOLD ? SSS_EC_LOW : SSS_EC_HIGH;
+  const sssEmployerTotalLiability = sssEmployer + sssEmployerEc;
+
+  // --- PhilHealth ---
+  const philhealthBase = Math.min(Math.max(basicSalary, PHILHEALTH_MIN_BASE), PHILHEALTH_MAX_BASE);
+  const philhealthEmployee = philhealthBase * PHILHEALTH_RATE_EE;
+  const philhealthEmployer = philhealthBase * PHILHEALTH_RATE_ER;
+
+  // --- Pag-IBIG / HDMF ---
+  const pagibigBase = Math.min(basicSalary, PAGIBIG_MAX_BASE);
+  const pagibigEmployee = Math.min(pagibigBase * PAGIBIG_RATE_EE, PAGIBIG_MAX_EE);
+  const pagibigEmployer = Math.min(pagibigBase * PAGIBIG_RATE_ER, PAGIBIG_MAX_ER);
+
+  // --- Totals ---
+  const totalEmployeeDeductions = sssEmployee + philhealthEmployee + pagibigEmployee;
+  const totalEmployerLiability = sssEmployer + sssEmployerEc + philhealthEmployer + pagibigEmployer;
+
+  // --- Net Pay ---
+  const estimatedNetMonthlyPay = grossMonthlyCompensation - totalEmployeeDeductions;
+  const estimatedSemiMonthlyPay = estimatedNetMonthlyPay / 2;
+
+  // --- 13th Month Pay Accrual (PD 851) ---
+  const { monthsWorkedThisYear, thirteenthMonthAccrual } = calculate13thMonthAccrual(
+    employee.hire_date,
+    basicSalary
+  );
+
+  // --- Service Incentive Leave (SIL) ---
+  const { serviceDays, silEligible, silStatusLabel } = calculateSilStatus(employee.hire_date);
+
+  return {
+    grossMonthlyCompensation,
+    sss: {
+      msc: sssMsc,
+      employee: sssEmployee,
+      employer: sssEmployer,
+      employerEc: sssEmployerEc,
+      employerTotalLiability: sssEmployerTotalLiability,
+    },
+    philhealth: {
+      base: philhealthBase,
+      employee: philhealthEmployee,
+      employer: philhealthEmployer,
+    },
+    pagibig: {
+      base: pagibigBase,
+      employee: pagibigEmployee,
+      employer: pagibigEmployer,
+    },
+    totalEmployeeDeductions,
+    totalEmployerLiability,
+    estimatedNetMonthlyPay,
+    estimatedSemiMonthlyPay,
+    monthsWorkedThisYear,
+    thirteenthMonthAccrual,
+    serviceDays,
+    silEligible,
+    silStatusLabel,
+  };
+}
+
+/**
+ * Computes completed months of service within the CURRENT calendar year,
+ * per Presidential Decree No. 851. Capped at 12, never negative.
+ *
+ * Rule:
+ * - If hired before this calendar year: count completed months from
+ *   Jan 1 of this year through today.
+ * - If hired during this calendar year: count completed months from
+ *   the hire date through today.
+ * A month counts as "completed" once the same day-of-month (or later)
+ * has been reached in the following month, consistent with how service
+ * months are normally counted (avoids simple calendar-month subtraction
+ * which can overcount partial months).
+ */
+function calculate13thMonthAccrual(hireDateStr, basicSalary) {
+  if (!hireDateStr) {
+    return { monthsWorkedThisYear: 0, thirteenthMonthAccrual: 0 };
+  }
+
+  const hireDate = new Date(hireDateStr + 'T00:00:00');
+  if (isNaN(hireDate.getTime())) {
+    return { monthsWorkedThisYear: 0, thirteenthMonthAccrual: 0 };
+  }
+
+  const today = new Date();
+  const currentYear = today.getFullYear();
+
+  // Determine the effective start date for counting within this calendar year.
+  const jan1ThisYear = new Date(currentYear, 0, 1);
+  const startDate = hireDate > jan1ThisYear ? hireDate : jan1ThisYear;
+
+  if (startDate > today) {
+    return { monthsWorkedThisYear: 0, thirteenthMonthAccrual: 0 };
+  }
+
+  // Count completed months between startDate and today.
+  let months =
+    (today.getFullYear() - startDate.getFullYear()) * 12 +
+    (today.getMonth() - startDate.getMonth());
+
+  // If today's day-of-month hasn't reached the start day-of-month yet,
+  // the current month is not yet "completed" — subtract it.
+  if (today.getDate() < startDate.getDate()) {
+    months -= 1;
+  }
+
+  months = Math.max(0, Math.min(12, months));
+
+  const thirteenthMonthAccrual = (basicSalary * months) / 12;
+
+  return { monthsWorkedThisYear: months, thirteenthMonthAccrual };
+}
+
+/**
+ * Determines Service Incentive Leave eligibility based on continuous
+ * service of at least 365 days from hire date to today.
+ */
+function calculateSilStatus(hireDateStr) {
+  if (!hireDateStr) {
+    return { serviceDays: 0, silEligible: false, silStatusLabel: 'Pending — New Hire' };
+  }
+
+  const hireDate = new Date(hireDateStr + 'T00:00:00');
+  if (isNaN(hireDate.getTime())) {
+    return { serviceDays: 0, silEligible: false, silStatusLabel: 'Pending — New Hire' };
+  }
+
+  const today = new Date();
+  const msPerDay = 1000 * 60 * 60 * 24;
+  const serviceDays = Math.max(0, Math.floor((today - hireDate) / msPerDay));
+
+  const silEligible = serviceDays >= SIL_ELIGIBILITY_DAYS;
+  const silStatusLabel = silEligible ? 'Eligible — 5 Days Paid Leave' : 'Pending — New Hire';
+
+  return { serviceDays, silEligible, silStatusLabel };
+}
+
+/* =========================================================
+   NOTIFICATION / TOAST SYSTEM
+========================================================= */
+
+const TOAST_STYLES = {
+  success: { border: 'border-emerald-500/40', bg: 'bg-emerald-500/10', text: 'text-emerald-700', icon: '✓' },
+  error: { border: 'border-rose-500/40', bg: 'bg-rose-500/10', text: 'text-rose-700', icon: '✕' },
+  warning: { border: 'border-amber-500/40', bg: 'bg-amber-500/10', text: 'text-amber-700', icon: '!' },
+  info: { border: 'border-sky-500/40', bg: 'bg-sky-500/10', text: 'text-sky-200', icon: 'i' },
+};
+
+function showToast(message, type = 'info', durationMs = 4000) {
+  const container = document.getElementById('toastContainer');
+  const style = TOAST_STYLES[type] || TOAST_STYLES.info;
+
+  const toast = document.createElement('div');
+  toast.className = `toast-anim flex items-start gap-2.5 border ${style.border} ${style.bg} ${style.text} rounded-lg px-3.5 py-3 text-sm shadow-lg shadow-black/30`;
+  toast.innerHTML = `
+    <span class="mt-0.5 font-bold text-xs w-4 h-4 flex items-center justify-center rounded-full bg-black/10 shrink-0">${style.icon}</span>
+    <span class="flex-1">${escapeHtml(message)}</span>
+    <button class="text-current opacity-60 hover:opacity-100 shrink-0" aria-label="Dismiss">✕</button>
+  `;
+
+  toast.querySelector('button').addEventListener('click', () => toast.remove());
+  container.appendChild(toast);
+
+  setTimeout(() => {
+    toast.style.transition = 'opacity 0.2s ease';
+    toast.style.opacity = '0';
+    setTimeout(() => toast.remove(), 200);
+  }, durationMs);
+}
+
+/* =========================================================
+   CONNECTION STATUS
+========================================================= */
+
+function setConnectionStatus(state) {
+  const dot = document.getElementById('connectionDot');
+  const text = document.getElementById('connectionText');
+  const warning = document.getElementById('credentialWarning');
+
+  if (state === 'unconfigured') {
+    dot.className = 'w-2 h-2 rounded-full bg-amber-500';
+    text.textContent = 'Not configured';
+    warning.classList.remove('hidden');
+  } else if (state === 'connected') {
+    dot.className = 'w-2 h-2 rounded-full bg-emerald-500';
+    text.textContent = 'Connected';
+    warning.classList.add('hidden');
+  } else if (state === 'error') {
+    dot.className = 'w-2 h-2 rounded-full bg-rose-500';
+    text.textContent = 'Connection error';
+  } else {
+    dot.className = 'w-2 h-2 rounded-full bg-slate-500 pulse-dot';
+    text.textContent = 'Connecting…';
+  }
+}
+
+function credentialsArePlaceholders() {
+  return SUPABASE_URL === 'YOUR_SUPABASE_URL_HERE' || SUPABASE_KEY === 'YOUR_SUPABASE_ANON_KEY_HERE';
+}
+
+/* =========================================================
+   ROSTER STATE RENDERING (loading / empty / error / data)
+========================================================= */
+
+function showRosterState(state) {
+  document.getElementById('rosterLoading').classList.toggle('hidden', state !== 'loading');
+  document.getElementById('rosterEmpty').classList.toggle('hidden', state !== 'empty');
+  document.getElementById('rosterError').classList.toggle('hidden', state !== 'error');
+  document.getElementById('rosterTableWrap').classList.toggle('hidden', state !== 'data');
+}
+
+/* =========================================================
+   DASHBOARD SUMMARY CARDS
+========================================================= */
+
+function updateDashboardCards(employeesWithPayroll) {
+  const totalEmployees = employeesWithPayroll.length;
+
+  let totalGross = 0;
+  let totalEeDeductions = 0;
+  let totalErLiability = 0;
+  let totalNetPayroll = 0;
+  let silEligibleCount = 0;
+
+  employeesWithPayroll.forEach(({ payroll }) => {
+    totalGross += payroll.grossMonthlyCompensation;
+    totalEeDeductions += payroll.totalEmployeeDeductions;
+    totalErLiability += payroll.totalEmployerLiability;
+    totalNetPayroll += payroll.estimatedNetMonthlyPay;
+    if (payroll.silEligible) silEligibleCount += 1;
+  });
+
+  document.getElementById('cardTotalEmployees').textContent = totalEmployees.toLocaleString('en-PH');
+  document.getElementById('cardGrossPayroll').textContent = formatCurrency(totalGross);
+  document.getElementById('cardEeDeductions').textContent = formatCurrency(totalEeDeductions);
+  document.getElementById('cardErLiability').textContent = formatCurrency(totalErLiability);
+  document.getElementById('cardNetPayroll').textContent = formatCurrency(totalNetPayroll);
+  document.getElementById('cardSilEligible').textContent = silEligibleCount.toLocaleString('en-PH');
+}
+
+/* =========================================================
+   ROSTER TABLE RENDERING
+========================================================= */
+
+function renderRosterRow(employee, payroll) {
+  const fullName = `${employee.first_name || ''} ${employee.last_name || ''}`.trim();
+
+  const silBadgeClass = payroll.silEligible
+    ? 'bg-emerald-500/15 text-emerald-700 border border-emerald-500/30'
+    : 'bg-slate-100 text-slate-600 border border-slate-300';
+
+  return `
+    <tr class="hover:bg-slate-100 transition-colors">
+      <td class="px-3 py-2.5 align-top">
+        <div class="font-medium text-slate-900">${escapeHtml(fullName)}</div>
+        <div class="text-xs text-slate-400">${escapeHtml(employee.email)}</div>
+      </td>
+      <td class="px-3 py-2.5 align-top">
+        <div class="text-slate-700">${escapeHtml(employee.job_title)}</div>
+        <div class="text-xs text-slate-400">${escapeHtml(employee.department)}</div>
+      </td>
+      <td class="px-3 py-2.5 align-top text-slate-600 whitespace-nowrap">${formatDate(employee.hire_date)}</td>
+      <td class="px-3 py-2.5 align-top text-right font-mono-tabular text-slate-700">${formatCurrency(employee.monthly_basic_salary)}</td>
+      <td class="px-3 py-2.5 align-top text-right font-mono-tabular text-slate-700">${formatCurrency(employee.allowance_allowance || 0)}</td>
+      <td class="px-3 py-2.5 align-top text-right font-mono-tabular text-slate-900 font-medium">${formatCurrency(payroll.grossMonthlyCompensation)}</td>
+
+      <td class="px-3 py-2.5 align-top text-right font-mono-tabular text-rose-700 bg-rose-500/5">${formatCurrency(payroll.sss.employee)}</td>
+      <td class="px-3 py-2.5 align-top text-right font-mono-tabular text-rose-700 bg-rose-500/5">${formatCurrency(payroll.philhealth.employee)}</td>
+      <td class="px-3 py-2.5 align-top text-right font-mono-tabular text-rose-700 bg-rose-500/5">${formatCurrency(payroll.pagibig.employee)}</td>
+      <td class="px-3 py-2.5 align-top text-right font-mono-tabular text-rose-700 font-medium bg-rose-500/5">${formatCurrency(payroll.totalEmployeeDeductions)}</td>
+
+      <td class="px-3 py-2.5 align-top text-right font-mono-tabular text-amber-700 bg-amber-500/5">${formatCurrency(payroll.sss.employer)}</td>
+      <td class="px-3 py-2.5 align-top text-right font-mono-tabular text-amber-700 bg-amber-500/5">${formatCurrency(payroll.sss.employerEc)}</td>
+      <td class="px-3 py-2.5 align-top text-right font-mono-tabular text-amber-700 bg-amber-500/5">${formatCurrency(payroll.philhealth.employer)}</td>
+      <td class="px-3 py-2.5 align-top text-right font-mono-tabular text-amber-700 bg-amber-500/5">${formatCurrency(payroll.pagibig.employer)}</td>
+      <td class="px-3 py-2.5 align-top text-right font-mono-tabular text-amber-700 font-medium bg-amber-500/5">${formatCurrency(payroll.totalEmployerLiability)}</td>
+
+      <td class="px-3 py-2.5 align-top whitespace-nowrap">
+        <span class="inline-block text-xs px-2 py-1 rounded-full ${silBadgeClass}">${escapeHtml(payroll.silStatusLabel)}</span>
+      </td>
+      <td class="px-3 py-2.5 align-top text-right font-mono-tabular text-slate-600">${payroll.monthsWorkedThisYear}</td>
+      <td class="px-3 py-2.5 align-top text-right font-mono-tabular text-slate-700">${formatCurrency(payroll.thirteenthMonthAccrual)}</td>
+
+      <td class="px-3 py-2.5 align-top text-right font-mono-tabular text-emerald-700 font-medium bg-emerald-500/5">${formatCurrency(payroll.estimatedNetMonthlyPay)}</td>
+      <td class="px-3 py-2.5 align-top text-right font-mono-tabular text-emerald-700 bg-emerald-500/5">
+        ${formatCurrency(payroll.estimatedSemiMonthlyPay)}
+        <div class="text-[10px] text-emerald-400/70 font-sans">est. per cutoff</div>
+      </td>
+
+      <td class="px-3 py-2.5 align-top text-center">
+        <button
+          class="delete-btn text-xs px-3 py-1.5 rounded-lg border border-rose-500/40 text-rose-700 hover:bg-rose-500/10 transition-colors whitespace-nowrap"
+          data-id="${escapeHtml(employee.id)}"
+          data-name="${escapeHtml(fullName)}"
+        >
+          Remove / Separate
+        </button>
+      </td>
+    </tr>
+  `;
+}
+
+function renderRoster(employeesWithPayroll) {
+  const tbody = document.getElementById('rosterTableBody');
+
+  if (employeesWithPayroll.length === 0) {
+    tbody.innerHTML = '';
+    showRosterState('empty');
+    return;
+  }
+
+  tbody.innerHTML = employeesWithPayroll
+    .map(({ employee, payroll }) => renderRosterRow(employee, payroll))
+    .join('');
+
+  showRosterState('data');
+
+  tbody.querySelectorAll('.delete-btn').forEach((btn) => {
+    btn.addEventListener('click', () => {
+      const id = btn.getAttribute('data-id');
+      const name = btn.getAttribute('data-name');
+      requestDeleteConfirmation(id, name);
+    });
+  });
+}
+
+/* =========================================================
+   FETCH EMPLOYEES
+========================================================= */
+
+async function fetchEmployees() {
+  showRosterState('loading');
+
+  if (credentialsArePlaceholders()) {
+    setConnectionStatus('unconfigured');
+    showRosterState('empty');
+    updateDashboardCards([]);
+    return;
+  }
+
+  try {
+    const { data, error } = await supabaseClient
+      .from(EMPLOYEES_TABLE)
+      .select('*')
+      .order('last_name', { ascending: true })
+      .order('first_name', { ascending: true });
+
+    if (error) throw error;
+
+    setConnectionStatus('connected');
+
+    const employees = data || [];
+    const employeesWithPayroll = employees.map((employee) => ({
+      employee,
+      payroll: calculateEmployeePayroll(employee),
+    }));
+
+    updateDashboardCards(employeesWithPayroll);
+    renderRoster(employeesWithPayroll);
+  } catch (err) {
+    console.error('fetchEmployees error:', err);
+    setConnectionStatus('error');
+    showRosterState('error');
+    updateDashboardCards([]);
+    showToast('Unable to load employee records.', 'error');
+  }
+}
+
+/* =========================================================
+   CREATE EMPLOYEE
+========================================================= */
+
+function setFormError(message) {
+  const el = document.getElementById('formError');
+  if (!message) {
+    el.classList.add('hidden');
+    el.textContent = '';
+  } else {
+    el.classList.remove('hidden');
+    el.textContent = message;
+  }
+}
+
+function setSubmitLoading(isLoading) {
+  const btn = document.getElementById('submitBtn');
+  const spinner = document.getElementById('submitSpinner');
+  const label = document.getElementById('submitBtnLabel');
+
+  btn.disabled = isLoading;
+  spinner.classList.toggle('hidden', !isLoading);
+  label.textContent = isLoading ? 'Adding…' : 'Add Employee';
+}
+
+function validateEmployeeForm(values) {
+  if (!values.firstName || !values.lastName || !values.email || !values.hireDate || !values.department || !values.jobTitle) {
+    return 'Please correct the highlighted fields.';
+  }
+
+  const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  if (!emailPattern.test(values.email)) {
+    return 'Please enter a valid email address.';
+  }
+
+  if (!Number.isFinite(values.basicSalary) || values.basicSalary < 0) {
+    return 'Monthly basic salary must be a non-negative number.';
+  }
+
+  if (!Number.isFinite(values.allowance) || values.allowance < 0) {
+    return 'Monthly allowance must be a non-negative number.';
+  }
+
+  return null;
+}
+
+async function handleEmployeeFormSubmit(evt) {
+  evt.preventDefault();
+  setFormError(null);
+
+  if (credentialsArePlaceholders()) {
+    showToast('Supabase is not configured yet.', 'warning');
+    return;
+  }
+
+  const form = evt.target;
+
+  const values = {
+    firstName: form.firstName.value.trim(),
+    lastName: form.lastName.value.trim(),
+    email: form.email.value.trim(),
+    hireDate: form.hireDate.value,
+    department: form.department.value.trim(),
+    jobTitle: form.jobTitle.value.trim(),
+    basicSalary: parseFloat(form.basicSalary.value),
+    allowance: form.allowance.value === '' ? 0 : parseFloat(form.allowance.value),
+  };
+
+  const validationError = validateEmployeeForm(values);
+  if (validationError) {
+    setFormError(validationError);
+    showToast(validationError, 'warning');
+    return;
+  }
+
+  setSubmitLoading(true);
+
+  try {
+    const { error } = await supabaseClient.from(EMPLOYEES_TABLE).insert([
+      {
+        first_name: values.firstName,
+        last_name: values.lastName,
+        email: values.email,
+        department: values.department,
+        job_title: values.jobTitle,
+        hire_date: values.hireDate,
+        monthly_basic_salary: values.basicSalary,
+        allowance_allowance: values.allowance,
+      },
+    ]);
+
+    if (error) {
+      if (error.code === '23505' || /duplicate|unique/i.test(error.message || '')) {
+        throw new Error('A record with this email already exists.');
+      }
+      throw new Error(error.message || 'Unable to add employee.');
+    }
+
+    showToast('Employee successfully added.', 'success');
+    form.reset();
+    form.allowance.value = '0';
+    await fetchEmployees();
+  } catch (err) {
+    console.error('createEmployee error:', err);
+    setFormError(err.message);
+    showToast(err.message || 'Unable to add employee.', 'error');
+  } finally {
+    setSubmitLoading(false);
+  }
+}
+
+/* =========================================================
+   DELETE / SEPARATE EMPLOYEE
+========================================================= */
+
+let pendingDeleteId = null;
+
+function requestDeleteConfirmation(id, name) {
+  pendingDeleteId = id;
+  const modal = document.getElementById('confirmModal');
+  const text = document.getElementById('confirmModalText');
+  text.textContent = `Are you sure you want to remove ${name || 'this employee'}'s profile? This cannot be undone.`;
+  modal.classList.remove('hidden');
+  modal.classList.add('flex');
+}
+
+function closeConfirmModal() {
+  pendingDeleteId = null;
+  const modal = document.getElementById('confirmModal');
+  modal.classList.add('hidden');
+  modal.classList.remove('flex');
+}
+
+async function deleteEmployee(id) {
+  try {
+    const { error } = await supabaseClient.from(EMPLOYEES_TABLE).delete().eq('id', id);
+    if (error) throw error;
+
+    showToast('Employee successfully removed.', 'success');
+    await fetchEmployees();
+  } catch (err) {
+    console.error('deleteEmployee error:', err);
+    showToast('Unable to remove employee record.', 'error');
+  }
+}
+
+/* =========================================================
+   INITIALIZATION
+========================================================= */
+
+function registerEventListeners() {
+  document.getElementById('employeeForm').addEventListener('submit', handleEmployeeFormSubmit);
+  document.getElementById('refreshBtn').addEventListener('click', fetchEmployees);
+
+  document.getElementById('confirmCancelBtn').addEventListener('click', closeConfirmModal);
+  document.getElementById('confirmOkBtn').addEventListener('click', async () => {
+    const id = pendingDeleteId;
+    closeConfirmModal();
+    if (id) await deleteEmployee(id);
+  });
+
+  document.getElementById('confirmModal').addEventListener('click', (evt) => {
+    if (evt.target.id === 'confirmModal') closeConfirmModal();
+  });
+}
+
+function init() {
+  registerEventListeners();
+  setConnectionStatus(credentialsArePlaceholders() ? 'unconfigured' : 'connecting');
+  fetchEmployees();
+}
+
+document.addEventListener('DOMContentLoaded', init);
+</script>
+
+</body>
+</html>
