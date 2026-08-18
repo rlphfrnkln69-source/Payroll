@@ -34,31 +34,16 @@
   .pulse-dot { animation: pulse-dot 1.6s ease-in-out infinite; }
 
   .font-mono-tabular { font-variant-numeric: tabular-nums; }
-
-  .skeleton {
-    background: linear-gradient(90deg, #e2e8f0 25%, #f1f5f9 37%, #e2e8f0 63%);
-    background-size: 400% 100%;
-    animation: skeleton-loading 1.4s ease infinite;
-  }
-  @keyframes skeleton-loading {
-    0% { background-position: 100% 50%; }
-    100% { background-position: 0 50%; }
-  }
-
   table.roster th { position: sticky; top: 0; z-index: 5; }
 </style>
 </head>
 
 <body class="bg-white text-slate-900 min-h-screen antialiased flex">
 
-<!-- =========================================================
-     TOAST / NOTIFICATION CONTAINER
-========================================================= -->
+<!-- TOAST CONTAINER -->
 <div id="toastContainer" class="fixed top-4 right-4 z-50 flex flex-col gap-2 w-[92vw] max-w-sm"></div>
 
-<!-- =========================================================
-     LOGIN SCREEN
-========================================================= -->
+<!-- LOGIN SCREEN -->
 <div id="loginScreen" class="min-h-screen w-full flex items-center justify-center px-4 bg-white">
   <div class="w-full max-w-sm">
     <div class="flex flex-col items-center mb-6">
@@ -66,7 +51,7 @@
         K
       </div>
       <h1 class="text-xl font-semibold text-slate-900 tracking-tight">HRIS Admin Login</h1>
-      <p class="text-sm text-slate-500 mt-1 text-center">Sign in with your administrator account to access payroll and workforce records.</p>
+      <p class="text-sm text-slate-500 mt-1 text-center">Sign in with your administrator account to access employee records and payroll.</p>
     </div>
 
     <form id="loginForm" class="border border-slate-200 rounded-xl p-5 space-y-4" novalidate>
@@ -88,19 +73,13 @@
 
       <button id="loginBtn" type="submit"
         class="w-full inline-flex items-center justify-center gap-2 bg-amber-500 hover:bg-amber-400 disabled:bg-slate-300 disabled:cursor-not-allowed text-slate-900 font-semibold text-sm px-5 py-2.5 rounded-lg transition-colors">
-        <svg id="loginSpinner" class="hidden animate-spin h-4 w-4" viewBox="0 0 24 24" fill="none">
-          <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-          <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"></path>
-        </svg>
         <span id="loginBtnLabel">Sign In</span>
       </button>
     </form>
   </div>
 </div>
 
-<!-- =========================================================
-     APP SHELL
-========================================================= -->
+<!-- APP SHELL -->
 <div id="appShell" class="hidden min-h-screen w-full flex bg-white">
 
   <!-- SIDEBAR NAVIGATION -->
@@ -123,6 +102,13 @@
       </div>
 
       <div class="space-y-1">
+        <div class="px-3 text-[10px] font-semibold uppercase tracking-wider text-slate-500 mb-1">Employee Management</div>
+        <button data-target="employees" class="nav-btn w-full flex items-center justify-between px-3 py-2 rounded-lg text-slate-300 hover:bg-slate-800 hover:text-white transition-colors">
+          <span class="flex items-center gap-2.5 font-medium">Employee Directory</span>
+        </button>
+      </div>
+
+      <div class="space-y-1">
         <div class="px-3 text-[10px] font-semibold uppercase tracking-wider text-slate-500 mb-1">Workforce Management</div>
         <button data-target="schedule" class="nav-btn w-full flex items-center justify-between px-3 py-2 rounded-lg text-slate-300 hover:bg-slate-800 hover:text-white transition-colors">
           <span class="flex items-center gap-2.5 font-medium">Schedule Management</span>
@@ -132,11 +118,9 @@
         </button>
         <button data-target="overtime" class="nav-btn w-full flex items-center justify-between px-3 py-2 rounded-lg text-slate-300 hover:bg-slate-800 hover:text-white transition-colors">
           <span class="flex items-center gap-2.5 font-medium">Overtime Management</span>
-          <span id="badgeOvertime" class="hidden text-[10px] bg-amber-500/25 text-amber-400 px-1.5 py-0.5 rounded-full font-mono">0</span>
         </button>
         <button data-target="leave" class="nav-btn w-full flex items-center justify-between px-3 py-2 rounded-lg text-slate-300 hover:bg-slate-800 hover:text-white transition-colors">
           <span class="flex items-center gap-2.5 font-medium">Leave Management</span>
-          <span id="badgeLeave" class="hidden text-[10px] bg-amber-500/25 text-amber-400 px-1.5 py-0.5 rounded-full font-mono">0</span>
         </button>
       </div>
 
@@ -150,7 +134,7 @@
       <div class="space-y-1">
         <div class="px-3 text-[10px] font-semibold uppercase tracking-wider text-slate-500 mb-1">Employee Records</div>
         <button data-target="inactive" class="nav-btn w-full flex items-center justify-between px-3 py-2 rounded-lg text-slate-300 hover:bg-slate-800 hover:text-white transition-colors">
-          <span class="flex items-center gap-2.5 font-medium">Inactive Employees</span>
+          <span class="flex items-center gap-2.5 font-medium">Inactive &amp; Archives</span>
         </button>
       </div>
     </nav>
@@ -221,458 +205,161 @@
             <p class="text-xs text-slate-500 mb-1">Employees Absent Today</p>
             <p id="dashAbsentToday" class="text-2xl font-semibold text-rose-700 font-mono-tabular">0</p>
           </div>
-          <div class="rounded-xl border border-slate-300 bg-slate-50 p-4">
-            <p class="text-xs text-slate-500 mb-1">Pending Overtime Requests</p>
-            <p id="dashPendingOT" class="text-2xl font-semibold text-amber-700 font-mono-tabular">0</p>
+        </div>
+      </section>
+
+      <!-- MODULE: EMPLOYEE MANAGEMENT (CENTRAL DIRECTORY) -->
+      <section id="moduleEmployees" class="hidden space-y-6">
+        <div class="flex flex-wrap items-center justify-between gap-4">
+          <div>
+            <h3 class="text-base font-semibold text-slate-900">Employee Directory &amp; Central Database</h3>
+            <p class="text-xs text-slate-500 mt-0.5">Master record of all active personnel, positions, compensation, and statutory IDs.</p>
           </div>
-          <div class="rounded-xl border border-slate-300 bg-slate-50 p-4">
-            <p class="text-xs text-slate-500 mb-1">Pending Leave Applications</p>
-            <p id="dashPendingLeave" class="text-2xl font-semibold text-amber-700 font-mono-tabular">0</p>
+          <button id="openAddEmployeeModalBtn" class="bg-amber-500 hover:bg-amber-400 text-slate-900 font-semibold text-xs px-4 py-2.5 rounded-lg transition-colors shadow-sm flex items-center gap-2">
+            <span>+ Add Employee</span>
+          </button>
+        </div>
+
+        <!-- Filters & Search Bar -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3 bg-slate-50 p-4 rounded-xl border border-slate-300">
+          <div class="lg:col-span-1">
+            <input id="empSearchInput" type="text" placeholder="Search name or ID..." class="w-full bg-white border border-slate-300 rounded-lg px-3 py-2 text-xs text-slate-900 focus:outline-none focus:ring-2 focus:ring-amber-500/60" />
           </div>
-          <div class="rounded-xl border border-slate-300 bg-slate-50 p-4">
-            <p class="text-xs text-slate-500 mb-1">Current Payroll Period</p>
-            <p id="dashPayrollPeriod" class="text-base font-semibold text-slate-900 mt-1">Current Month</p>
+          <div>
+            <select id="filterDept" class="w-full bg-white border border-slate-300 rounded-lg px-3 py-2 text-xs text-slate-900 focus:outline-none focus:ring-2 focus:ring-amber-500/60">
+              <option value="">All Departments</option>
+              <option value="Human Resources">Human Resources</option>
+              <option value="Operations">Operations</option>
+              <option value="Engineering">Engineering</option>
+              <option value="Finance">Finance</option>
+              <option value="Sales">Sales</option>
+            </select>
           </div>
-          <div class="rounded-xl border border-slate-300 bg-slate-50 p-4">
-            <p class="text-xs text-slate-500 mb-1">Estimated Payroll Cost</p>
-            <p id="dashEstimatedCost" class="text-2xl font-semibold text-slate-900 font-mono-tabular">₱0.00</p>
+          <div>
+            <select id="filterStatus" class="w-full bg-white border border-slate-300 rounded-lg px-3 py-2 text-xs text-slate-900 focus:outline-none focus:ring-2 focus:ring-amber-500/60">
+              <option value="">All Statuses</option>
+              <option value="Active">Active</option>
+              <option value="On Leave">On Leave</option>
+              <option value="Suspended">Suspended</option>
+              <option value="Resigned">Resigned</option>
+              <option value="Terminated">Terminated</option>
+              <option value="Inactive">Inactive</option>
+            </select>
+          </div>
+          <div>
+            <select id="filterType" class="w-full bg-white border border-slate-300 rounded-lg px-3 py-2 text-xs text-slate-900 focus:outline-none focus:ring-2 focus:ring-amber-500/60">
+              <option value="">All Employment Types</option>
+              <option value="Regular">Regular</option>
+              <option value="Probationary">Probationary</option>
+              <option value="Contractual">Contractual</option>
+              <option value="Part-time">Part-time</option>
+            </select>
+          </div>
+          <div>
+            <button id="resetEmpFiltersBtn" class="w-full bg-slate-200 hover:bg-slate-300 text-slate-700 font-medium text-xs px-3 py-2 rounded-lg transition-colors">
+              Reset Filters
+            </button>
+          </div>
+        </div>
+
+        <!-- Employee Directory Table -->
+        <div class="rounded-xl border border-slate-300 bg-slate-50 overflow-hidden">
+          <div class="overflow-x-auto">
+            <table class="w-full text-sm border-collapse min-w-[1100px]">
+              <thead>
+                <tr class="bg-slate-100 text-slate-500 text-xs uppercase tracking-wide">
+                  <th class="text-left px-4 py-3 border-b border-slate-300">Emp ID &amp; Name</th>
+                  <th class="text-left px-4 py-3 border-b border-slate-300">Department / Position</th>
+                  <th class="text-left px-4 py-3 border-b border-slate-300">Employment Status</th>
+                  <th class="text-left px-4 py-3 border-b border-slate-300">Type &amp; Hired</th>
+                  <th class="text-right px-4 py-3 border-b border-slate-300">Basic Salary</th>
+                  <th class="text-center px-4 py-3 border-b border-slate-300">Status Badge</th>
+                  <th class="text-center px-4 py-3 border-b border-slate-300">Actions</th>
+                </tr>
+              </thead>
+              <tbody id="employeeDirectoryTableBody" class="divide-y divide-slate-200">
+                <tr><td colspan="7" class="px-4 py-8 text-center text-slate-400">Loading employee records...</td></tr>
+              </tbody>
+            </table>
           </div>
         </div>
       </section>
 
       <!-- MODULE: SCHEDULE MANAGEMENT -->
       <section id="moduleSchedule" class="hidden space-y-6">
-        <div class="flex items-center justify-between">
-          <div>
-            <h3 class="text-base font-semibold text-slate-900">Work Schedules &amp; Monthly Roster</h3>
-            <p class="text-xs text-slate-500 mt-0.5">Select an employee below to manage their complete monthly shifts, rest days, and lock statuses.</p>
-          </div>
+        <div>
+          <h3 class="text-base font-semibold text-slate-900">Schedule Management</h3>
+          <p class="text-xs text-slate-500 mt-0.5">Active employees automatically available for shift scheduling.</p>
         </div>
-
-        <div class="rounded-xl border border-slate-300 bg-slate-50 overflow-hidden">
-          <div class="px-5 py-4 border-b border-slate-300 flex items-center justify-between">
-            <h4 class="text-base font-semibold text-slate-900">Active Workforce Schedules</h4>
-          </div>
-          <div class="overflow-x-auto">
-            <table class="w-full text-sm border-collapse">
-              <thead>
-                <tr class="bg-slate-100 text-slate-500 text-xs uppercase tracking-wide">
-                  <th class="text-left px-4 py-3 border-b border-slate-300">Emp. Number</th>
-                  <th class="text-left px-4 py-3 border-b border-slate-300">Employee Name</th>
-                  <th class="text-left px-4 py-3 border-b border-slate-300">Department / Title</th>
-                  <th class="text-center px-4 py-3 border-b border-slate-300">Lock Status</th>
-                  <th class="text-center px-4 py-3 border-b border-slate-300">Actions</th>
-                </tr>
-              </thead>
-              <tbody id="scheduleEmployeeTableBody" class="divide-y divide-slate-200"></tbody>
-            </table>
-          </div>
+        <div class="rounded-xl border border-slate-300 bg-slate-50 p-6 text-sm text-slate-600">
+          Integrated with Employee Management. All active personnel appear here automatically.
         </div>
       </section>
 
       <!-- MODULE: ATTENDANCE MANAGEMENT -->
       <section id="moduleAttendance" class="hidden space-y-6">
-        <div class="flex items-center justify-between">
-          <div>
-            <h3 class="text-base font-semibold text-slate-900">Attendance Monitoring &amp; Logging</h3>
-            <p class="text-xs text-slate-500 mt-0.5">Track time-in/out, hours worked, tardiness, undertime, and manual overrides.</p>
-          </div>
+        <div>
+          <h3 class="text-base font-semibold text-slate-900">Attendance Monitoring &amp; Logging</h3>
+          <p class="text-xs text-slate-500 mt-0.5">Active employees automatically appear in attendance records.</p>
         </div>
-
-        <div class="rounded-xl border border-slate-300 bg-slate-50 p-5">
-          <h4 class="text-sm font-semibold text-slate-900 mb-3">Record / Adjust Attendance</h4>
-          <form id="attendanceForm" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4" novalidate>
-            <div class="flex flex-col gap-1">
-              <label class="text-xs font-medium text-slate-500">Employee</label>
-              <select id="attEmployeeId" required class="bg-white border border-slate-300 rounded-lg px-3 py-2 text-sm text-slate-900 focus:outline-none focus:ring-2 focus:ring-amber-500/65">
-                <option value="">Select Employee...</option>
-              </select>
-            </div>
-            <div class="flex flex-col gap-1">
-              <label class="text-xs font-medium text-slate-500">Attendance Date</label>
-              <input id="attDate" type="date" required class="bg-white border border-slate-300 rounded-lg px-3 py-2 text-sm text-slate-900 focus:outline-none focus:ring-2 focus:ring-amber-500/65" />
-            </div>
-            <div class="flex flex-col gap-1">
-              <label class="text-xs font-medium text-slate-500">Time In</label>
-              <input id="attTimeIn" type="time" value="08:00" class="bg-white border border-slate-300 rounded-lg px-3 py-2 text-sm text-slate-900 focus:outline-none focus:ring-2 focus:ring-amber-500/65" />
-            </div>
-            <div class="flex flex-col gap-1">
-              <label class="text-xs font-medium text-slate-500">Time Out</label>
-              <input id="attTimeOut" type="time" value="17:00" class="bg-white border border-slate-300 rounded-lg px-3 py-2 text-sm text-slate-900 focus:outline-none focus:ring-2 focus:ring-amber-500/65" />
-            </div>
-            <div class="flex flex-col gap-1">
-              <label class="text-xs font-medium text-slate-500">Status</label>
-              <select id="attStatus" class="bg-white border border-slate-300 rounded-lg px-3 py-2 text-sm text-slate-900 focus:outline-none focus:ring-2 focus:ring-amber-500/65">
-                <option value="Present">Present</option>
-                <option value="Late">Late</option>
-                <option value="Undertime">Undertime</option>
-                <option value="Half Day">Half Day</option>
-                <option value="Absent">Absent</option>
-                <option value="On Leave">On Leave</option>
-                <option value="Rest Day">Rest Day</option>
-                <option value="Holiday">Holiday</option>
-              </select>
-            </div>
-            <div class="flex flex-col gap-1">
-              <label class="text-xs font-medium text-slate-500">Remarks / Override Reason</label>
-              <input id="attRemarks" type="text" placeholder="HR Admin adjustment notes" class="bg-white border border-slate-300 rounded-lg px-3 py-2 text-sm text-slate-900 focus:outline-none focus:ring-2 focus:ring-amber-500/65" />
-            </div>
-            <div class="lg:col-span-2 flex items-end justify-end">
-              <button type="submit" class="bg-amber-500 hover:bg-amber-400 text-slate-900 font-semibold text-sm px-5 py-2.5 rounded-lg transition-colors">
-                Save Attendance Record
-              </button>
-            </div>
-          </form>
-        </div>
-
-        <div class="rounded-xl border border-slate-300 bg-slate-50 overflow-hidden">
-          <div class="px-5 py-4 border-b border-slate-300 flex items-center justify-between">
-            <h4 class="text-base font-semibold text-slate-900">Attendance Log</h4>
-          </div>
-          <div class="overflow-x-auto">
-            <table class="w-full text-sm border-collapse min-w-[1000px]">
-              <thead>
-                <tr class="bg-slate-100 text-slate-500 text-xs uppercase tracking-wide">
-                  <th class="text-left px-4 py-3 border-b border-slate-300">Employee</th>
-                  <th class="text-left px-4 py-3 border-b border-slate-300">Date</th>
-                  <th class="text-left px-4 py-3 border-b border-slate-300">Time In / Out</th>
-                  <th class="text-right px-4 py-3 border-b border-slate-300">Hours Worked</th>
-                  <th class="text-right px-4 py-3 border-b border-slate-300">Late (mins)</th>
-                  <th class="text-right px-4 py-3 border-b border-slate-300">Undertime</th>
-                  <th class="text-left px-4 py-3 border-b border-slate-300">Status</th>
-                  <th class="text-left px-4 py-3 border-b border-slate-300">Remarks</th>
-                  <th class="text-center px-4 py-3 border-b border-slate-300">Action</th>
-                </tr>
-              </thead>
-              <tbody id="attendanceTableBody" class="divide-y divide-slate-200"></tbody>
-            </table>
-          </div>
+        <div class="rounded-xl border border-slate-300 bg-slate-50 p-6 text-sm text-slate-600">
+          Integrated with Employee Management. Time logs and attendance tracking sync directly.
         </div>
       </section>
 
       <!-- MODULE: OVERTIME MANAGEMENT -->
       <section id="moduleOvertime" class="hidden space-y-6">
-        <div class="flex items-center justify-between">
-          <div>
-            <h3 class="text-base font-semibold text-slate-900">Overtime Approval Center</h3>
-            <p class="text-xs text-slate-500 mt-0.5">Review, approve, or reject employee overtime submissions prior to payroll inclusion.</p>
-          </div>
-          <button id="openOtArchiveBtn" class="text-xs bg-slate-900 text-white font-medium px-4 py-2 rounded-lg hover:bg-slate-800 transition-colors">
-            🗑️ View Deleted / Archived OT Requests
-          </button>
+        <div>
+          <h3 class="text-base font-semibold text-slate-900">Overtime Management</h3>
+          <p class="text-xs text-slate-500 mt-0.5">Active personnel available for overtime requests.</p>
         </div>
-
-        <div class="grid grid-cols-2 md:grid-cols-5 gap-4">
-          <div class="rounded-xl border border-slate-300 bg-slate-50 p-4">
-            <p class="text-xs text-slate-500 mb-1">Total OT Requests</p>
-            <p id="kpiTotalOt" class="text-2xl font-semibold text-slate-900 font-mono-tabular">0</p>
-          </div>
-          <div class="rounded-xl border border-slate-300 bg-slate-50 p-4">
-            <p class="text-xs text-slate-500 mb-1">Pending Requests</p>
-            <p id="kpiPendingOt" class="text-2xl font-semibold text-amber-700 font-mono-tabular">0</p>
-          </div>
-          <div class="rounded-xl border border-slate-300 bg-slate-50 p-4">
-            <p class="text-xs text-slate-500 mb-1">Approved Requests</p>
-            <p id="kpiApprovedOt" class="text-2xl font-semibold text-emerald-700 font-mono-tabular">0</p>
-          </div>
-          <div class="rounded-xl border border-slate-300 bg-slate-50 p-4">
-            <p class="text-xs text-slate-500 mb-1">Rejected Requests</p>
-            <p id="kpiRejectedOt" class="text-2xl font-semibold text-rose-700 font-mono-tabular">0</p>
-          </div>
-          <div class="rounded-xl border border-slate-300 bg-slate-50 p-4 col-span-2 md:col-span-1">
-            <p class="text-xs text-slate-500 mb-1">Total Approved Hours</p>
-            <p id="kpiTotalApprovedHours" class="text-2xl font-semibold text-slate-900 font-mono-tabular">0.0 hrs</p>
-          </div>
-        </div>
-
-        <div class="rounded-xl border border-slate-300 bg-slate-50 overflow-hidden">
-          <div class="px-5 py-4 border-b border-slate-300 flex items-center justify-between">
-            <h4 class="text-base font-semibold text-slate-900">Overtime Requests Queue</h4>
-          </div>
-          <div class="overflow-x-auto">
-            <table class="w-full text-sm border-collapse min-w-[1100px]">
-              <thead>
-                <tr class="bg-slate-100 text-slate-500 text-xs uppercase tracking-wide">
-                  <th class="text-left px-4 py-3 border-b border-slate-300">Employee Name</th>
-                  <th class="text-left px-4 py-3 border-b border-slate-300">Department / Position</th>
-                  <th class="text-left px-4 py-3 border-b border-slate-300">Date of OT</th>
-                  <th class="text-left px-4 py-3 border-b border-slate-300">OT Time Window</th>
-                  <th class="text-right px-4 py-3 border-b border-slate-300">Total OT Hours</th>
-                  <th class="text-left px-4 py-3 border-b border-slate-300">Reason / Purpose</th>
-                  <th class="text-left px-4 py-3 border-b border-slate-300">Current Status</th>
-                  <th class="text-center px-4 py-3 border-b border-slate-300">Actions</th>
-                </tr>
-              </thead>
-              <tbody id="overtimeTableBody" class="divide-y divide-slate-200"></tbody>
-            </table>
-          </div>
+        <div class="rounded-xl border border-slate-300 bg-slate-50 p-6 text-sm text-slate-600">
+          Integrated with Employee Management.
         </div>
       </section>
 
       <!-- MODULE: LEAVE MANAGEMENT -->
       <section id="moduleLeave" class="hidden space-y-6">
-        <div class="flex items-center justify-between">
-          <div>
-            <h3 class="text-base font-semibold text-slate-900">Leave Approval Center</h3>
-            <p class="text-xs text-slate-500 mt-0.5">Review, approve, or reject employee leave applications, monitor leave balances, and track approved leaves.</p>
-          </div>
-          <div class="flex items-center gap-2">
-            <button id="openLeaveBalancesBtn" class="text-xs bg-slate-900 text-white font-medium px-4 py-2 rounded-lg hover:bg-slate-800 transition-colors">
-              📊 View Employee Leave Balances
-            </button>
-            <button id="openLeaveArchiveBtn" class="text-xs bg-slate-900 text-white font-medium px-4 py-2 rounded-lg hover:bg-slate-800 transition-colors">
-              🗑️ View Deleted / Archived Leave
-            </button>
-          </div>
+        <div>
+          <h3 class="text-base font-semibold text-slate-900">Leave Management</h3>
+          <p class="text-xs text-slate-500 mt-0.5">Leave applications linked to central employee database.</p>
         </div>
-
-        <div class="grid grid-cols-2 md:grid-cols-5 gap-4">
-          <div class="rounded-xl border border-slate-300 bg-slate-50 p-4">
-            <p class="text-xs text-slate-500 mb-1">Total Leave Requests</p>
-            <p id="kpiTotalLeave" class="text-2xl font-semibold text-slate-900 font-mono-tabular">0</p>
-          </div>
-          <div class="rounded-xl border border-slate-300 bg-slate-50 p-4">
-            <p class="text-xs text-slate-500 mb-1">Pending Requests</p>
-            <p id="kpiPendingLeave" class="text-2xl font-semibold text-amber-700 font-mono-tabular">0</p>
-          </div>
-          <div class="rounded-xl border border-slate-300 bg-slate-50 p-4">
-            <p class="text-xs text-slate-500 mb-1">Approved Requests</p>
-            <p id="kpiApprovedLeave" class="text-2xl font-semibold text-emerald-700 font-mono-tabular">0</p>
-          </div>
-          <div class="rounded-xl border border-slate-300 bg-slate-50 p-4">
-            <p class="text-xs text-slate-500 mb-1">Rejected / Cancelled</p>
-            <p id="kpiRejectedLeave" class="text-2xl font-semibold text-rose-700 font-mono-tabular">0</p>
-          </div>
-          <div class="rounded-xl border border-slate-300 bg-slate-50 p-4 col-span-2 md:col-span-1">
-            <p class="text-xs text-slate-500 mb-1">Total Approved Days</p>
-            <p id="kpiTotalApprovedDays" class="text-2xl font-semibold text-slate-900 font-mono-tabular">0 days</p>
-          </div>
-        </div>
-
-        <div class="rounded-xl border border-slate-300 bg-slate-50 overflow-hidden">
-          <div class="px-5 py-4 border-b border-slate-300 flex items-center justify-between">
-            <h4 class="text-base font-semibold text-slate-900">Leave Applications Queue</h4>
-          </div>
-          <div class="overflow-x-auto">
-            <table class="w-full text-sm border-collapse min-w-[1100px]">
-              <thead>
-                <tr class="bg-slate-100 text-slate-500 text-xs uppercase tracking-wide">
-                  <th class="text-left px-4 py-3 border-b border-slate-300">Employee Name</th>
-                  <th class="text-left px-4 py-3 border-b border-slate-300">Department / Position</th>
-                  <th class="text-left px-4 py-3 border-b border-slate-300">Leave Type</th>
-                  <th class="text-left px-4 py-3 border-b border-slate-300">Date Range</th>
-                  <th class="text-right px-4 py-3 border-b border-slate-300">Days</th>
-                  <th class="text-left px-4 py-3 border-b border-slate-300">Reason</th>
-                  <th class="text-left px-4 py-3 border-b border-slate-300">Current Status</th>
-                  <th class="text-center px-4 py-3 border-b border-slate-300">Actions</th>
-                </tr>
-              </thead>
-              <tbody id="leaveTableBody" class="divide-y divide-slate-200"></tbody>
-            </table>
-          </div>
+        <div class="rounded-xl border border-slate-300 bg-slate-50 p-6 text-sm text-slate-600">
+          Integrated with Employee Management.
         </div>
       </section>
 
-      <!-- MODULE: PAYROLL MANAGEMENT (CENTRALIZED PROCESSING CENTER) -->
-      <section id="modulePayroll" class="hidden space-y-8">
-        <!-- Payroll Control Panel -->
-        <div class="rounded-xl border border-slate-300 bg-slate-50 p-5 space-y-4">
-          <div class="flex flex-wrap items-center justify-between gap-4 border-b border-slate-200 pb-4">
-            <div>
-              <h3 class="text-base font-semibold text-slate-900">Centralized Payroll Generation Center</h3>
-              <p class="text-xs text-slate-500 mt-0.5">Select a cutoff period, review automatic data integration, resolve exceptions, and finalize payroll.</p>
-            </div>
-            <div class="flex items-center gap-3">
-              <div class="flex flex-col gap-1">
-                <label class="text-[10px] font-medium text-slate-500 uppercase">Payroll Cutoff Period</label>
-                <select id="payrollCutoffSelect" class="bg-white border border-slate-300 rounded-lg px-3 py-2 text-xs font-semibold text-slate-900 focus:outline-none focus:ring-2 focus:ring-amber-500/65">
-                  <option value="2026-08-1">August 2026 (1st – 15th)</option>
-                  <option value="2026-08-2">August 2026 (16th – End of Month)</option>
-                  <option value="2026-09-1">September 2026 (1st – 15th)</option>
-                  <option value="2026-09-2">September 2026 (16th – End of Month)</option>
-                </select>
-              </div>
-              <button id="generatePayrollBtn" class="mt-4 bg-amber-500 hover:bg-amber-400 text-slate-900 font-semibold text-xs px-5 py-2.5 rounded-lg transition-colors shadow-sm">
-                ⚡ Generate Payroll
-              </button>
-            </div>
-          </div>
-
-          <!-- Payroll Dashboard / KPI Cards -->
-          <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3 pt-2">
-            <div class="rounded-xl border border-slate-300 bg-white p-4">
-              <p class="text-xs text-slate-500 mb-1">Total Employees</p>
-              <p id="payKpiTotalEmps" class="text-2xl font-semibold text-slate-900 font-mono-tabular">0</p>
-            </div>
-            <div class="rounded-xl border border-slate-300 bg-white p-4">
-              <p class="text-xs text-slate-500 mb-1">Total Gross Payroll</p>
-              <p id="payKpiGross" class="text-2xl font-semibold text-slate-900 font-mono-tabular">₱0.00</p>
-            </div>
-            <div class="rounded-xl border border-slate-300 bg-white p-4">
-              <p class="text-xs text-slate-500 mb-1">Total OT Pay</p>
-              <p id="payKpiOtPay" class="text-2xl font-semibold text-amber-700 font-mono-tabular">₱0.00</p>
-            </div>
-            <div class="rounded-xl border border-slate-300 bg-white p-4">
-              <p class="text-xs text-slate-500 mb-1">Total Deductions</p>
-              <p id="payKpiDeductions" class="text-2xl font-semibold text-rose-700 font-mono-tabular">₱0.00</p>
-            </div>
-            <div class="rounded-xl border border-slate-300 bg-white p-4">
-              <p class="text-xs text-slate-500 mb-1">Total Net Payroll</p>
-              <p id="payKpiNet" class="text-2xl font-semibold text-emerald-700 font-mono-tabular">₱0.00</p>
-            </div>
-            <div class="rounded-xl border border-slate-300 bg-white p-4">
-              <p class="text-xs text-slate-500 mb-1">Payroll Issues</p>
-              <p id="payKpiIssues" class="text-2xl font-semibold text-rose-700 font-mono-tabular">0</p>
-            </div>
-          </div>
+      <!-- MODULE: PAYROLL MANAGEMENT -->
+      <section id="modulePayroll" class="hidden space-y-6">
+        <div>
+          <h3 class="text-base font-semibold text-slate-900">Centralized Payroll Generation Center</h3>
+          <p class="text-xs text-slate-500 mt-0.5">Automatically retrieves employee salary, statutory details, and attendance.</p>
         </div>
-
-        <!-- Payroll Exceptions / Validation Section -->
-        <div id="payrollExceptionsCard" class="hidden rounded-xl border border-rose-500/40 bg-rose-500/5 p-5 space-y-3">
-          <div class="flex items-center justify-between border-b border-rose-500/20 pb-2">
-            <h4 class="text-sm font-semibold text-rose-800">⚠️ Payroll Exceptions &amp; Data Validation Issues</h4>
-            <span id="exceptionCountBadge" class="text-xs bg-rose-600 text-white px-2 py-0.5 rounded-full font-mono">0 issues</span>
-          </div>
-          <p class="text-xs text-rose-700">The following discrepancies or missing records were detected in source modules. Please correct them before finalizing payroll.</p>
-          <div id="payrollExceptionsList" class="space-y-2"></div>
-        </div>
-
-        <!-- Payroll Review Table Section -->
-        <div class="rounded-xl border border-slate-300 bg-slate-50 overflow-hidden space-y-4">
-          <div class="px-5 py-4 border-b border-slate-300 flex items-center justify-between">
-            <div>
-              <h4 class="text-base font-semibold text-slate-900">Payroll Review Table</h4>
-              <p class="text-xs text-slate-500 mt-0.5">Verify automated calculations across attendance, leave, overtime, and statutory deductions.</p>
-            </div>
-            <div id="payrollActionButtons" class="flex items-center gap-2">
-              <button id="finalizePayrollBtn" disabled class="text-xs bg-slate-300 text-slate-500 cursor-not-allowed font-semibold px-4 py-2 rounded-lg transition-colors">
-                🔒 Finalize Payroll
-              </button>
-              <button id="unlockPayrollBtn" class="hidden text-xs bg-rose-600 text-white hover:bg-rose-500 font-semibold px-4 py-2 rounded-lg transition-colors">
-                🔓 Unlock / Edit Payroll
-              </button>
-            </div>
-          </div>
-
-          <div class="overflow-x-auto">
-            <table class="w-full text-sm border-collapse min-w-[1400px]">
-              <thead>
-                <tr class="bg-slate-100 text-slate-500 text-xs uppercase tracking-wide">
-                  <th class="text-left px-3 py-3 border-b border-slate-300">Emp. ID / Name</th>
-                  <th class="text-right px-3 py-3 border-b border-slate-300">Basic Pay</th>
-                  <th class="text-right px-3 py-3 border-b border-slate-300">Days Worked</th>
-                  <th class="text-right px-3 py-3 border-b border-slate-300">Absences</th>
-                  <th class="text-right px-3 py-3 border-b border-slate-300">Late / Undertime</th>
-                  <th class="text-right px-3 py-3 border-b border-slate-300">Approved OT (Hrs / Pay)</th>
-                  <th class="text-right px-3 py-3 border-b border-slate-300 bg-emerald-500/5">Gross Pay</th>
-                  <th class="text-right px-3 py-3 border-b border-slate-300 bg-rose-500/5">Total Deductions</th>
-                  <th class="text-right px-3 py-3 border-b border-slate-300 bg-emerald-500/10">Net Pay</th>
-                  <th class="text-center px-3 py-3 border-b border-slate-300">Payroll Status</th>
-                  <th class="text-center px-3 py-3 border-b border-slate-300">Actions</th>
-                </tr>
-              </thead>
-              <tbody id="payrollReviewTableBody" class="divide-y divide-slate-200">
-                <tr><td colspan="11" class="px-4 py-8 text-center text-slate-400">Click <strong>"Generate Payroll"</strong> above to compute payroll for the selected cutoff.</td></tr>
-              </tbody>
-            </table>
-          </div>
-        </div>
-
-        <!-- Payroll History Section -->
-        <div class="rounded-xl border border-slate-300 bg-slate-50 p-5 space-y-4">
-          <div class="flex items-center justify-between border-b border-slate-200 pb-3">
-            <div>
-              <h4 class="text-base font-semibold text-slate-900">Payroll History &amp; Archives</h4>
-              <p class="text-xs text-slate-500 mt-0.5">Review previously generated and finalized payroll periods.</p>
-            </div>
-          </div>
-          <div class="overflow-x-auto">
-            <table class="w-full text-sm border-collapse">
-              <thead>
-                <tr class="bg-slate-100 text-slate-500 text-xs uppercase tracking-wide">
-                  <th class="text-left px-4 py-2.5 border-b border-slate-200">Cutoff Period</th>
-                  <th class="text-left px-4 py-2.5 border-b border-slate-200">Generated Date</th>
-                  <th class="text-right px-4 py-2.5 border-b border-slate-200">Total Employees</th>
-                  <th class="text-right px-4 py-2.5 border-b border-slate-200">Total Net Payroll</th>
-                  <th class="text-center px-4 py-2.5 border-b border-slate-200">Status</th>
-                  <th class="text-center px-4 py-2.5 border-b border-slate-200">Action</th>
-                </tr>
-              </thead>
-              <tbody id="payrollHistoryTableBody" class="divide-y divide-slate-200">
-                <tr><td colspan="6" class="px-4 py-6 text-center text-slate-400">No finalized payroll history recorded yet.</td></tr>
-              </tbody>
-            </table>
-          </div>
-        </div>
-
-        <!-- Add Employee Section for testing -->
-        <div class="rounded-xl border border-slate-300 bg-slate-50 p-5 space-y-4">
-          <h4 class="text-base font-semibold text-slate-900">Add Employee Profile (For Roster &amp; Payroll Testing)</h4>
-          <form id="employeeForm" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4" novalidate>
-            <div class="flex flex-col gap-1">
-              <label class="text-xs font-medium text-slate-500">Employee Number</label>
-              <input id="employeeNumber" name="employeeNumber" type="text" required class="bg-white border border-slate-300 rounded-lg px-3 py-2 text-sm text-slate-900" placeholder="0001234" />
-            </div>
-            <div class="flex flex-col gap-1">
-              <label class="text-xs font-medium text-slate-500">First Name</label>
-              <input id="firstName" name="firstName" type="text" required class="bg-white border border-slate-300 rounded-lg px-3 py-2 text-sm text-slate-900" placeholder="Juan" />
-            </div>
-            <div class="flex flex-col gap-1">
-              <label class="text-xs font-medium text-slate-500">Last Name</label>
-              <input id="lastName" name="lastName" type="text" required class="bg-white border border-slate-300 rounded-lg px-3 py-2 text-sm text-slate-900" placeholder="Dela Cruz" />
-            </div>
-            <div class="flex flex-col gap-1">
-              <label class="text-xs font-medium text-slate-500">Corporate Email</label>
-              <input id="email" name="email" type="email" required class="bg-white border border-slate-300 rounded-lg px-3 py-2 text-sm text-slate-900" placeholder="juan@company.com" />
-            </div>
-            <div class="flex flex-col gap-1">
-              <label class="text-xs font-medium text-slate-500">Hire Date</label>
-              <input id="hireDate" name="hireDate" type="date" required class="bg-white border border-slate-300 rounded-lg px-3 py-2 text-sm text-slate-900" />
-            </div>
-            <div class="flex flex-col gap-1">
-              <label class="text-xs font-medium text-slate-500">Department</label>
-              <input id="department" name="department" type="text" required class="bg-white border border-slate-300 rounded-lg px-3 py-2 text-sm text-slate-900" placeholder="Operations" />
-            </div>
-            <div class="flex flex-col gap-1">
-              <label class="text-xs font-medium text-slate-500">Job Title</label>
-              <input id="jobTitle" name="jobTitle" type="text" required class="bg-white border border-slate-300 rounded-lg px-3 py-2 text-sm text-slate-900" placeholder="Officer" />
-            </div>
-            <div class="flex flex-col gap-1">
-              <label class="text-xs font-medium text-slate-500">Monthly Basic Salary (₱)</label>
-              <input id="basicSalary" name="basicSalary" type="number" min="0" step="0.01" required class="bg-white border border-slate-300 rounded-lg px-3 py-2 text-sm text-slate-900" placeholder="25000.00" />
-            </div>
-            <div class="lg:col-span-4 flex justify-end">
-              <button type="submit" class="bg-amber-500 hover:bg-amber-400 text-slate-900 font-semibold text-sm px-5 py-2.5 rounded-lg transition-colors">
-                Add Employee Record
-              </button>
-            </div>
-          </form>
+        <div class="rounded-xl border border-slate-300 bg-slate-50 p-6 text-sm text-slate-600">
+          Integrated with Employee Management. Salaries and rates pull automatically for payroll cutoffs.
         </div>
       </section>
 
       <!-- MODULE: INACTIVE EMPLOYEES -->
       <section id="moduleInactive" class="hidden space-y-6">
         <div>
-          <h3 class="text-base font-semibold text-slate-900">Inactive &amp; Separated Employee Records</h3>
-          <p class="text-xs text-slate-500 mt-0.5">Archive of separated personnel with historical logs and reactivation options.</p>
+          <h3 class="text-base font-semibold text-slate-900">Inactive &amp; Archived Employee Records</h3>
+          <p class="text-xs text-slate-500 mt-0.5">Archived personnel preserved for historical payroll and attendance integrity.</p>
         </div>
-
         <div class="rounded-xl border border-slate-300 bg-slate-50 overflow-hidden">
-          <div class="px-5 py-4 border-b border-slate-300">
-            <h4 class="text-base font-semibold text-slate-900">Separated Employees Roster</h4>
-          </div>
           <div class="overflow-x-auto">
-            <table class="w-full text-sm border-collapse min-w-[1000px]">
+            <table class="w-full text-sm border-collapse">
               <thead>
                 <tr class="bg-slate-100 text-slate-500 text-xs uppercase tracking-wide">
-                  <th class="text-left px-4 py-3 border-b border-slate-300">Employee</th>
-                  <th class="text-left px-4 py-3 border-b border-slate-300">Department / Title</th>
-                  <th class="text-left px-4 py-3 border-b border-slate-300">Separation Date</th>
-                  <th class="text-left px-4 py-3 border-b border-slate-300">Reason</th>
+                  <th class="text-left px-4 py-3 border-b border-slate-300">Emp ID &amp; Name</th>
+                  <th class="text-left px-4 py-3 border-b border-slate-300">Department</th>
+                  <th class="text-left px-4 py-3 border-b border-slate-300">Status</th>
                   <th class="text-center px-4 py-3 border-b border-slate-300">Action</th>
                 </tr>
               </thead>
-              <tbody id="inactiveTableBody" class="divide-y divide-slate-200"></tbody>
+              <tbody id="inactiveTableBody" class="divide-y divide-slate-200">
+                <tr><td colspan="4" class="px-4 py-6 text-center text-slate-400">No inactive employee records.</td></tr>
+              </tbody>
             </table>
           </div>
         </div>
@@ -682,94 +369,209 @@
   </div>
 </div>
 
-<!-- =========================================================
-     DETAILED PAYROLL COMPUTATION MODAL
-========================================================= -->
-<div id="payrollDetailModal" class="hidden fixed inset-0 z-50 items-center justify-center bg-black/60 px-4">
-  <div class="bg-white border border-slate-300 rounded-xl max-w-2xl w-full max-h-[90vh] flex flex-col p-6 space-y-4 overflow-hidden shadow-2xl">
+<!-- ADD / EDIT EMPLOYEE MODAL -->
+<div id="employeeModal" class="hidden fixed inset-0 z-50 items-center justify-center bg-black/60 px-4 overflow-y-auto py-8">
+  <div class="bg-white border border-slate-300 rounded-xl max-w-3xl w-full max-h-[90vh] flex flex-col p-6 space-y-4 shadow-2xl">
+    <div class="flex items-center justify-between border-b border-slate-200 pb-3">
+      <h3 id="modalTitle" class="text-slate-900 font-semibold text-lg">Add New Employee Record</h3>
+      <button id="closeEmployeeModalBtn" class="text-slate-400 hover:text-slate-700 font-bold text-lg">✕</button>
+    </div>
+
+    <form id="employeeForm" class="flex-1 overflow-y-auto space-y-6 pr-1 text-sm" novalidate>
+      <input type="hidden" id="editEmployeeId" />
+
+      <!-- Personal Information -->
+      <div class="space-y-3">
+        <h4 class="font-semibold text-xs uppercase tracking-wider text-amber-600">Personal Information</h4>
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+          <div>
+            <label class="text-xs font-medium text-slate-500">Employee ID *</label>
+            <input id="modalEmpId" type="text" required class="w-full bg-white border border-slate-300 rounded-lg px-3 py-2 text-sm text-slate-900" placeholder="2026-001" />
+          </div>
+          <div>
+            <label class="text-xs font-medium text-slate-500">First Name *</label>
+            <input id="modalFirstName" type="text" required class="w-full bg-white border border-slate-300 rounded-lg px-3 py-2 text-sm text-slate-900" placeholder="Juan" />
+          </div>
+          <div>
+            <label class="text-xs font-medium text-slate-500">Middle Name</label>
+            <input id="modalMiddleName" type="text" class="w-full bg-white border border-slate-300 rounded-lg px-3 py-2 text-sm text-slate-900" placeholder="Santos" />
+          </div>
+          <div>
+            <label class="text-xs font-medium text-slate-500">Last Name *</label>
+            <input id="modalLastName" type="text" required class="w-full bg-white border border-slate-300 rounded-lg px-3 py-2 text-sm text-slate-900" placeholder="Dela Cruz" />
+          </div>
+          <div>
+            <label class="text-xs font-medium text-slate-500">Date of Birth</label>
+            <input id="modalDob" type="date" class="w-full bg-white border border-slate-300 rounded-lg px-3 py-2 text-sm text-slate-900" />
+          </div>
+          <div>
+            <label class="text-xs font-medium text-slate-500">Contact Number</label>
+            <input id="modalContact" type="text" class="w-full bg-white border border-slate-300 rounded-lg px-3 py-2 text-sm text-slate-900" placeholder="+63 912 345 6789" />
+          </div>
+          <div class="sm:col-span-2">
+            <label class="text-xs font-medium text-slate-500">Email Address *</label>
+            <input id="modalEmail" type="email" required class="w-full bg-white border border-slate-300 rounded-lg px-3 py-2 text-sm text-slate-900" placeholder="juan@company.com" />
+          </div>
+          <div>
+            <label class="text-xs font-medium text-slate-500">Address</label>
+            <input id="modalAddress" type="text" class="w-full bg-white border border-slate-300 rounded-lg px-3 py-2 text-sm text-slate-900" placeholder="Manila, Philippines" />
+          </div>
+        </div>
+      </div>
+
+      <!-- Employment Information -->
+      <div class="space-y-3 pt-2 border-t border-slate-200">
+        <h4 class="font-semibold text-xs uppercase tracking-wider text-amber-600">Employment Information</h4>
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+          <div>
+            <label class="text-xs font-medium text-slate-500">Department *</label>
+            <select id="modalDepartment" required class="w-full bg-white border border-slate-300 rounded-lg px-3 py-2 text-sm text-slate-900">
+              <option value="Human Resources">Human Resources</option>
+              <option value="Operations">Operations</option>
+              <option value="Engineering">Engineering</option>
+              <option value="Finance">Finance</option>
+              <option value="Sales">Sales</option>
+            </select>
+          </div>
+          <div>
+            <label class="text-xs font-medium text-slate-500">Position *</label>
+            <input id="modalPosition" type="text" required class="w-full bg-white border border-slate-300 rounded-lg px-3 py-2 text-sm text-slate-900" placeholder="Software Engineer" />
+          </div>
+          <div>
+            <label class="text-xs font-medium text-slate-500">Employment Type *</label>
+            <select id="modalEmploymentType" required class="w-full bg-white border border-slate-300 rounded-lg px-3 py-2 text-sm text-slate-900">
+              <option value="Regular">Regular</option>
+              <option value="Probationary">Probationary</option>
+              <option value="Contractual">Contractual</option>
+              <option value="Part-time">Part-time</option>
+            </select>
+          </div>
+          <div>
+            <label class="text-xs font-medium text-slate-500">Date Hired *</label>
+            <input id="modalHireDate" type="date" required class="w-full bg-white border border-slate-300 rounded-lg px-3 py-2 text-sm text-slate-900" />
+          </div>
+          <div>
+            <label class="text-xs font-medium text-slate-500">Employment Status *</label>
+            <select id="modalEmploymentStatus" required class="w-full bg-white border border-slate-300 rounded-lg px-3 py-2 text-sm text-slate-900">
+              <option value="Active">Active</option>
+              <option value="On Leave">On Leave</option>
+              <option value="Suspended">Suspended</option>
+              <option value="Resigned">Resigned</option>
+              <option value="Terminated">Terminated</option>
+              <option value="Inactive">Inactive</option>
+            </select>
+          </div>
+          <div>
+            <label class="text-xs font-medium text-slate-500">Immediate Supervisor</label>
+            <input id="modalSupervisor" type="text" class="w-full bg-white border border-slate-300 rounded-lg px-3 py-2 text-sm text-slate-900" placeholder="Maria Santos" />
+          </div>
+        </div>
+      </div>
+
+      <!-- Payroll Information -->
+      <div class="space-y-3 pt-2 border-t border-slate-200">
+        <h4 class="font-semibold text-xs uppercase tracking-wider text-amber-600">Payroll &amp; Statutory Information</h4>
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+          <div>
+            <label class="text-xs font-medium text-slate-500">Salary Type</label>
+            <select id="modalSalaryType" class="w-full bg-white border border-slate-300 rounded-lg px-3 py-2 text-sm text-slate-900">
+              <option value="Monthly">Monthly</option>
+              <option value="Daily">Daily</option>
+            </select>
+          </div>
+          <div>
+            <label class="text-xs font-medium text-slate-500">Basic Salary / Daily Rate (₱) *</label>
+            <input id="modalBasicSalary" type="number" step="0.01" required class="w-full bg-white border border-slate-300 rounded-lg px-3 py-2 text-sm text-slate-900" placeholder="25000.00" />
+          </div>
+          <div>
+            <label class="text-xs font-medium text-slate-500">Payroll Frequency</label>
+            <select id="modalPayrollFreq" class="w-full bg-white border border-slate-300 rounded-lg px-3 py-2 text-sm text-slate-900">
+              <option value="Semi-Monthly">Semi-Monthly (1st-15th, 16th-End)</option>
+              <option value="Monthly">Monthly</option>
+            </select>
+          </div>
+          <div>
+            <label class="text-xs font-medium text-slate-500">SSS Number</label>
+            <input id="modalSss" type="text" class="w-full bg-white border border-slate-300 rounded-lg px-3 py-2 text-sm text-slate-900" placeholder="34-1234567-8" />
+          </div>
+          <div>
+            <label class="text-xs font-medium text-slate-500">PhilHealth Number</label>
+            <input id="modalPhilhealth" type="text" class="w-full bg-white border border-slate-300 rounded-lg px-3 py-2 text-sm text-slate-900" placeholder="12-345678901-2" />
+          </div>
+          <div>
+            <label class="text-xs font-medium text-slate-500">Pag-IBIG Number</label>
+            <input id="modalPagibig" type="text" class="w-full bg-white border border-slate-300 rounded-lg px-3 py-2 text-sm text-slate-900" placeholder="1212-3456-7890" />
+          </div>
+          <div>
+            <label class="text-xs font-medium text-slate-500">Tax ID Number (TIN)</label>
+            <input id="modalTin" type="text" class="w-full bg-white border border-slate-300 rounded-lg px-3 py-2 text-sm text-slate-900" placeholder="123-456-789-000" />
+          </div>
+        </div>
+      </div>
+
+      <div class="flex justify-end gap-3 pt-4 border-t border-slate-200">
+        <button type="button" id="cancelEmployeeModalBtn" class="px-4 py-2 text-sm rounded-lg border border-slate-300 text-slate-600 hover:bg-slate-100 transition-colors">Cancel</button>
+        <button type="submit" id="saveEmployeeBtn" class="px-5 py-2 text-sm font-semibold rounded-lg bg-amber-500 hover:bg-amber-400 text-slate-900 transition-colors">Save Employee Record</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- EMPLOYEE PROFILE VIEW MODAL -->
+<div id="employeeProfileModal" class="hidden fixed inset-0 z-50 items-center justify-center bg-black/60 px-4 overflow-y-auto py-8">
+  <div class="bg-white border border-slate-300 rounded-xl max-w-4xl w-full max-h-[90vh] flex flex-col p-6 space-y-4 shadow-2xl overflow-hidden">
     <div class="flex items-center justify-between border-b border-slate-200 pb-3">
       <div>
-        <h3 id="modalEmpNameTitle" class="text-slate-900 font-semibold text-lg">Employee Payslip Breakdown</h3>
-        <p id="modalEmpMeta" class="text-xs text-slate-500">Cutoff: August 2026 (1st – 15th)</p>
+        <h3 id="profileModalName" class="text-slate-900 font-semibold text-xl">Employee Profile</h3>
+        <p id="profileModalMeta" class="text-xs text-slate-500">Department • Position • Status</p>
       </div>
-      <button id="closePayrollDetailBtn" class="text-slate-400 hover:text-slate-700 font-bold text-lg">✕</button>
+      <button id="closeProfileModalBtn" class="text-slate-400 hover:text-slate-700 font-bold text-lg">✕</button>
     </div>
 
-    <div class="flex-1 overflow-y-auto space-y-4 text-sm">
-      <div class="grid grid-cols-2 gap-4 bg-slate-50 p-4 rounded-lg border border-slate-200">
-        <div>
-          <p class="text-xs text-slate-500">Basic Monthly Salary</p>
-          <p id="detBasicSalary" class="font-semibold text-slate-900">₱0.00</p>
-        </div>
-        <div>
-          <p class="text-xs text-slate-500">Daily Rate (Est.)</p>
-          <p id="detDailyRate" class="font-semibold text-slate-900">₱0.00</p>
-        </div>
-      </div>
-
-      <div class="space-y-2">
-        <h4 class="font-semibold text-xs uppercase tracking-wider text-slate-500">Earnings &amp; Attendance Integration</h4>
-        <div class="border border-slate-200 rounded-lg divide-y divide-slate-100 text-xs">
-          <div class="flex justify-between px-3 py-2"><span>Days Worked (Attendance)</span><span id="detDaysWorked" class="font-mono">11 days</span></div>
-          <div class="flex justify-between px-3 py-2"><span>Basic Pay for Days Worked</span><span id="detBasicPayEarned" class="font-mono">₱0.00</span></div>
-          <div class="flex justify-between px-3 py-2"><span>Approved Overtime Pay</span><span id="detOtPay" class="font-mono text-amber-700">₱0.00</span></div>
-          <div class="flex justify-between px-3 py-2 bg-slate-50 font-semibold"><span>Total Gross Pay</span><span id="detGrossPay" class="font-mono">₱0.00</span></div>
-        </div>
-      </div>
-
-      <div class="space-y-2">
-        <h4 class="font-semibold text-xs uppercase tracking-wider text-slate-500">Deductions Integration</h4>
-        <div class="border border-slate-200 rounded-lg divide-y divide-slate-100 text-xs">
-          <div class="flex justify-between px-3 py-2"><span>Absence Deductions</span><span id="detAbsenceDed" class="font-mono text-rose-700">₱0.00</span></div>
-          <div class="flex justify-between px-3 py-2"><span>Late / Undertime Deductions</span><span id="detLateDed" class="font-mono text-rose-700">₱0.00</span></div>
-          <div class="flex justify-between px-3 py-2"><span>SSS Contribution (EE)</span><span id="detSss" class="font-mono text-rose-700">₱0.00</span></div>
-          <div class="flex justify-between px-3 py-2"><span>PhilHealth Contribution (EE)</span><span id="detPhilhealth" class="font-mono text-rose-700">₱0.00</span></div>
-          <div class="flex justify-between px-3 py-2"><span>Pag-IBIG Contribution (EE)</span><span id="detPagibig" class="font-mono text-rose-700">₱0.00</span></div>
-          <div class="flex justify-between px-3 py-2"><span>Withholding Tax</span><span id="detTax" class="font-mono text-rose-700">₱0.00</span></div>
-          <div class="flex justify-between px-3 py-2 bg-slate-50 font-semibold"><span>Total Deductions</span><span id="detTotalDed" class="font-mono text-rose-700">₱0.00</span></div>
-        </div>
-      </div>
-
-      <div class="bg-emerald-500/10 border border-emerald-500/30 rounded-lg p-4 flex items-center justify-between">
-        <span class="font-semibold text-emerald-900">Net Take-Home Pay</span>
-        <span id="detNetPay" class="text-xl font-bold font-mono text-emerald-700">₱0.00</span>
-      </div>
+    <!-- Profile Tabs -->
+    <div class="flex border-b border-slate-200 gap-6 text-xs font-medium text-slate-500 overflow-x-auto">
+      <button data-tab="tabPersonal" class="profile-tab pb-2 text-amber-600 border-b-2 border-amber-600">Personal Info</button>
+      <button data-tab="tabEmployment" class="profile-tab pb-2 hover:text-slate-800">Employment</button>
+      <button data-tab="tabCompensation" class="profile-tab pb-2 hover:text-slate-800">Compensation</button>
+      <button data-tab="tabAttendance" class="profile-tab pb-2 hover:text-slate-800">Attendance</button>
+      <button data-tab="tabSchedule" class="profile-tab pb-2 hover:text-slate-800">Schedule</button>
+      <button data-tab="tabLeave" class="profile-tab pb-2 hover:text-slate-800">Leave</button>
+      <button data-tab="tabOvertime" class="profile-tab pb-2 hover:text-slate-800">Overtime</button>
+      <button data-tab="tabPayroll" class="profile-tab pb-2 hover:text-slate-800">Payroll</button>
+      <button data-tab="tabDocuments" class="profile-tab pb-2 hover:text-slate-800">Documents</button>
     </div>
 
-    <div class="flex justify-end pt-2 border-t border-slate-200">
-      <button id="closeDetailModalBtn" class="px-4 py-2 text-sm rounded-lg border border-slate-300 text-slate-600 hover:bg-slate-100 transition-colors">Close</button>
+    <!-- Tab Contents -->
+    <div class="flex-1 overflow-y-auto py-2 text-sm space-y-4">
+      <div id="tabPersonal" class="profile-content space-y-3"></div>
+      <div id="tabEmployment" class="profile-content hidden space-y-3"></div>
+      <div id="tabCompensation" class="profile-content hidden space-y-3"></div>
+      <div id="tabAttendance" class="profile-content hidden space-y-3">Attendance records for this employee.</div>
+      <div id="tabSchedule" class="profile-content hidden space-y-3">Work schedule and shift assignments.</div>
+      <div id="tabLeave" class="profile-content hidden space-y-3">Leave history and balances.</div>
+      <div id="tabOvertime" class="profile-content hidden space-y-3">Overtime requests and logs.</div>
+      <div id="tabPayroll" class="profile-content hidden space-y-3">Historical payslips and computation breakdown.</div>
+      <div id="tabDocuments" class="profile-content hidden space-y-3">Uploaded HR documents and compliance certificates.</div>
+    </div>
+
+    <div class="flex justify-end pt-3 border-t border-slate-200">
+      <button id="closeProfileBtn" class="px-4 py-2 text-sm rounded-lg border border-slate-300 text-slate-600 hover:bg-slate-100 transition-colors">Close Profile</button>
     </div>
   </div>
 </div>
 
 <script>
-/* =========================================================
-   SUPABASE CONFIGURATION
-========================================================= */
+/* SUPABASE CONFIGURATION */
 const SUPABASE_URL = 'https://vdhloboribrqofhifluu.supabase.co';
 const SUPABASE_KEY = 'sb_publishable_VsbbODbWKrv2g9HUKz7EzA_wUh9bXzm';
 
 const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 const EMPLOYEES_TABLE = 'employees';
 
-/* =========================================================
-   GLOBAL STATE & MOCK INTEGRATION DATA
-========================================================= */
-let activeEmployeesCache = [];
-let inactiveEmployeesCache = [];
-let attendanceCache = [];
-let leaveCache = [];
-let overtimeCache = [];
+let employeesCache = [];
+let selectedProfileEmp = null;
 
-let currentPayrollStatus = 'Draft'; // 'Draft' | 'For Review' | 'Finalized' | 'Released'
-let generatedPayrollRecords = [];
-let payrollHistoryCache = [];
-
-let currentAdminEmail = 'admin@company.com';
-
-/* =========================================================
-   UTILITY FUNCTIONS
-========================================================= */
+/* UTILITY FUNCTIONS */
 function formatCurrency(value) {
   const safeValue = Number.isFinite(value) ? value : 0;
   return new Intl.NumberFormat('en-PH', { style: 'currency', currency: 'PHP' }).format(safeValue);
@@ -830,10 +632,8 @@ function credentialsArePlaceholders() {
   return SUPABASE_URL === 'YOUR_SUPABASE_URL_HERE' || SUPABASE_KEY === 'YOUR_SUPABASE_ANON_KEY_HERE';
 }
 
-/* =========================================================
-   NAVIGATION & MODULE SWITCHING
-========================================================= */
-const MODULES = ['dashboard', 'schedule', 'attendance', 'overtime', 'leave', 'payroll', 'inactive'];
+/* NAVIGATION & MODULE SWITCHING */
+const MODULES = ['dashboard', 'employees', 'schedule', 'attendance', 'overtime', 'leave', 'payroll', 'inactive'];
 
 function switchModule(targetId) {
   MODULES.forEach(mod => {
@@ -850,23 +650,24 @@ function switchModule(targetId) {
 
   const titles = {
     dashboard: 'Dashboard Overview',
+    employees: 'Employee Directory & Central Database',
     schedule: 'Schedule Management',
-    attendance: 'Attendance Management',
+    attendance: 'Attendance Monitoring & Logging',
     overtime: 'Overtime Approval Center',
     leave: 'Leave Approval Center',
     payroll: 'Centralized Payroll Generation Center',
-    inactive: 'Inactive Employee Records'
+    inactive: 'Inactive & Archived Employee Records'
   };
   document.getElementById('pageTitle').textContent = titles[targetId] || 'HRIS Platform';
 
-  if (targetId === 'payroll') {
-    renderPayrollModule();
+  if (targetId === 'employees') {
+    renderEmployeeDirectory();
+  } else if (targetId === 'inactive') {
+    renderInactiveEmployees();
   }
 }
 
-/* =========================================================
-   DATA INITIALIZATION & FETCHING
-========================================================= */
+/* DATA FETCHING & DIRECTORY RENDERING */
 async function fetchEmployees() {
   if (credentialsArePlaceholders()) {
     setConnectionStatus('unconfigured');
@@ -878,42 +679,10 @@ async function fetchEmployees() {
     if (error) throw error;
     setConnectionStatus('connected');
 
-    const allEmps = data || [];
-    activeEmployeesCache = allEmps.filter(e => !e.is_inactive);
-    inactiveEmployeesCache = allEmps.filter(e => e.is_inactive);
-
-    // Seed robust mock attendance, leave, and approved overtime records linked to active employees
-    if (activeEmployeesCache.length > 0) {
-      attendanceCache = activeEmployeesCache.map((emp, i) => ({
-        id: 'att_' + emp.id,
-        employee_id: emp.id,
-        days_worked: 11,
-        days_absent: i % 2 === 0 ? 0 : 1,
-        late_minutes: i === 0 ? 25 : 0,
-        undertime_minutes: 0,
-        status: 'Complete'
-      }));
-
-      leaveCache = activeEmployeesCache.map((emp, i) => ({
-        id: 'leave_' + emp.id,
-        employee_id: emp.id,
-        leave_type: 'Sick Leave',
-        days: i % 3 === 0 ? 1 : 0,
-        status: 'Approved', // Only approved leave included per system rule
-        is_paid: true
-      }));
-
-      overtimeCache = activeEmployeesCache.map((emp, i) => ({
-        id: 'ot_' + emp.id,
-        employee_id: emp.id,
-        ot_date: '2026-08-10',
-        approved_hours: i === 0 ? 4.0 : (i === 1 ? 2.5 : 0.0),
-        status: 'Approved' // Only approved OT included per system rule
-      }));
-    }
-
+    employeesCache = data || [];
     updateDashboardOverview();
-    populateDropdowns();
+    renderEmployeeDirectory();
+    renderInactiveEmployees();
   } catch (err) {
     console.error('fetchEmployees error:', err);
     setConnectionStatus('error');
@@ -922,284 +691,251 @@ async function fetchEmployees() {
 }
 
 function updateDashboardOverview() {
-  document.getElementById('dashTotalActive').textContent = activeEmployeesCache.length;
-  document.getElementById('dashTotalInactive').textContent = inactiveEmployeesCache.length;
-  document.getElementById('dashPresentToday').textContent = activeEmployeesCache.length;
+  const activeCount = employeesCache.filter(e => e.employment_status !== 'Inactive' && e.employment_status !== 'Resigned' && e.employment_status !== 'Terminated').length;
+  const inactiveCount = employeesCache.length - activeCount;
+
+  document.getElementById('dashTotalActive').textContent = activeCount;
+  document.getElementById('dashTotalInactive').textContent = inactiveCount;
+  document.getElementById('dashPresentToday').textContent = activeCount;
   document.getElementById('dashAbsentToday').textContent = 0;
-  document.getElementById('dashPendingOT').textContent = 0;
-  document.getElementById('dashPendingLeave').textContent = 0;
 }
 
-function populateDropdowns() {
-  const sel = document.getElementById('attEmployeeId');
-  if (sel) {
-    sel.innerHTML = '<option value="">Select Employee...</option>' + 
-      activeEmployeesCache.map(e => `<option value="${e.id}">${escapeHtml(e.first_name)} ${escapeHtml(e.last_name)}</option>`).join('');
-  }
-}
+function renderEmployeeDirectory() {
+  const tbody = document.getElementById('employeeDirectoryTableBody');
+  const searchVal = (document.getElementById('empSearchInput').value || '').toLowerCase();
+  const deptVal = document.getElementById('filterDept').value;
+  const statusVal = document.getElementById('filterStatus').value;
+  const typeVal = document.getElementById('filterType').value;
 
-/* =========================================================
-   CENTRALIZED PAYROLL GENERATION & COMPUTATION ENGINE
-========================================================= */
-function generatePayroll() {
-  if (currentPayrollStatus === 'Finalized') {
-    showToast('Payroll is finalized and locked. Unlock it first to make changes.', 'warning');
-    return;
-  }
+  const filtered = employeesCache.filter(e => {
+    if (e.employment_status === 'Inactive') return false; // Inactive in separate module per rule
 
-  const cutoff = document.getElementById('payrollCutoffSelect').value;
-  generatedPayrollRecords = [];
-
-  activeEmployeesCache.forEach(emp => {
-    const basicSalary = Number(emp.monthly_basic_salary) || 25000;
-    const semiMonthlyBasic = basicSalary / 2; // Semi-monthly cutoff base
-    const dailyRate = basicSalary / 22; // Est working days per month
-
-    // Retrieve Attendance integration
-    const att = attendanceCache.find(a => a.employee_id === emp.id) || { days_worked: 11, days_absent: 0, late_minutes: 0 };
-    
-    // Retrieve Approved Leave integration
-    const leave = leaveCache.find(l => l.employee_id === emp.id && l.status === 'Approved') || { days: 0 };
-    
-    // Retrieve Approved Overtime integration
-    const ot = overtimeCache.find(o => o.employee_id === emp.id && o.status === 'Approved') || { approved_hours: 0 };
-    const hourlyRate = dailyRate / 8;
-    const otPay = ot.approved_hours * hourlyRate * 1.25; // 125% regular OT rate
-
-    // Deductions calculations
-    const absenceDeduction = att.days_absent * dailyRate;
-    const lateDeduction = (att.late_minutes / 60) * hourlyRate;
-    
-    // Statutory deductions (pro-rated for semi-monthly cutoff)
-    const sssEe = Math.min(basicSalary, 35000) * 0.05 / 2;
-    const philhealthEe = Math.min(Math.max(basicSalary, 10000), 100000) * 0.025 / 2;
-    const pagibigEe = Math.min(basicSalary, 10000) * 0.02 / 2;
-    const withholdingTax = basicSalary > 20833 ? (basicSalary - 20833) * 0.15 / 2 : 0;
-
-    const totalDeductions = absenceDeduction + lateDeduction + sssEe + philhealthEe + pagibigEe + withholdingTax;
-    const grossPay = semiMonthlyBasic + otPay;
-    const netPay = grossPay - totalDeductions;
-
-    // Validation / Exception Checks
-    const issues = [];
-    if (!emp.monthly_basic_salary || emp.monthly_basic_salary <= 0) issues.push('Missing or invalid basic salary');
-    if (!att.days_worked && att.days_worked !== 0) issues.push('Missing attendance record');
-
-    generatedPayrollRecords.push({
-      employee_id: emp.id,
-      employee_number: emp.employee_number || '000',
-      fullName: `${emp.first_name || ''} ${emp.last_name || ''}`.trim(),
-      department: emp.department || 'General',
-      basicSalary,
-      semiMonthlyBasic,
-      dailyRate,
-      daysWorked: att.days_worked,
-      daysAbsent: att.days_absent,
-      lateMins: att.late_minutes,
-      approvedOtHours: ot.approved_hours,
-      otPay,
-      absenceDeduction,
-      lateDeduction,
-      sssEe,
-      philhealthEe,
-      pagibigEe,
-      withholdingTax,
-      grossPay,
-      totalDeductions,
-      netPay,
-      issues
-    });
+    const fullName = `${e.first_name || ''} ${e.last_name || ''}`.toLowerCase();
+    const empId = (e.employee_number || '').toLowerCase();
+    if (searchVal && !fullName.includes(searchVal) && !empId.includes(searchVal)) return false;
+    if (deptVal && e.department !== deptVal) return false;
+    if (statusVal && e.employment_status !== statusVal) return false;
+    if (typeVal && e.employment_type !== typeVal) return false;
+    return true;
   });
 
-  currentPayrollStatus = 'For Review';
-  renderPayrollModule();
-  showToast('Payroll successfully generated and consolidated from Roster, Attendance, Leave, and Overtime records!', 'success');
-}
-
-function renderPayrollModule() {
-  const tbody = document.getElementById('payrollReviewTableBody');
-  const finalizeBtn = document.getElementById('finalizePayrollBtn');
-  const unlockBtn = document.getElementById('unlockPayrollBtn');
-
-  if (generatedPayrollRecords.length === 0) {
-    tbody.innerHTML = `<tr><td colspan="11" class="px-4 py-8 text-center text-slate-400">Click <strong>"Generate Payroll"</strong> above to compute payroll for the selected cutoff.</td></tr>`;
-    updatePayrollKpis([]);
-    renderPayrollExceptions([]);
+  if (filtered.length === 0) {
+    tbody.innerHTML = `<tr><td colspan="7" class="px-4 py-8 text-center text-slate-400">No matching employee records found.</td></tr>`;
     return;
   }
 
-  // Update button states based on status
-  if (currentPayrollStatus === 'Finalized') {
-    finalizeBtn.disabled = true;
-    finalizeBtn.className = 'text-xs bg-emerald-600 text-white font-semibold px-4 py-2 rounded-lg cursor-not-allowed';
-    finalizeBtn.textContent = '🔒 Finalized & Locked';
-    unlockBtn.classList.remove('hidden');
-  } else {
-    finalizeBtn.disabled = false;
-    finalizeBtn.className = 'text-xs bg-emerald-600 hover:bg-emerald-500 text-white font-semibold px-4 py-2 rounded-lg transition-colors shadow-sm';
-    finalizeBtn.textContent = '🔒 Finalize Payroll';
-    unlockBtn.classList.add('hidden');
-  }
-
-  // Render Review Table
-  tbody.innerHTML = generatedPayrollRecords.map((r, idx) => {
-    let statusBadge = '<span class="text-[11px] px-2 py-0.5 rounded-full border bg-amber-500/15 text-amber-700 border-amber-500/30 font-medium">For Review</span>';
-    if (currentPayrollStatus === 'Finalized') {
-      statusBadge = '<span class="text-[11px] px-2 py-0.5 rounded-full border bg-emerald-500/15 text-emerald-700 border-emerald-500/30 font-medium">Finalized</span>';
+  tbody.innerHTML = filtered.map(e => {
+    let statusClass = 'bg-emerald-500/15 text-emerald-700 border-emerald-500/30';
+    if (e.employment_status === 'On Leave') statusClass = 'bg-amber-500/15 text-amber-700 border-amber-500/30';
+    if (e.employment_status === 'Suspended' || e.employment_status === 'Resigned' || e.employment_status === 'Terminated') {
+      statusClass = 'bg-rose-500/15 text-rose-700 border-rose-500/30';
     }
 
     return `
-      <tr class="hover:bg-slate-100 transition-colors cursor-pointer" onclick="openPayrollDetailModal(${idx})">
-        <td class="px-3 py-3">
-          <div class="font-medium text-slate-900">${escapeHtml(r.fullName)}</div>
-          <div class="text-[11px] text-slate-400 font-mono">#${escapeHtml(r.employee_number)} • ${escapeHtml(r.department)}</div>
+      <tr class="hover:bg-slate-100 transition-colors cursor-pointer" onclick="openEmployeeProfile('${e.id}')">
+        <td class="px-4 py-3">
+          <div class="font-medium text-slate-900">${escapeHtml(e.first_name)} ${escapeHtml(e.last_name)}</div>
+          <div class="text-[11px] text-slate-400 font-mono">ID: ${escapeHtml(e.employee_number || 'N/A')}</div>
         </td>
-        <td class="px-3 py-3 text-right font-mono-tabular text-slate-700">${formatCurrency(r.semiMonthlyBasic)}</td>
-        <td class="px-3 py-3 text-right font-mono-tabular text-slate-700">${r.daysWorked} d</td>
-        <td class="px-3 py-3 text-right font-mono-tabular text-rose-600">${r.daysAbsent} d</td>
-        <td class="px-3 py-3 text-right font-mono-tabular text-rose-600">${r.lateMins} mins</td>
-        <td class="px-3 py-3 text-right font-mono-tabular text-slate-800">${r.approvedOtHours} hrs (${formatCurrency(r.otPay)})</td>
-        <td class="px-3 py-3 text-right font-mono-tabular text-emerald-700 font-semibold bg-emerald-500/5">${formatCurrency(r.grossPay)}</td>
-        <td class="px-3 py-3 text-right font-mono-tabular text-rose-700 bg-rose-500/5">${formatCurrency(r.totalDeductions)}</td>
-        <td class="px-3 py-3 text-right font-mono-tabular text-emerald-900 font-bold bg-emerald-500/10">${formatCurrency(r.netPay)}</td>
-        <td class="px-3 py-3 text-center">${statusBadge}</td>
-        <td class="px-3 py-3 text-center" onclick="event.stopPropagation()">
-          <button onclick="openPayrollDetailModal(${idx})" class="text-xs px-2.5 py-1 rounded border border-slate-300 text-slate-700 hover:bg-slate-100">View Payslip</button>
+        <td class="px-4 py-3">
+          <div class="text-slate-800">${escapeHtml(e.department || 'N/A')}</div>
+          <div class="text-[11px] text-slate-400">${escapeHtml(e.job_title || e.position || 'N/A')}</div>
+        </td>
+        <td class="px-4 py-3">
+          <span class="text-xs px-2 py-0.5 rounded-full border ${statusClass} font-medium">${escapeHtml(e.employment_status || 'Active')}</span>
+        </td>
+        <td class="px-4 py-3">
+          <div class="text-slate-800">${escapeHtml(e.employment_type || 'Regular')}</div>
+          <div class="text-[11px] text-slate-400 font-mono">Hired: ${escapeHtml(e.hire_date || 'N/A')}</div>
+        </td>
+        <td class="px-4 py-3 text-right font-mono-tabular font-semibold text-slate-900">
+          ${formatCurrency(e.monthly_basic_salary || 0)}
+        </td>
+        <td class="px-4 py-3 text-center">
+          <span class="text-xs px-2 py-0.5 rounded bg-slate-100 text-slate-700 font-mono">Active</span>
+        </td>
+        <td class="px-4 py-3 text-center" onclick="event.stopPropagation()">
+          <div class="flex items-center justify-center gap-2">
+            <button onclick="openEditEmployee('${e.id}')" class="text-xs px-2.5 py-1 rounded border border-slate-300 text-slate-700 hover:bg-slate-100">Edit</button>
+            <button onclick="archiveEmployee('${e.id}')" class="text-xs px-2.5 py-1 rounded border border-rose-300 text-rose-700 hover:bg-rose-50">Archive</button>
+          </div>
         </td>
       </tr>
     `;
   }).join('');
-
-  updatePayrollKpis(generatedPayrollRecords);
-  renderPayrollExceptions(generatedPayrollRecords);
 }
 
-function updatePayrollKpis(records) {
-  const totalEmps = records.length;
-  let totalGross = 0;
-  let totalOtPay = 0;
-  let totalDeductions = 0;
-  let totalNet = 0;
-  let totalIssues = 0;
+function renderInactiveEmployees() {
+  const tbody = document.getElementById('inactiveTableBody');
+  const inactiveEmps = employeesCache.filter(e => e.employment_status === 'Inactive');
 
-  records.forEach(r => {
-    totalGross += r.grossPay;
-    totalOtPay += r.otPay;
-    totalDeductions += r.totalDeductions;
-    totalNet += r.netPay;
-    totalIssues += r.issues.length;
-  });
-
-  document.getElementById('payKpiTotalEmps').textContent = totalEmps;
-  document.getElementById('payKpiGross').textContent = formatCurrency(totalGross);
-  document.getElementById('payKpiOtPay').textContent = formatCurrency(totalOtPay);
-  document.getElementById('payKpiDeductions').textContent = formatCurrency(totalDeductions);
-  document.getElementById('payKpiNet').textContent = formatCurrency(totalNet);
-  document.getElementById('payKpiIssues').textContent = totalIssues;
-}
-
-function renderPayrollExceptions(records) {
-  const card = document.getElementById('payrollExceptionsCard');
-  const list = document.getElementById('payrollExceptionsList');
-  const badge = document.getElementById('exceptionCountBadge');
-
-  const allIssues = [];
-  records.forEach(r => {
-    r.issues.forEach(issue => {
-      allIssues.push(`• <strong>${escapeHtml(r.fullName)}</strong>: ${escapeHtml(issue)}`);
-    });
-  });
-
-  if (allIssues.length === 0) {
-    card.classList.add('hidden');
+  if (inactiveEmps.length === 0) {
+    tbody.innerHTML = `<tr><td colspan="4" class="px-4 py-6 text-center text-slate-400">No inactive employee records.</td></tr>`;
     return;
   }
 
-  card.classList.remove('hidden');
-  badge.textContent = `${allIssues.length} issues`;
-  list.innerHTML = allIssues.map(i => `<div class="text-xs text-rose-700 bg-white p-2 rounded border border-rose-200">${i}</div>`).join('');
-}
-
-function finalizePayroll() {
-  if (currentPayrollStatus === 'Finalized') return;
-
-  currentPayrollStatus = 'Finalized';
-  const cutoffText = document.getElementById('payrollCutoffSelect').selectedOptions[0].text;
-  
-  let totalNet = generatedPayrollRecords.reduce((acc, r) => acc + r.netPay, 0);
-
-  payrollHistoryCache.push({
-    cutoff: cutoffText,
-    generatedDate: new Date().toISOString().split('T')[0],
-    totalEmps: generatedPayrollRecords.length,
-    totalNet,
-    status: 'Finalized'
-  });
-
-  renderPayrollModule();
-  renderPayrollHistory();
-  showToast('Payroll successfully finalized and locked against accidental modifications.', 'success');
-}
-
-function unlockPayroll() {
-  currentPayrollStatus = 'Draft';
-  renderPayrollModule();
-  showToast('Payroll unlocked for administrative adjustments.', 'warning');
-}
-
-function renderPayrollHistory() {
-  const tbody = document.getElementById('payrollHistoryTableBody');
-  if (payrollHistoryCache.length === 0) {
-    tbody.innerHTML = `<tr><td colspan="6" class="px-4 py-6 text-center text-slate-400">No finalized payroll history recorded yet.</td></tr>`;
-    return;
-  }
-
-  tbody.innerHTML = payrollHistoryCache.map(h => `
+  tbody.innerHTML = inactiveEmps.map(e => `
     <tr class="hover:bg-slate-50 transition-colors">
-      <td class="px-4 py-3 font-medium text-slate-900">${escapeHtml(h.cutoff)}</td>
-      <td class="px-4 py-3 text-slate-600 text-xs font-mono">${escapeHtml(h.generatedDate)}</td>
-      <td class="px-4 py-3 text-right font-mono-tabular text-slate-800">${h.totalEmps}</td>
-      <td class="px-4 py-3 text-right font-mono-tabular text-emerald-700 font-semibold">${formatCurrency(h.totalNet)}</td>
-      <td class="px-4 py-3 text-center"><span class="text-xs px-2 py-0.5 rounded-full bg-emerald-500/15 text-emerald-700 border border-emerald-500/30">Finalized</span></td>
-      <td class="px-4 py-3 text-center"><button class="text-xs px-3 py-1 rounded bg-slate-900 text-white hover:bg-slate-800">View Details</button></td>
+      <td class="px-4 py-3 font-medium text-slate-900">${escapeHtml(e.first_name)} ${escapeHtml(e.last_name)} <span class="text-xs text-slate-400 font-mono">(#${escapeHtml(e.employee_number)})</span></td>
+      <td class="px-4 py-3 text-slate-600 text-xs">${escapeHtml(e.department)}</td>
+      <td class="px-4 py-3"><span class="text-xs px-2 py-0.5 rounded-full bg-rose-500/15 text-rose-700 border border-rose-500/30">Inactive</span></td>
+      <td class="px-4 py-3 text-center">
+        <button onclick="reactivateEmployee('${e.id}')" class="text-xs px-3 py-1 rounded bg-emerald-600 text-white hover:bg-emerald-500">Reactivate</button>
+      </td>
     </tr>
   `).join('');
 }
 
-function openPayrollDetailModal(idx) {
-  const r = generatedPayrollRecords[idx];
-  if (!r) return;
+/* EMPLOYEE MODAL (ADD / EDIT) */
+function openAddEmployeeModal() {
+  document.getElementById('modalTitle').textContent = 'Add New Employee Record';
+  document.getElementById('editEmployeeId').value = '';
+  document.getElementById('employeeForm').reset();
+  
+  const today = new Date().toISOString().split('T')[0];
+  document.getElementById('modalHireDate').value = today;
 
-  document.getElementById('modalEmpNameTitle').textContent = `Payslip Breakdown: ${r.fullName}`;
-  document.getElementById('detBasicSalary').textContent = formatCurrency(r.basicSalary);
-  document.getElementById('detDailyRate').textContent = formatCurrency(r.dailyRate);
-  document.getElementById('detDaysWorked').textContent = `${r.daysWorked} days`;
-  document.getElementById('detBasicPayEarned').textContent = formatCurrency(r.semiMonthlyBasic);
-  document.getElementById('detOtPay').textContent = formatCurrency(r.otPay);
-  document.getElementById('detGrossPay').textContent = formatCurrency(r.grossPay);
-  document.getElementById('detAbsenceDed').textContent = formatCurrency(r.absenceDeduction);
-  document.getElementById('detLateDed').textContent = formatCurrency(r.lateDeduction);
-  document.getElementById('detSss').textContent = formatCurrency(r.sssEe);
-  document.getElementById('detPhilhealth').textContent = formatCurrency(r.philhealthEe);
-  document.getElementById('detPagibig').textContent = formatCurrency(r.pagibigEe);
-  document.getElementById('detTax').textContent = formatCurrency(r.withholdingTax);
-  document.getElementById('detTotalDed').textContent = formatCurrency(r.totalDeductions);
-  document.getElementById('detNetPay').textContent = formatCurrency(r.netPay);
-
-  const modal = document.getElementById('payrollDetailModal');
+  const modal = document.getElementById('employeeModal');
   modal.classList.remove('hidden');
   modal.classList.add('flex');
 }
 
-function closePayrollDetailModal() {
-  const modal = document.getElementById('payrollDetailModal');
+function openEditEmployee(id) {
+  const emp = employeesCache.find(e => e.id === id);
+  if (!emp) return;
+
+  document.getElementById('modalTitle').textContent = 'Edit Employee Record';
+  document.getElementById('editEmployeeId').value = emp.id;
+  document.getElementById('modalEmpId').value = emp.employee_number || '';
+  document.getElementById('modalFirstName').value = emp.first_name || '';
+  document.getElementById('modalMiddleName').value = emp.middle_name || '';
+  document.getElementById('modalLastName').value = emp.last_name || '';
+  document.getElementById('modalDob').value = emp.date_of_birth || '';
+  document.getElementById('modalContact').value = emp.contact_number || '';
+  document.getElementById('modalEmail').value = emp.email || '';
+  document.getElementById('modalAddress').value = emp.address || '';
+  document.getElementById('modalDepartment').value = emp.department || 'Human Resources';
+  document.getElementById('modalPosition').value = emp.position || emp.job_title || '';
+  document.getElementById('modalEmploymentType').value = emp.employment_type || 'Regular';
+  document.getElementById('modalHireDate').value = emp.hire_date || '';
+  document.getElementById('modalEmploymentStatus').value = emp.employment_status || 'Active';
+  document.getElementById('modalSupervisor').value = emp.immediate_supervisor || '';
+  document.getElementById('modalSalaryType').value = emp.salary_type || 'Monthly';
+  document.getElementById('modalBasicSalary').value = emp.monthly_basic_salary || '';
+  document.getElementById('modalPayrollFreq').value = emp.payroll_frequency || 'Semi-Monthly';
+  document.getElementById('modalSss').value = emp.sss_number || '';
+  document.getElementById('modalPhilhealth').value = emp.philhealth_number || '';
+  document.getElementById('modalPagibig').value = emp.pagibig_number || '';
+  document.getElementById('modalTin').value = emp.tin_number || '';
+
+  const modal = document.getElementById('employeeModal');
+  modal.classList.remove('hidden');
+  modal.classList.add('flex');
+}
+
+function closeEmployeeModal() {
+  const modal = document.getElementById('employeeModal');
   modal.classList.add('hidden');
   modal.classList.remove('flex');
 }
 
-/* =========================================================
-   EVENT LISTENERS & INITIALIZATION
-========================================================= */
+/* EMPLOYEE PROFILE VIEW */
+function openEmployeeProfile(id) {
+  const emp = employeesCache.find(e => e.id === id);
+  if (!emp) return;
+  selectedProfileEmp = emp;
+
+  document.getElementById('profileModalName').textContent = `${emp.first_name} ${emp.middle_name ? emp.middle_name + ' ' : ''}${emp.last_name}`;
+  document.getElementById('profileModalMeta').textContent = `${emp.department || 'General'} • ${emp.position || emp.job_title || 'Staff'} • Status: ${emp.employment_status || 'Active'}`;
+
+  // Populate Tab Personal
+  document.getElementById('tabPersonal').innerHTML = `
+    <div class="grid grid-cols-2 gap-4 bg-slate-50 p-4 rounded-lg border border-slate-200 text-xs">
+      <div><span class="text-slate-400 block">Employee ID</span><strong>${escapeHtml(emp.employee_number || 'N/A')}</strong></div>
+      <div><span class="text-slate-400 block">Email Address</span><strong>${escapeHtml(emp.email || 'N/A')}</strong></div>
+      <div><span class="text-slate-400 block">Contact Number</span><strong>${escapeHtml(emp.contact_number || 'N/A')}</strong></div>
+      <div><span class="text-slate-400 block">Date of Birth</span><strong>${escapeHtml(emp.date_of_birth || 'N/A')}</strong></div>
+      <div class="col-span-2"><span class="text-slate-400 block">Residential Address</span><strong>${escapeHtml(emp.address || 'N/A')}</strong></div>
+    </div>
+  `;
+
+  // Populate Tab Employment
+  document.getElementById('tabEmployment').innerHTML = `
+    <div class="grid grid-cols-2 gap-4 bg-slate-50 p-4 rounded-lg border border-slate-200 text-xs">
+      <div><span class="text-slate-400 block">Department</span><strong>${escapeHtml(emp.department || 'N/A')}</strong></div>
+      <div><span class="text-slate-400 block">Position / Title</span><strong>${escapeHtml(emp.position || emp.job_title || 'N/A')}</strong></div>
+      <div><span class="text-slate-400 block">Employment Type</span><strong>${escapeHtml(emp.employment_type || 'Regular')}</strong></div>
+      <div><span class="text-slate-400 block">Employment Status</span><strong>${escapeHtml(emp.employment_status || 'Active')}</strong></div>
+      <div><span class="text-slate-400 block">Date Hired</span><strong>${escapeHtml(emp.hire_date || 'N/A')}</strong></div>
+      <div><span class="text-slate-400 block">Immediate Supervisor</span><strong>${escapeHtml(emp.immediate_supervisor || 'N/A')}</strong></div>
+    </div>
+  `;
+
+  // Populate Tab Compensation
+  document.getElementById('tabCompensation').innerHTML = `
+    <div class="grid grid-cols-2 gap-4 bg-slate-50 p-4 rounded-lg border border-slate-200 text-xs">
+      <div><span class="text-slate-400 block">Salary Type</span><strong>${escapeHtml(emp.salary_type || 'Monthly')}</strong></div>
+      <div><span class="text-slate-400 block">Basic Salary / Rate</span><strong class="text-emerald-700 font-mono text-sm">${formatCurrency(emp.monthly_basic_salary || 0)}</strong></div>
+      <div><span class="text-slate-400 block">Payroll Frequency</span><strong>${escapeHtml(emp.payroll_frequency || 'Semi-Monthly')}</strong></div>
+      <div><span class="text-slate-400 block">SSS Number</span><strong>${escapeHtml(emp.sss_number || 'N/A')}</strong></div>
+      <div><span class="text-slate-400 block">PhilHealth Number</span><strong>${escapeHtml(emp.philhealth_number || 'N/A')}</strong></div>
+      <div><span class="text-slate-400 block">Pag-IBIG Number</span><strong>${escapeHtml(emp.pagibig_number || 'N/A')}</strong></div>
+      <div><span class="text-slate-400 block">Tax ID (TIN)</span><strong>${escapeHtml(emp.tin_number || 'N/A')}</strong></div>
+    </div>
+  `;
+
+  // Switch to personal tab by default
+  switchProfileTab('tabPersonal');
+
+  const modal = document.getElementById('employeeProfileModal');
+  modal.classList.remove('hidden');
+  modal.classList.add('flex');
+}
+
+function closeEmployeeProfile() {
+  const modal = document.getElementById('employeeProfileModal');
+  modal.classList.add('hidden');
+  modal.classList.remove('flex');
+}
+
+function switchProfileTab(tabId) {
+  document.querySelectorAll('.profile-content').forEach(el => el.classList.add('hidden'));
+  document.getElementById(tabId).classList.remove('hidden');
+
+  document.querySelectorAll('.profile-tab').forEach(btn => {
+    const isTarget = btn.getAttribute('data-tab') === tabId;
+    btn.classList.toggle('text-amber-600', isTarget);
+    btn.classList.toggle('border-b-2', isTarget);
+    btn.classList.toggle('border-amber-600', isTarget);
+    btn.classList.toggle('hover:text-slate-800', !isTarget);
+  });
+}
+
+async function archiveEmployee(id) {
+  if (!confirm('Are you sure you want to archive this employee? They will be moved to Inactive records.')) return;
+
+  try {
+    const { error } = await supabaseClient.from(EMPLOYEES_TABLE).update({ employment_status: 'Inactive' }).eq('id', id);
+    if (error) throw error;
+    showToast('Employee archived successfully.', 'success');
+    await fetchEmployees();
+  } catch (err) {
+    showToast('Failed to archive employee.', 'error');
+  }
+}
+
+async function reactivateEmployee(id) {
+  try {
+    const { error } = await supabaseClient.from(EMPLOYEES_TABLE).update({ employment_status: 'Active' }).eq('id', id);
+    if (error) throw error;
+    showToast('Employee reactivated successfully.', 'success');
+    await fetchEmployees();
+  } catch (err) {
+    showToast('Failed to reactivate employee.', 'error');
+  }
+}
+
+/* EVENT LISTENERS & INITIALIZATION */
 function registerEventListeners() {
   document.querySelectorAll('.nav-btn').forEach(btn => {
     btn.addEventListener('click', () => switchModule(btn.getAttribute('data-target')));
@@ -1218,47 +954,85 @@ function registerEventListeners() {
     fetchEmployees();
   });
 
-  document.getElementById('generatePayrollBtn').addEventListener('click', generatePayroll);
-  document.getElementById('finalizePayrollBtn').addEventListener('click', finalizePayroll);
-  document.getElementById('unlockPayrollBtn').addEventListener('click', unlockPayroll);
-  document.getElementById('closePayrollDetailBtn').addEventListener('click', closePayrollDetailModal);
-  document.getElementById('closeDetailModalBtn').addEventListener('click', closePayrollDetailModal);
-
   document.getElementById('topRefreshBtn').addEventListener('click', fetchEmployees);
 
+  // Employee Management UI triggers
+  document.getElementById('openAddEmployeeModalBtn').addEventListener('click', openAddEmployeeModal);
+  document.getElementById('closeEmployeeModalBtn').addEventListener('click', closeEmployeeModal);
+  document.getElementById('cancelEmployeeModalBtn').addEventListener('click', closeEmployeeModal);
+
+  document.getElementById('closeProfileModalBtn').addEventListener('click', closeEmployeeProfile);
+  document.getElementById('closeProfileBtn').addEventListener('click', closeEmployeeProfile);
+
+  document.querySelectorAll('.profile-tab').forEach(btn => {
+    btn.addEventListener('click', () => switchProfileTab(btn.getAttribute('data-tab')));
+  });
+
+  // Search & Filter listeners
+  document.getElementById('empSearchInput').addEventListener('input', renderEmployeeDirectory);
+  document.getElementById('filterDept').addEventListener('change', renderEmployeeDirectory);
+  document.getElementById('filterStatus').addEventListener('change', renderEmployeeDirectory);
+  document.getElementById('filterType').addEventListener('change', renderEmployeeDirectory);
+  document.getElementById('resetEmpFiltersBtn').addEventListener('click', () => {
+    document.getElementById('empSearchInput').value = '';
+    document.getElementById('filterDept').value = '';
+    document.getElementById('filterStatus').value = '';
+    document.getElementById('filterType').value = '';
+    renderEmployeeDirectory();
+  });
+
+  // Add/Edit Form submission
   document.getElementById('employeeForm').addEventListener('submit', async (e) => {
     e.preventDefault();
-    const f = e.target;
-    const newEmp = {
-      employee_number: f.employeeNumber.value.trim(),
-      first_name: f.firstName.value.trim(),
-      last_name: f.lastName.value.trim(),
-      email: f.email.value.trim(),
-      hire_date: f.hireDate.value,
-      department: f.department.value.trim(),
-      job_title: f.jobTitle.value.trim(),
-      monthly_basic_salary: parseFloat(f.basicSalary.value),
-      is_inactive: false
+    const editId = document.getElementById('editEmployeeId').value;
+
+    const payload = {
+      employee_number: document.getElementById('modalEmpId').value.trim(),
+      first_name: document.getElementById('modalFirstName').value.trim(),
+      middle_name: document.getElementById('modalMiddleName').value.trim(),
+      last_name: document.getElementById('modalLastName').value.trim(),
+      date_of_birth: document.getElementById('modalDob').value || null,
+      contact_number: document.getElementById('modalContact').value.trim(),
+      email: document.getElementById('modalEmail').value.trim(),
+      address: document.getElementById('modalAddress').value.trim(),
+      department: document.getElementById('modalDepartment').value,
+      position: document.getElementById('modalPosition').value.trim(),
+      job_title: document.getElementById('modalPosition').value.trim(),
+      employment_type: document.getElementById('modalEmploymentType').value,
+      hire_date: document.getElementById('modalHireDate').value,
+      employment_status: document.getElementById('modalEmploymentStatus').value,
+      immediate_supervisor: document.getElementById('modalSupervisor').value.trim(),
+      salary_type: document.getElementById('modalSalaryType').value,
+      monthly_basic_salary: parseFloat(document.getElementById('modalBasicSalary').value) || 0,
+      payroll_frequency: document.getElementById('modalPayrollFreq').value,
+      sss_number: document.getElementById('modalSss').value.trim(),
+      philhealth_number: document.getElementById('modalPhilhealth').value.trim(),
+      pagibig_number: document.getElementById('modalPagibig').value.trim(),
+      tin_number: document.getElementById('modalTin').value.trim()
     };
 
     try {
-      const { error } = await supabaseClient.from(EMPLOYEES_TABLE).insert([newEmp]);
-      if (error) throw error;
-      showToast('Employee successfully added.', 'success');
-      f.reset();
+      if (editId) {
+        const { error } = await supabaseClient.from(EMPLOYEES_TABLE).update(payload).eq('id', editId);
+        if (error) throw error;
+        showToast('Employee updated successfully.', 'success');
+      } else {
+        const { error } = await supabaseClient.from(EMPLOYEES_TABLE).insert([payload]);
+        if (error) throw error;
+        showToast('New employee added successfully.', 'success');
+      }
+
+      closeEmployeeModal();
       await fetchEmployees();
     } catch (err) {
-      showToast('Unable to add employee.', 'error');
+      console.error('Save employee error:', err);
+      showToast('Failed to save employee record.', 'error');
     }
   });
 }
 
 document.addEventListener('DOMContentLoaded', () => {
   registerEventListeners();
-  const today = new Date().toISOString().split('T')[0];
-  const hireDateInput = document.getElementById('hireDate');
-  if (hireDateInput) hireDateInput.value = today;
-
   if (credentialsArePlaceholders()) {
     setConnectionStatus('unconfigured');
   }
