@@ -299,7 +299,6 @@
           </div>
         </div>
 
-        <!-- Employee List View for Scheduling -->
         <div class="rounded-xl border border-slate-300 bg-slate-50 overflow-hidden">
           <div class="px-5 py-4 border-b border-slate-300 flex items-center justify-between">
             <h4 class="text-base font-semibold text-slate-900">Active Workforce Schedules</h4>
@@ -332,7 +331,6 @@
           </div>
         </div>
 
-        <!-- Add Attendance Form -->
         <div class="rounded-xl border border-slate-300 bg-slate-50 p-5">
           <h4 class="text-sm font-semibold text-slate-900 mb-3">Record / Adjust Attendance</h4>
           <form id="attendanceForm" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4" novalidate>
@@ -379,7 +377,6 @@
           </form>
         </div>
 
-        <!-- Attendance Table -->
         <div class="rounded-xl border border-slate-300 bg-slate-50 overflow-hidden">
           <div class="px-5 py-4 border-b border-slate-300 flex items-center justify-between">
             <h4 class="text-base font-semibold text-slate-900">Attendance Log</h4>
@@ -406,65 +403,89 @@
       </section>
 
       <!-- =========================================================
-            MODULE: OVERTIME MANAGEMENT
+            MODULE: OVERTIME MANAGEMENT (APPROVAL CENTER)
       ========================================================= -->
       <section id="moduleOvertime" class="hidden space-y-6">
         <div class="flex items-center justify-between">
           <div>
-            <h3 class="text-base font-semibold text-slate-900">Overtime Requests &amp; Approvals</h3>
+            <h3 class="text-base font-semibold text-slate-900">Overtime Approval Center</h3>
             <p class="text-xs text-slate-500 mt-0.5">Review, approve, or reject employee overtime submissions prior to payroll inclusion.</p>
           </div>
         </div>
 
-        <!-- Submit OT Form (Admin simulation) -->
-        <div class="rounded-xl border border-slate-300 bg-slate-50 p-5">
-          <h4 class="text-sm font-semibold text-slate-900 mb-3">Submit Overtime Request</h4>
-          <form id="overtimeForm" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4" novalidate>
+        <!-- KPI Cards -->
+        <div class="grid grid-cols-2 md:grid-cols-5 gap-4">
+          <div class="rounded-xl border border-slate-300 bg-slate-50 p-4">
+            <p class="text-xs text-slate-500 mb-1">Total OT Requests</p>
+            <p id="kpiTotalOt" class="text-2xl font-semibold text-slate-900 font-mono-tabular">0</p>
+          </div>
+          <div class="rounded-xl border border-slate-300 bg-slate-50 p-4">
+            <p class="text-xs text-slate-500 mb-1">Pending Requests</p>
+            <p id="kpiPendingOt" class="text-2xl font-semibold text-amber-700 font-mono-tabular">0</p>
+          </div>
+          <div class="rounded-xl border border-slate-300 bg-slate-50 p-4">
+            <p class="text-xs text-slate-500 mb-1">Approved Requests</p>
+            <p id="kpiApprovedOt" class="text-2xl font-semibold text-emerald-700 font-mono-tabular">0</p>
+          </div>
+          <div class="rounded-xl border border-slate-300 bg-slate-50 p-4">
+            <p class="text-xs text-slate-500 mb-1">Rejected Requests</p>
+            <p id="kpiRejectedOt" class="text-2xl font-semibold text-rose-700 font-mono-tabular">0</p>
+          </div>
+          <div class="rounded-xl border border-slate-300 bg-slate-50 p-4 col-span-2 md:col-span-1">
+            <p class="text-xs text-slate-500 mb-1">Total Approved Hours</p>
+            <p id="kpiTotalApprovedHours" class="text-2xl font-semibold text-slate-900 font-mono-tabular">0.0 hrs</p>
+          </div>
+        </div>
+
+        <!-- Filter & Search Toolbar -->
+        <div class="rounded-xl border border-slate-300 bg-slate-50 p-4 flex flex-wrap gap-3 items-center justify-between">
+          <div class="flex flex-wrap items-center gap-3 flex-1">
             <div class="flex flex-col gap-1">
-              <label class="text-xs font-medium text-slate-500">Employee</label>
-              <select id="otEmployeeId" required class="bg-white border border-slate-300 rounded-lg px-3 py-2 text-sm text-slate-900 focus:outline-none focus:ring-2 focus:ring-amber-500/65">
-                <option value="">Select Employee...</option>
+              <label class="text-[10px] font-medium text-slate-500 uppercase">Search Employee</label>
+              <input id="otSearchInput" type="text" placeholder="Search name..." class="bg-white border border-slate-300 rounded-lg px-3 py-1.5 text-xs text-slate-900 focus:outline-none focus:ring-2 focus:ring-amber-500/65" />
+            </div>
+            <div class="flex flex-col gap-1">
+              <label class="text-[10px] font-medium text-slate-500 uppercase">Department</label>
+              <select id="otFilterDept" class="bg-white border border-slate-300 rounded-lg px-3 py-1.5 text-xs text-slate-900 focus:outline-none focus:ring-2 focus:ring-amber-500/65">
+                <option value="">All Departments</option>
               </select>
             </div>
             <div class="flex flex-col gap-1">
-              <label class="text-xs font-medium text-slate-500">Overtime Date</label>
-              <input id="otDate" type="date" required class="bg-white border border-slate-300 rounded-lg px-3 py-2 text-sm text-slate-900 focus:outline-none focus:ring-2 focus:ring-amber-500/65" />
+              <label class="text-[10px] font-medium text-slate-500 uppercase">Status</label>
+              <select id="otFilterStatus" class="bg-white border border-slate-300 rounded-lg px-3 py-1.5 text-xs text-slate-900 focus:outline-none focus:ring-2 focus:ring-amber-500/65">
+                <option value="">All Statuses</option>
+                <option value="Pending">Pending</option>
+                <option value="Approved">Approved</option>
+                <option value="Rejected">Rejected</option>
+              </select>
             </div>
             <div class="flex flex-col gap-1">
-              <label class="text-xs font-medium text-slate-500">OT Start Time</label>
-              <input id="otStart" type="time" value="17:00" class="bg-white border border-slate-300 rounded-lg px-3 py-2 text-sm text-slate-900 focus:outline-none focus:ring-2 focus:ring-amber-500/65" />
+              <label class="text-[10px] font-medium text-slate-500 uppercase">Month</label>
+              <input id="otFilterMonth" type="month" class="bg-white border border-slate-300 rounded-lg px-2.5 py-1 text-xs text-slate-900 focus:outline-none focus:ring-2 focus:ring-amber-500/65" />
             </div>
-            <div class="flex flex-col gap-1">
-              <label class="text-xs font-medium text-slate-500">OT End Time</label>
-              <input id="otEnd" type="time" value="20:00" class="bg-white border border-slate-300 rounded-lg px-3 py-2 text-sm text-slate-900 focus:outline-none focus:ring-2 focus:ring-amber-500/65" />
-            </div>
-            <div class="lg:col-span-3 flex flex-col gap-1">
-              <label class="text-xs font-medium text-slate-500">Reason / Justification</label>
-              <input id="otReason" type="text" placeholder="Project deadline extension" class="bg-white border border-slate-300 rounded-lg px-3 py-2 text-sm text-slate-900 focus:outline-none focus:ring-2 focus:ring-amber-500/65" />
-            </div>
-            <div class="flex items-end justify-end">
-              <button type="submit" class="w-full bg-amber-500 hover:bg-amber-400 text-slate-900 font-semibold text-sm px-5 py-2.5 rounded-lg transition-colors">
-                Submit Request
-              </button>
-            </div>
-          </form>
+          </div>
+          <div class="flex items-end">
+            <button id="otResetFiltersBtn" class="text-xs px-3 py-1.5 rounded-lg border border-slate-300 text-slate-600 hover:bg-slate-100 transition-colors">Reset Filters</button>
+          </div>
         </div>
 
-        <!-- Overtime Table -->
+        <!-- Overtime Requests Queue Table -->
         <div class="rounded-xl border border-slate-300 bg-slate-50 overflow-hidden">
           <div class="px-5 py-4 border-b border-slate-300 flex items-center justify-between">
             <h4 class="text-base font-semibold text-slate-900">Overtime Requests Queue</h4>
           </div>
           <div class="overflow-x-auto">
-            <table class="w-full text-sm border-collapse min-w-[900px]">
+            <table class="w-full text-sm border-collapse min-w-[1100px]">
               <thead>
                 <tr class="bg-slate-100 text-slate-500 text-xs uppercase tracking-wide">
-                  <th class="text-left px-4 py-3 border-b border-slate-300">Employee</th>
-                  <th class="text-left px-4 py-3 border-b border-slate-300">Date</th>
-                  <th class="text-left px-4 py-3 border-b border-slate-300">Time Window</th>
-                  <th class="text-right px-4 py-3 border-b border-slate-300">OT Hours</th>
-                  <th class="text-left px-4 py-3 border-b border-slate-300">Reason</th>
-                  <th class="text-left px-4 py-3 border-b border-slate-300">Status</th>
+                  <th class="text-left px-4 py-3 border-b border-slate-300">Employee Name</th>
+                  <th class="text-left px-4 py-3 border-b border-slate-300">Department / Position</th>
+                  <th class="text-left px-4 py-3 border-b border-slate-300">Date of OT</th>
+                  <th class="text-left px-4 py-3 border-b border-slate-300">OT Time Window</th>
+                  <th class="text-right px-4 py-3 border-b border-slate-300">Total OT Hours</th>
+                  <th class="text-left px-4 py-3 border-b border-slate-300">Reason / Purpose</th>
+                  <th class="text-left px-4 py-3 border-b border-slate-300">Date Filed</th>
+                  <th class="text-left px-4 py-3 border-b border-slate-300">Current Status</th>
                   <th class="text-center px-4 py-3 border-b border-slate-300">Actions</th>
                 </tr>
               </thead>
@@ -485,7 +506,6 @@
           </div>
         </div>
 
-        <!-- Leave Form -->
         <div class="rounded-xl border border-slate-300 bg-slate-50 p-5">
           <h4 class="text-sm font-semibold text-slate-900 mb-3">File Leave Application</h4>
           <form id="leaveForm" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4" novalidate>
@@ -528,7 +548,6 @@
           </form>
         </div>
 
-        <!-- Leave Table -->
         <div class="rounded-xl border border-slate-300 bg-slate-50 overflow-hidden">
           <div class="px-5 py-4 border-b border-slate-300 flex items-center justify-between">
             <h4 class="text-base font-semibold text-slate-900">Leave Applications Queue</h4>
@@ -679,26 +698,22 @@
             </div>
           </div>
 
-          <!-- Loading state -->
           <div id="rosterLoading" class="p-5 space-y-2">
             <div class="skeleton h-10 rounded-lg"></div>
             <div class="skeleton h-10 rounded-lg"></div>
             <div class="skeleton h-10 rounded-lg"></div>
           </div>
 
-          <!-- Empty state -->
           <div id="rosterEmpty" class="hidden p-10 text-center">
             <p class="text-slate-600 font-medium">No employee profiles found.</p>
             <p class="text-slate-400 text-sm mt-1">Add your first employee above.</p>
           </div>
 
-          <!-- Error state -->
           <div id="rosterError" class="hidden p-10 text-center">
             <p class="text-rose-700 font-medium">Unable to load employee records.</p>
             <p class="text-slate-400 text-sm mt-1">Check your Supabase configuration and try again.</p>
           </div>
 
-          <!-- Table -->
           <div id="rosterTableWrap" class="hidden overflow-x-auto">
             <table class="roster w-full text-sm border-collapse min-w-[1800px]">
               <thead>
@@ -779,9 +794,7 @@
         <p id="monthlyScheduleModalSubtitle" class="text-xs text-slate-500">Configure shifts and rest days for the entire month.</p>
       </div>
       <div class="flex items-center gap-3">
-        <div id="scheduleLockIndicator" class="flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-medium border">
-          <!-- Dynamically set via JS -->
-        </div>
+        <div id="scheduleLockIndicator" class="flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-medium border"></div>
         <button id="toggleLockBtn" class="px-3 py-1.5 text-xs font-medium rounded-lg border border-slate-300 text-slate-700 hover:bg-slate-100 transition-colors">
           🔒 Toggle Lock
         </button>
@@ -789,13 +802,11 @@
       </div>
     </div>
 
-    <!-- Month Selector -->
     <div class="flex items-center gap-3 bg-slate-50 p-3 rounded-lg border border-slate-200">
       <label class="text-xs font-medium text-slate-600">Select Month:</label>
       <input id="scheduleMonthPicker" type="month" class="bg-white border border-slate-300 rounded-md px-3 py-1 text-sm text-slate-900 focus:outline-none focus:ring-2 focus:ring-amber-500/65" />
     </div>
 
-    <!-- Monthly Days Table -->
     <div class="flex-1 overflow-y-auto border border-slate-200 rounded-lg">
       <table class="w-full text-sm border-collapse">
         <thead>
@@ -809,9 +820,7 @@
             <th class="text-left px-4 py-2.5 border-b border-slate-200">Notes</th>
           </tr>
         </thead>
-        <tbody id="monthlyScheduleTableBody" class="divide-y divide-slate-200">
-          <!-- Populated dynamically -->
-        </tbody>
+        <tbody id="monthlyScheduleTableBody" class="divide-y divide-slate-200"></tbody>
       </table>
     </div>
 
@@ -875,9 +884,35 @@ const EMPLOYEES_TABLE = 'employees';
 ========================================================= */
 let activeEmployeesCache = [];
 let inactiveEmployeesCache = [];
-let schedulesCache = {}; // Map: employee_id -> { month: 'YYYY-MM', locked: boolean, days: { 'YYYY-MM-DD': { isRestDay, shiftName, startTime, endTime, breakStart, breakEnd, notes } } }
+let schedulesCache = {};
 let attendanceCache = [];
-let overtimeCache = [];
+let overtimeCache = [
+  // Sample initial records to populate the Overtime Approval Center
+  {
+    id: 'ot_1',
+    employee_id: '',
+    request_date: '2026-08-15',
+    start_time: '17:00',
+    end_time: '20:00',
+    hours: 3.0,
+    reason: 'Project deadline extension for Q3 sprint release',
+    date_filed: '2026-08-14 16:30',
+    status: 'Pending',
+    action_timestamp: null
+  },
+  {
+    id: 'ot_2',
+    employee_id: '',
+    request_date: '2026-08-12',
+    start_time: '17:00',
+    end_time: '21:00',
+    hours: 4.0,
+    reason: 'System maintenance and database backup',
+    date_filed: '2026-08-11 14:00',
+    status: 'Approved',
+    action_timestamp: '2026-08-11 15:20'
+  }
+];
 let leaveCache = [];
 
 let pendingSeparationId = null;
@@ -938,7 +973,7 @@ function formatDate(dateStr) {
 
 function setDefaultDates() {
   const todayStr = new Date().toISOString().split('T')[0];
-  const dateInputs = ['attDate', 'otDate', 'leaveStartDate', 'leaveEndDate', 'hireDate', 'sepDate'];
+  const dateInputs = ['attDate', 'leaveStartDate', 'leaveEndDate', 'hireDate', 'sepDate'];
   dateInputs.forEach(id => {
     const el = document.getElementById(id);
     if (el && !el.value) {
@@ -1118,7 +1153,7 @@ function switchModule(targetId) {
     dashboard: 'Dashboard Overview',
     schedule: 'Schedule Management',
     attendance: 'Attendance Management',
-    overtime: 'Overtime Management',
+    overtime: 'Overtime Approval Center',
     leave: 'Leave Management',
     payroll: 'Payroll Management',
     inactive: 'Inactive Employee Records'
@@ -1127,6 +1162,9 @@ function switchModule(targetId) {
 
   if (targetId === 'schedule') {
     renderScheduleEmployeeList();
+  }
+  if (targetId === 'overtime') {
+    renderOvertimeCenter();
   }
 }
 
@@ -1152,12 +1190,26 @@ async function fetchEmployees() {
     activeEmployeesCache = allEmps.filter(e => !e.is_inactive);
     inactiveEmployeesCache = allEmps.filter(e => e.is_inactive);
 
+    // Bind sample OT requests to active employees if employee_id is empty
+    if (activeEmployeesCache.length > 0) {
+      overtimeCache.forEach((ot, idx) => {
+        if (!ot.employee_id) {
+          ot.employee_id = activeEmployeesCache[idx % activeEmployeesCache.length].id;
+        }
+      });
+    }
+
     updateDashboardOverview();
     updatePayrollModule();
     updateInactiveModule();
     populateEmployeeDropdowns();
+    populateOvertimeFilters();
+
     if (!document.getElementById('moduleSchedule').classList.contains('hidden')) {
       renderScheduleEmployeeList();
+    }
+    if (!document.getElementById('moduleOvertime').classList.contains('hidden')) {
+      renderOvertimeCenter();
     }
   } catch (err) {
     console.error('fetchEmployees error:', err);
@@ -1210,7 +1262,119 @@ function updateDashboardOverview() {
 }
 
 /* =========================================================
-   SCHEDULE MANAGEMENT ENHANCEMENT
+   OVERTIME APPROVAL CENTER MODULE
+========================================================= */
+function populateOvertimeFilters() {
+  const deptSelect = document.getElementById('otFilterDept');
+  if (!deptSelect) return;
+
+  const departments = [...new Set(activeEmployeesCache.map(e => e.department).filter(Boolean))];
+  const currentVal = deptSelect.value;
+  deptSelect.innerHTML = '<option value="">All Departments</option>' +
+    departments.map(d => `<option value="${escapeHtml(d)}">${escapeHtml(d)}</option>`).join('');
+  deptSelect.value = currentVal;
+}
+
+function renderOvertimeCenter() {
+  const tbody = document.getElementById('overtimeTableBody');
+  if (!tbody) return;
+
+  const searchInput = document.getElementById('otSearchInput').value.toLowerCase().trim();
+  const filterDept = document.getElementById('otFilterDept').value;
+  const filterStatus = document.getElementById('otFilterStatus').value;
+  const filterMonth = document.getElementById('otFilterMonth').value;
+
+  // Filter requests
+  const filtered = overtimeCache.filter(o => {
+    const emp = activeEmployeesCache.find(e => e.id === o.employee_id) || {};
+    const fullName = `${emp.first_name || ''} ${emp.last_name || ''}`.toLowerCase();
+    
+    if (searchInput && !fullName.includes(searchInput)) return false;
+    if (filterDept && emp.department !== filterDept) return false;
+    if (filterStatus && o.status !== filterStatus) return false;
+    if (filterMonth && !o.request_date.startsWith(filterMonth)) return false;
+
+    return true;
+  });
+
+  // Calculate KPIs based on the entire overtimeCache (or filtered? Usually KPIs reflect the system or filtered view; let's reflect system-wide or filtered. Let's do system-wide as standard for summary cards, but total approved hours can sum approved requests).
+  const totalRequests = overtimeCache.length;
+  const pendingCount = overtimeCache.filter(o => o.status === 'Pending').length;
+  const approvedCount = overtimeCache.filter(o => o.status === 'Approved').length;
+  const rejectedCount = overtimeCache.filter(o => o.status === 'Rejected').length;
+  
+  let totalApprovedHours = 0;
+  overtimeCache.forEach(o => {
+    if (o.status === 'Approved') {
+      totalApprovedHours += Number(o.hours) || 0;
+    }
+  });
+
+  document.getElementById('kpiTotalOt').textContent = totalRequests;
+  document.getElementById('kpiPendingOt').textContent = pendingCount;
+  document.getElementById('kpiApprovedOt').textContent = approvedCount;
+  document.getElementById('kpiRejectedOt').textContent = rejectedCount;
+  document.getElementById('kpiTotalApprovedHours').textContent = totalApprovedHours.toFixed(1) + ' hrs';
+
+  // Render Table
+  if (filtered.length === 0) {
+    tbody.innerHTML = `<tr><td colspan="9" class="px-4 py-8 text-center text-slate-400">No overtime requests match your filter criteria.</td></tr>`;
+    return;
+  }
+
+  tbody.innerHTML = filtered.map(o => {
+    const emp = activeEmployeesCache.find(e => e.id === o.employee_id) || {};
+    const empName = `${emp.first_name || ''} ${emp.last_name || ''}`.trim() || 'Unknown Employee';
+    const deptTitle = `${emp.department || '—'} / ${emp.job_title || '—'}`;
+
+    let statusBadge = '<span class="text-xs px-2.5 py-1 rounded-full border bg-amber-500/15 text-amber-700 border-amber-500/30 font-medium">Pending</span>';
+    if (o.status === 'Approved') {
+      statusBadge = `<span class="text-xs px-2.5 py-1 rounded-full border bg-emerald-500/15 text-emerald-700 border-emerald-500/30 font-medium">Approved</span>
+                     <div class="text-[10px] text-slate-400 mt-0.5 font-mono">${o.action_timestamp || ''}</div>`;
+    } else if (o.status === 'Rejected') {
+      statusBadge = `<span class="text-xs px-2.5 py-1 rounded-full border bg-rose-500/15 text-rose-700 border-rose-500/30 font-medium">Rejected</span>
+                     <div class="text-[10px] text-slate-400 mt-0.5 font-mono">${o.action_timestamp || ''}</div>`;
+    }
+
+    return `
+      <tr class="hover:bg-slate-50 transition-colors">
+        <td class="px-4 py-3 font-medium text-slate-900">${escapeHtml(empName)}</td>
+        <td class="px-4 py-3 text-slate-600 text-xs">${escapeHtml(deptTitle)}</td>
+        <td class="px-4 py-3 text-slate-700 whitespace-nowrap">${formatDate(o.request_date)}</td>
+        <td class="px-4 py-3 font-mono-tabular text-slate-700 whitespace-nowrap">${escapeHtml(o.start_time)} → ${escapeHtml(o.end_time)}</td>
+        <td class="px-4 py-3 text-right font-mono-tabular text-slate-900 font-semibold">${Number(o.hours || 0).toFixed(1)} hrs</td>
+        <td class="px-4 py-3 text-xs text-slate-600">${escapeHtml(o.reason)}</td>
+        <td class="px-4 py-3 text-xs text-slate-500 font-mono whitespace-nowrap">${escapeHtml(o.date_filed || '—')}</td>
+        <td class="px-4 py-3">${statusBadge}</td>
+        <td class="px-4 py-3 text-center whitespace-nowrap">
+          ${o.status === 'Pending' ? `
+            <button onclick="handleOtApproval('${o.id}', 'Approved')" class="text-xs px-2.5 py-1 rounded-lg bg-emerald-600 text-white hover:bg-emerald-500 font-medium shadow-sm transition-colors mr-1">Approve</button>
+            <button onclick="handleOtApproval('${o.id}', 'Rejected')" class="text-xs px-2.5 py-1 rounded-lg bg-rose-600 text-white hover:bg-rose-500 font-medium shadow-sm transition-colors">Reject</button>
+          ` : `<span class="text-xs text-slate-400 italic">Locked</span>`}
+        </td>
+      </tr>
+    `;
+  }).join('');
+}
+
+function handleOtApproval(id, newStatus) {
+  const req = overtimeCache.find(o => o.id === id);
+  if (!req) return;
+
+  const now = new Date();
+  const timestampStr = now.toISOString().replace('T', ' ').substring(0, 16);
+
+  req.status = newStatus;
+  req.action_timestamp = timestampStr;
+
+  renderOvertimeCenter();
+  updateDashboardOverview();
+
+  showToast(`Overtime request successfully ${newStatus.toLowerCase()}.`, newStatus === 'Approved' ? 'success' : 'warning');
+}
+
+/* =========================================================
+   SCHEDULE MANAGEMENT MODULE
 ========================================================= */
 function renderScheduleEmployeeList() {
   const tbody = document.getElementById('scheduleEmployeeTableBody');
@@ -1293,7 +1457,6 @@ function renderMonthlyScheduleDays(employeeId, monthStr) {
   const monthData = schedulesCache[employeeId][monthStr];
   const isLocked = monthData.locked;
 
-  // Update Lock Indicator & Button
   const lockIndicator = document.getElementById('scheduleLockIndicator');
   if (isLocked) {
     lockIndicator.className = 'flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-medium bg-rose-500/10 text-rose-700 border border-rose-500/30';
@@ -1309,7 +1472,6 @@ function renderMonthlyScheduleDays(employeeId, monthStr) {
     document.getElementById('scheduleModalSaveBtn').classList.remove('opacity-50', 'cursor-not-allowed');
   }
 
-  // Calculate days in month
   const [year, month] = monthStr.split('-').map(Number);
   const daysInMonth = new Date(year, month, 0).getDate();
 
@@ -1459,6 +1621,7 @@ function saveCurrentMonthlySchedule() {
 ========================================================= */
 function renderAttendance() {
   const tbody = document.getElementById('attendanceTableBody');
+  if (!tbody) return;
   if (attendanceCache.length === 0) {
     tbody.innerHTML = `<tr><td colspan="9" class="px-4 py-8 text-center text-slate-400">No attendance records logged yet.</td></tr>`;
     return;
@@ -1493,56 +1656,11 @@ function deleteAttendance(id) {
 }
 
 /* =========================================================
-   OVERTIME MANAGEMENT MODULE
-========================================================= */
-function renderOvertime() {
-  const tbody = document.getElementById('overtimeTableBody');
-  if (overtimeCache.length === 0) {
-    tbody.innerHTML = `<tr><td colspan="7" class="px-4 py-8 text-center text-slate-400">No overtime requests submitted.</td></tr>`;
-    return;
-  }
-
-  tbody.innerHTML = overtimeCache.map(o => {
-    const emp = activeEmployeesCache.find(e => e.id === o.employee_id) || {};
-    const empName = `${emp.first_name || ''} ${emp.last_name || ''}`.trim() || 'Unknown';
-    let statusClass = 'bg-amber-500/15 text-amber-700 border-amber-500/30';
-    if (o.status === 'Approved') statusClass = 'bg-emerald-500/15 text-emerald-700 border-emerald-500/30';
-    if (o.status === 'Rejected') statusClass = 'bg-rose-500/15 text-rose-700 border-rose-500/30';
-
-    return `
-      <tr class="hover:bg-slate-100 transition-colors">
-        <td class="px-4 py-3 font-medium text-slate-900">${escapeHtml(empName)}</td>
-        <td class="px-4 py-3 text-slate-600">${formatDate(o.request_date)}</td>
-        <td class="px-4 py-3 font-mono-tabular text-slate-700">${escapeHtml(o.start_time)} → ${escapeHtml(o.end_time)}</td>
-        <td class="px-4 py-3 text-right font-mono-tabular text-slate-900 font-medium">${o.hours || 2.0} hrs</td>
-        <td class="px-4 py-3 text-xs text-slate-600">${escapeHtml(o.reason)}</td>
-        <td class="px-4 py-3"><span class="text-xs px-2 py-0.5 rounded-full border ${statusClass}">${escapeHtml(o.status)}</span></td>
-        <td class="px-4 py-3 text-center space-x-1">
-          ${o.status === 'Pending' ? `
-            <button onclick="updateOvertimeStatus('${o.id}', 'Approved')" class="text-xs px-2 py-1 rounded bg-emerald-600 text-white hover:bg-emerald-500">Approve</button>
-            <button onclick="updateOvertimeStatus('${o.id}', 'Rejected')" class="text-xs px-2 py-1 rounded bg-rose-600 text-white hover:bg-rose-500">Reject</button>
-          ` : `<span class="text-xs text-slate-400">Processed</span>`}
-        </td>
-      </tr>
-    `;
-  }).join('');
-}
-
-function updateOvertimeStatus(id, newStatus) {
-  const req = overtimeCache.find(o => o.id === id);
-  if (req) {
-    req.status = newStatus;
-    renderOvertime();
-    updateDashboardOverview();
-    showToast(`Overtime request ${newStatus.toLowerCase()}.`, newStatus === 'Approved' ? 'success' : 'warning');
-  }
-}
-
-/* =========================================================
    LEAVE MANAGEMENT MODULE
 ========================================================= */
 function renderLeave() {
   const tbody = document.getElementById('leaveTableBody');
+  if (!tbody) return;
   if (leaveCache.length === 0) {
     tbody.innerHTML = `<tr><td colspan="6" class="px-4 py-8 text-center text-slate-400">No leave applications filed.</td></tr>`;
     return;
@@ -1685,6 +1803,8 @@ function renderRoster(employeesWithPayroll) {
   const empty = document.getElementById('rosterEmpty');
   const tableWrap = document.getElementById('rosterTableWrap');
 
+  if (!tbody || !loading || !empty || !tableWrap) return;
+
   loading.classList.add('hidden');
 
   if (employeesWithPayroll.length === 0) {
@@ -1715,6 +1835,7 @@ function renderRoster(employeesWithPayroll) {
 ========================================================= */
 function updateInactiveModule() {
   const tbody = document.getElementById('inactiveTableBody');
+  if (!tbody) return;
   if (inactiveEmployeesCache.length === 0) {
     tbody.innerHTML = `<tr><td colspan="6" class="px-4 py-8 text-center text-slate-400">No separated employee records found.</td></tr>`;
     return;
@@ -1805,7 +1926,7 @@ async function confirmSeparation() {
    POPULATE DROPDOWNS
 ========================================================= */
 function populateEmployeeDropdowns() {
-  const selects = ['attEmployeeId', 'otEmployeeId', 'leaveEmployeeId'];
+  const selects = ['attEmployeeId', 'leaveEmployeeId'];
   selects.forEach(id => {
     const select = document.getElementById(id);
     if (!select) return;
@@ -1849,6 +1970,19 @@ function registerEventListeners() {
     }
   });
 
+  // Overtime Approval Center Filters & Search
+  document.getElementById('otSearchInput').addEventListener('input', renderOvertimeCenter);
+  document.getElementById('otFilterDept').addEventListener('change', renderOvertimeCenter);
+  document.getElementById('otFilterStatus').addEventListener('change', renderOvertimeCenter);
+  document.getElementById('otFilterMonth').addEventListener('change', renderOvertimeCenter);
+  document.getElementById('otResetFiltersBtn').addEventListener('click', () => {
+    document.getElementById('otSearchInput').value = '';
+    document.getElementById('otFilterDept').value = '';
+    document.getElementById('otFilterStatus').value = '';
+    document.getElementById('otFilterMonth').value = '';
+    renderOvertimeCenter();
+  });
+
   // Attendance Form
   document.getElementById('attendanceForm').addEventListener('submit', (e) => {
     e.preventDefault();
@@ -1870,28 +2004,6 @@ function registerEventListeners() {
     renderAttendance();
     updateDashboardOverview();
     showToast('Attendance record logged successfully.', 'success');
-    e.target.reset();
-  });
-
-  // Overtime Form
-  document.getElementById('overtimeForm').addEventListener('submit', (e) => {
-    e.preventDefault();
-    const empId = document.getElementById('otEmployeeId').value;
-    if (!empId) { showToast('Please select an employee.', 'warning'); return; }
-
-    overtimeCache.push({
-      id: 'ot_' + Date.now(),
-      employee_id: empId,
-      request_date: new Date().toISOString().split('T')[0],
-      start_time: document.getElementById('otStart').value,
-      end_time: document.getElementById('otEnd').value,
-      hours: 2.0,
-      reason: document.getElementById('otReason').value || 'Overtime work',
-      status: 'Pending'
-    });
-    renderOvertime();
-    updateDashboardOverview();
-    showToast('Overtime request submitted for review.', 'success');
     e.target.reset();
   });
 
