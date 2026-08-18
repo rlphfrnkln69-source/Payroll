@@ -400,6 +400,9 @@
             <h3 class="text-base font-semibold text-slate-900">Overtime Approval Center</h3>
             <p class="text-xs text-slate-500 mt-0.5">Review, approve, or reject employee overtime submissions prior to payroll inclusion.</p>
           </div>
+          <button id="openOtArchiveBtn" class="text-xs bg-slate-900 text-white font-medium px-4 py-2 rounded-lg hover:bg-slate-800 transition-colors">
+            🗑️ View Deleted / Archived OT Requests
+          </button>
         </div>
 
         <div class="grid grid-cols-2 md:grid-cols-5 gap-4">
@@ -490,12 +493,16 @@
             <h3 class="text-base font-semibold text-slate-900">Leave Approval Center</h3>
             <p class="text-xs text-slate-500 mt-0.5">Review, approve, or reject employee leave applications, monitor leave balances, and track approved leaves.</p>
           </div>
-          <button id="openLeaveBalancesBtn" class="text-xs bg-slate-900 text-white font-medium px-4 py-2 rounded-lg hover:bg-slate-800 transition-colors">
-            📊 View Employee Leave Balances
-          </button>
+          <div class="flex items-center gap-2">
+            <button id="openLeaveBalancesBtn" class="text-xs bg-slate-900 text-white font-medium px-4 py-2 rounded-lg hover:bg-slate-800 transition-colors">
+              📊 View Employee Leave Balances
+            </button>
+            <button id="openLeaveArchiveBtn" class="text-xs bg-slate-900 text-white font-medium px-4 py-2 rounded-lg hover:bg-slate-800 transition-colors">
+              🗑️ View Deleted / Archived Leave
+            </button>
+          </div>
         </div>
 
-        <!-- KPI Cards -->
         <div class="grid grid-cols-2 md:grid-cols-5 gap-4">
           <div class="rounded-xl border border-slate-300 bg-slate-50 p-4">
             <p class="text-xs text-slate-500 mb-1">Total Leave Requests</p>
@@ -519,7 +526,6 @@
           </div>
         </div>
 
-        <!-- Filter & Search Toolbar -->
         <div class="rounded-xl border border-slate-300 bg-slate-50 p-4 flex flex-wrap gap-3 items-center justify-between">
           <div class="flex flex-wrap items-center gap-3 flex-1">
             <div class="flex flex-col gap-1">
@@ -566,7 +572,6 @@
           </div>
         </div>
 
-        <!-- Leave Applications Queue Table -->
         <div class="rounded-xl border border-slate-300 bg-slate-50 overflow-hidden">
           <div class="px-5 py-4 border-b border-slate-300 flex items-center justify-between">
             <h4 class="text-base font-semibold text-slate-900">Leave Applications Queue</h4>
@@ -591,7 +596,6 @@
           </div>
         </div>
 
-        <!-- Optional Approved Leave Calendar View -->
         <div class="rounded-xl border border-slate-300 bg-slate-50 p-5 space-y-4">
           <div class="flex items-center justify-between border-b border-slate-200 pb-3">
             <div>
@@ -603,9 +607,7 @@
               <input id="calendarMonthPicker" type="month" class="bg-white border border-slate-300 rounded-md px-3 py-1 text-xs text-slate-900 focus:outline-none focus:ring-2 focus:ring-amber-500/65" />
             </div>
           </div>
-          <div id="leaveCalendarContainer" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
-            <!-- Populated dynamically -->
-          </div>
+          <div id="leaveCalendarContainer" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3"></div>
         </div>
       </section>
 
@@ -681,7 +683,7 @@
             <div class="flex flex-col gap-1">
               <label for="hireDate" class="text-xs font-medium text-slate-500">Hire Date</label>
               <input id="hireDate" name="hireDate" type="date" required
-                class="bg-white border border-slate-300 rounded-lg px-3 py-2 text-sm text-slate-900 focus:outline-none focus:ring-2 focus:ring-amber-500/60 focus:border-amber-500/60" />
+                class="bg-white border border-slate-300 rounded-lg px-3 py-2 text-sm text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-amber-500/60 focus:border-amber-500/60" />
             </div>
 
             <div class="flex flex-col gap-1">
@@ -820,6 +822,74 @@
 </div>
 
 <!-- =========================================================
+     DELETE CONFIRMATION MODAL WITH SAFEGUARDS
+========================================================= -->
+<div id="deleteModal" class="hidden fixed inset-0 z-50 items-center justify-center bg-black/60 px-4">
+  <div class="bg-white border border-slate-300 rounded-xl max-w-md w-full p-6 space-y-4 shadow-2xl">
+    <div class="flex items-center justify-between border-b border-slate-200 pb-3">
+      <h3 class="text-rose-700 font-semibold text-base">⚠️ Delete Request Confirmation</h3>
+      <button id="closeDeleteModalBtn" class="text-slate-400 hover:text-slate-700 font-bold text-lg">✕</button>
+    </div>
+
+    <p class="text-sm text-slate-700 font-medium">
+      Are you sure you want to delete this request? This action cannot be undone.
+    </p>
+
+    <div class="space-y-3 pt-2">
+      <div class="flex flex-col gap-1">
+        <label class="text-xs font-medium text-slate-500">Reason for Deletion <span class="text-rose-500">*</span></label>
+        <input id="deleteReasonInput" type="text" placeholder="e.g. Duplicate filing / Incorrect dates entered" required
+          class="bg-white border border-slate-300 rounded-lg px-3 py-2 text-sm text-slate-900 focus:outline-none focus:ring-2 focus:ring-rose-500/60" />
+      </div>
+      <div class="text-[11px] text-slate-400 space-y-1">
+        <div>• Request will be moved to the Trash/Audit Archive.</div>
+        <div>• Related leave balances or approved OT totals will be automatically recalculated.</div>
+      </div>
+    </div>
+
+    <div class="flex justify-end gap-2 pt-3 border-t border-slate-200">
+      <button id="deleteCancelBtn" class="px-4 py-2 text-sm rounded-lg border border-slate-300 text-slate-600 hover:bg-slate-100 transition-colors">Cancel</button>
+      <button id="deleteConfirmBtn" class="px-4 py-2 text-sm rounded-lg bg-rose-600 hover:bg-rose-500 text-white font-medium transition-colors">Confirm Delete</button>
+    </div>
+  </div>
+</div>
+
+<!-- =========================================================
+     DELETED / ARCHIVED REQUESTS MODAL
+========================================================= -->
+<div id="archiveModal" class="hidden fixed inset-0 z-50 items-center justify-center bg-black/60 px-4">
+  <div class="bg-white border border-slate-300 rounded-xl max-w-4xl w-full max-h-[85vh] flex flex-col p-6 space-y-4 overflow-hidden shadow-2xl">
+    <div class="flex items-center justify-between border-b border-slate-200 pb-3">
+      <div>
+        <h3 id="archiveModalTitle" class="text-slate-900 font-semibold text-lg">Deleted / Archived Requests</h3>
+        <p class="text-xs text-slate-500">Audit trail and soft-deleted filings.</p>
+      </div>
+      <button id="closeArchiveModalBtn" class="text-slate-400 hover:text-slate-700 font-bold text-lg">✕</button>
+    </div>
+
+    <div class="flex-1 overflow-y-auto border border-slate-200 rounded-lg">
+      <table class="w-full text-sm border-collapse">
+        <thead>
+          <tr class="bg-slate-100 text-slate-600 text-xs uppercase tracking-wide sticky top-0 z-10">
+            <th class="text-left px-4 py-2.5 border-b border-slate-200">Employee</th>
+            <th class="text-left px-4 py-2.5 border-b border-slate-200">Type / Details</th>
+            <th class="text-left px-4 py-2.5 border-b border-slate-200">Deletion Reason</th>
+            <th class="text-left px-4 py-2.5 border-b border-slate-200">Deleted By (Admin)</th>
+            <th class="text-left px-4 py-2.5 border-b border-slate-200">Timestamp</th>
+            <th class="text-center px-4 py-2.5 border-b border-slate-200">Action</th>
+          </tr>
+        </thead>
+        <tbody id="archiveTableBody" class="divide-y divide-slate-200"></tbody>
+      </table>
+    </div>
+
+    <div class="flex justify-end pt-2 border-t border-slate-200">
+      <button id="closeArchiveBtn" class="px-4 py-2 text-sm rounded-lg border border-slate-300 text-slate-600 hover:bg-slate-100 transition-colors">Close</button>
+    </div>
+  </div>
+</div>
+
+<!-- =========================================================
      EMPLOYEE LEAVE BALANCES MODAL
 ========================================================= -->
 <div id="leaveBalancesModal" class="hidden fixed inset-0 z-50 items-center justify-center bg-black/60 px-4">
@@ -952,11 +1022,12 @@ const EMPLOYEES_TABLE = 'employees';
 
 /* =========================================================
    GLOBAL STATE
-========================================================= */
+========================================================= -->
 let activeEmployeesCache = [];
 let inactiveEmployeesCache = [];
 let schedulesCache = {};
 let attendanceCache = [];
+
 let overtimeCache = [
   {
     id: 'ot_1',
@@ -1011,11 +1082,19 @@ let leaveCache = [
   }
 ];
 
-// Employee leave balances cache: employee_id -> { 'Vacation Leave': 12, 'Sick Leave': 10, 'Service Incentive Leave': 5, 'Emergency Leave': 3 }
+// Soft Delete / Archived Storage
+let archivedOvertimeCache = [];
+let archivedLeaveCache = [];
+
 let leaveBalancesCache = {};
 
 let pendingSeparationId = null;
 let currentScheduleEmployeeId = null;
+
+// Pending deletion state
+let pendingDeleteTarget = null; // { type: 'overtime' | 'leave', id: string }
+
+let currentAdminEmail = 'admin@company.com';
 
 /* =========================================================
    STATUTORY CONSTANTS (Philippines)
@@ -1306,7 +1385,6 @@ async function fetchEmployees() {
     activeEmployeesCache = allEmps.filter(e => !e.is_inactive);
     inactiveEmployeesCache = allEmps.filter(e => e.is_inactive);
 
-    // Initialize leave balances & bind sample requests to active employees if empty
     activeEmployeesCache.forEach(emp => {
       if (!leaveBalancesCache[emp.id]) {
         leaveBalancesCache[emp.id] = {
@@ -1391,8 +1469,6 @@ function updateDashboardOverview() {
 
   const badgeLeave = document.getElementById('badgeLeave');
   if (pendingLeaveCount > 0) {
-    badgeLeave.textContent = pendingLeaveCount;
-    badgeLeave.classList.add('hidden'); // wait, let's show badge
     badgeLeave.textContent = pendingLeaveCount;
     badgeLeave.classList.remove('hidden');
   } else {
@@ -1482,11 +1558,12 @@ function renderOvertimeCenter() {
         <td class="px-4 py-3 text-xs text-slate-600">${escapeHtml(o.reason)}</td>
         <td class="px-4 py-3 text-xs text-slate-500 font-mono whitespace-nowrap">${escapeHtml(o.date_filed || '—')}</td>
         <td class="px-4 py-3">${statusBadge}</td>
-        <td class="px-4 py-3 text-center whitespace-nowrap">
+        <td class="px-4 py-3 text-center whitespace-nowrap space-x-1">
           ${o.status === 'Pending' ? `
-            <button onclick="handleOtApproval('${o.id}', 'Approved')" class="text-xs px-2.5 py-1 rounded-lg bg-emerald-600 text-white hover:bg-emerald-500 font-medium shadow-sm transition-colors mr-1">Approve</button>
-            <button onclick="handleOtApproval('${o.id}', 'Rejected')" class="text-xs px-2.5 py-1 rounded-lg bg-rose-600 text-white hover:bg-rose-500 font-medium shadow-sm transition-colors">Reject</button>
-          ` : `<span class="text-xs text-slate-400 italic">Locked</span>`}
+            <button onclick="handleOtApproval('${o.id}', 'Approved')" class="text-xs px-2 py-1 rounded-lg bg-emerald-600 text-white hover:bg-emerald-500 font-medium shadow-sm transition-colors">Approve</button>
+            <button onclick="handleOtApproval('${o.id}', 'Rejected')" class="text-xs px-2 py-1 rounded-lg bg-rose-600 text-white hover:bg-rose-500 font-medium shadow-sm transition-colors">Reject</button>
+          ` : `<span class="text-xs text-slate-400 italic mr-1">Locked</span>`}
+          <button onclick="openDeleteModal('overtime', '${o.id}')" class="text-xs px-2.5 py-1 rounded-lg border border-rose-300 text-rose-700 hover:bg-rose-50 font-medium transition-colors" title="Delete request">Delete</button>
         </td>
       </tr>
     `;
@@ -1510,7 +1587,7 @@ function handleOtApproval(id, newStatus) {
 }
 
 /* =========================================================
-   LEAVE APPROVAL CENTER MODULE (ENHANCED)
+   LEAVE APPROVAL CENTER MODULE
 ========================================================= */
 function populateLeaveFilters() {
   const deptSelect = document.getElementById('leaveFilterDept');
@@ -1546,7 +1623,6 @@ function renderLeaveCenter() {
     return true;
   });
 
-  // Calculate KPIs
   const totalRequests = leaveCache.length;
   const pendingCount = leaveCache.filter(l => l.status === 'Pending').length;
   const approvedCount = leaveCache.filter(l => l.status === 'Approved').length;
@@ -1565,7 +1641,6 @@ function renderLeaveCenter() {
   document.getElementById('kpiRejectedLeave').textContent = rejectedCount;
   document.getElementById('kpiTotalApprovedDays').textContent = totalApprovedDays + ' days';
 
-  // Render Table
   if (filtered.length === 0) {
     tbody.innerHTML = `<tr><td colspan="9" class="px-4 py-8 text-center text-slate-400">No leave applications match your filter criteria.</td></tr>`;
   } else {
@@ -1597,14 +1672,15 @@ function renderLeaveCenter() {
           <td class="px-4 py-3 text-xs text-slate-600">${escapeHtml(l.reason)}</td>
           <td class="px-4 py-3 text-xs text-slate-500 font-mono whitespace-nowrap">${escapeHtml(l.date_filed || '—')}</td>
           <td class="px-4 py-3">${statusBadge}</td>
-          <td class="px-4 py-3 text-center whitespace-nowrap">
+          <td class="px-4 py-3 text-center whitespace-nowrap space-x-1">
             ${l.status === 'Pending' ? `
-              <button onclick="handleLeaveApproval('${l.id}', 'Approved')" class="text-xs px-2.5 py-1 rounded-lg bg-emerald-600 text-white hover:bg-emerald-500 font-medium shadow-sm transition-colors mr-1">Approve</button>
-              <button onclick="handleLeaveApproval('${l.id}', 'Rejected')" class="text-xs px-2.5 py-1 rounded-lg bg-rose-600 text-white hover:bg-rose-500 font-medium shadow-sm transition-colors mr-1">Reject</button>
-              <button onclick="handleLeaveApproval('${l.id}', 'Cancelled')" class="text-xs px-2 py-1 rounded-lg border border-slate-300 text-slate-600 hover:bg-slate-100 font-medium transition-colors">Cancel</button>
+              <button onclick="handleLeaveApproval('${l.id}', 'Approved')" class="text-xs px-2 py-1 rounded bg-emerald-600 text-white hover:bg-emerald-500">Approve</button>
+              <button onclick="handleLeaveApproval('${l.id}', 'Rejected')" class="text-xs px-2 py-1 rounded bg-rose-600 text-white hover:bg-rose-500">Reject</button>
+              <button onclick="handleLeaveApproval('${l.id}', 'Cancelled')" class="text-xs px-2 py-1 rounded border border-slate-300 text-slate-600 hover:bg-slate-100">Cancel</button>
             ` : l.status === 'Approved' ? `
-              <button onclick="handleLeaveApproval('${l.id}', 'Cancelled')" class="text-xs px-2.5 py-1 rounded-lg border border-amber-300 text-amber-700 hover:bg-amber-50 font-medium transition-colors">Cancel Leave</button>
-            ` : `<span class="text-xs text-slate-400 italic">Locked</span>`}
+              <button onclick="handleLeaveApproval('${l.id}', 'Cancelled')" class="text-xs px-2 py-1 rounded border border-amber-300 text-amber-700 hover:bg-amber-50">Cancel</button>
+            ` : `<span class="text-xs text-slate-400 italic mr-1">Locked</span>`}
+            <button onclick="openDeleteModal('leave', '${l.id}')" class="text-xs px-2.5 py-1 rounded-lg border border-rose-300 text-rose-700 hover:bg-rose-50 font-medium transition-colors" title="Delete application">Delete</button>
           </td>
         </tr>
       `;
@@ -1624,15 +1700,12 @@ function handleLeaveApproval(id, newStatus) {
   const empId = req.employee_id;
   const leaveType = req.leave_type;
 
-  // Handle Leave Balance updates
   if (empId && leaveBalancesCache[empId]) {
     if (req.status === 'Pending' && newStatus === 'Approved') {
-      // Deduct balance
       if (leaveBalancesCache[empId][leaveType] !== undefined) {
         leaveBalancesCache[empId][leaveType] = Math.max(0, leaveBalancesCache[empId][leaveType] - numDays);
       }
     } else if (req.status === 'Approved' && (newStatus === 'Cancelled' || newStatus === 'Rejected')) {
-      // Restore balance
       if (leaveBalancesCache[empId][leaveType] !== undefined) {
         leaveBalancesCache[empId][leaveType] += numDays;
       }
@@ -1646,6 +1719,169 @@ function handleLeaveApproval(id, newStatus) {
   updateDashboardOverview();
 
   showToast(`Leave application successfully ${newStatus.toLowerCase()}.`, newStatus === 'Approved' ? 'success' : 'warning');
+}
+
+/* =========================================================
+   DELETE & SOFT DELETE / ARCHIVE WORKFLOW
+========================================================= */
+function openDeleteModal(type, id) {
+  pendingDeleteTarget = { type, id };
+  document.getElementById('deleteReasonInput').value = '';
+  const modal = document.getElementById('deleteModal');
+  modal.classList.remove('hidden');
+  modal.classList.add('flex');
+}
+
+function closeDeleteModal() {
+  pendingDeleteTarget = null;
+  const modal = document.getElementById('deleteModal');
+  modal.classList.add('hidden');
+  modal.classList.remove('flex');
+}
+
+function confirmDeleteAction() {
+  if (!pendingDeleteTarget) return;
+  const reason = document.getElementById('deleteReasonInput').value.trim();
+  if (!reason) {
+    showToast('Please provide a reason for deletion.', 'warning');
+    return;
+  }
+
+  const { type, id } = pendingDeleteTarget;
+  const nowStr = new Date().toISOString().replace('T', ' ').substring(0, 16);
+
+  if (type === 'overtime') {
+    const idx = overtimeCache.findIndex(o => o.id === id);
+    if (idx === -1) return;
+    const req = overtimeCache[idx];
+
+    // Safeguard: Recalculate if approved
+    // (If approved OT was counted towards totals, removing it ensures totals update automatically since totals compute directly from overtimeCache)
+
+    overtimeCache.splice(idx, 1);
+    archivedOvertimeCache.push({
+      ...req,
+      deleted_by: currentAdminEmail,
+      deleted_at: nowStr,
+      deletion_reason: reason
+    });
+
+    renderOvertimeCenter();
+    updateDashboardOverview();
+    showToast('Overtime request successfully archived/deleted.', 'success');
+
+  } else if (type === 'leave') {
+    const idx = leaveCache.findIndex(l => l.id === id);
+    if (idx === -1) return;
+    const req = leaveCache[idx];
+
+    // Safeguard: If the deleted leave was approved, restore the employee's leave balance
+    if (req.status === 'Approved') {
+      const numDays = req.days || calculateDateDiffDays(req.start_date, req.end_date);
+      const empId = req.employee_id;
+      const leaveType = req.leave_type;
+      if (empId && leaveBalancesCache[empId] && leaveBalancesCache[empId][leaveType] !== undefined) {
+        leaveBalancesCache[empId][leaveType] += numDays;
+      }
+    }
+
+    leaveCache.splice(idx, 1);
+    archivedLeaveCache.push({
+      ...req,
+      deleted_by: currentAdminEmail,
+      deleted_at: nowStr,
+      deletion_reason: reason
+    });
+
+    renderLeaveCenter();
+    updateDashboardOverview();
+    showToast('Leave request successfully archived/deleted.', 'success');
+  }
+
+  closeDeleteModal();
+}
+
+function openArchiveModal(type) {
+  const tbody = document.getElementById('archiveTableBody');
+  const title = document.getElementById('archiveModalTitle');
+  if (!tbody || !title) return;
+
+  const isOt = type === 'overtime';
+  title.textContent = isOt ? 'Deleted / Archived Overtime Requests' : 'Deleted / Archived Leave Requests';
+
+  const items = isOt ? archivedOvertimeCache : archivedLeaveCache;
+
+  if (items.length === 0) {
+    tbody.innerHTML = `<tr><td colspan="6" class="px-4 py-8 text-center text-slate-400">No archived records found.</td></tr>`;
+  } else {
+    tbody.innerHTML = items.map((item, index) => {
+      const emp = activeEmployeesCache.find(e => e.id === item.employee_id) || {};
+      const empName = `${emp.first_name || ''} ${emp.last_name || ''}`.trim() || 'Unknown';
+      const detailStr = isOt 
+        ? `${formatDate(item.request_date)} (${item.hours} hrs) — ${item.reason}`
+        : `${item.leave_type}: ${formatDate(item.start_date)} to ${formatDate(item.end_date)} (${item.days}d)`;
+
+      return `
+        <tr class="hover:bg-slate-50 transition-colors">
+          <td class="px-4 py-3 font-medium text-slate-900">${escapeHtml(empName)}</td>
+          <td class="px-4 py-3 text-slate-700 text-xs">${escapeHtml(detailStr)}</td>
+          <td class="px-4 py-3 text-rose-700 text-xs font-medium">${escapeHtml(item.deletion_reason)}</td>
+          <td class="px-4 py-3 text-slate-600 text-xs font-mono">${escapeHtml(item.deleted_by)}</td>
+          <td class="px-4 py-3 text-slate-500 text-xs font-mono whitespace-nowrap">${escapeHtml(item.deleted_at)}</td>
+          <td class="px-4 py-3 text-center">
+            <button onclick="restoreArchivedItem('${type}', ${index})" class="text-xs px-2.5 py-1 rounded bg-emerald-600 text-white hover:bg-emerald-500 font-medium">Restore</button>
+          </td>
+        </tr>
+      `;
+    }).join('');
+  }
+
+  const modal = document.getElementById('archiveModal');
+  modal.classList.remove('hidden');
+  modal.classList.add('flex');
+}
+
+function closeArchiveModal() {
+  const modal = document.getElementById('archiveModal');
+  modal.classList.add('hidden');
+  modal.classList.remove('flex');
+}
+
+function restoreArchivedItem(type, index) {
+  if (type === 'overtime') {
+    const [item] = archivedOvertimeCache.splice(index, 1);
+    if (!item) return;
+    delete item.deleted_by;
+    delete item.deleted_at;
+    delete item.deletion_reason;
+    overtimeCache.push(item);
+    renderOvertimeCenter();
+    updateDashboardOverview();
+    showToast('Overtime request successfully restored.', 'success');
+  } else {
+    const [item] = archivedLeaveCache.splice(index, 1);
+    if (!item) return;
+    delete item.deleted_by;
+    delete item.deleted_at;
+    delete item.deletion_reason;
+
+    // If restoring an approved leave, re-deduct leave balance securely
+    if (item.status === 'Approved') {
+      const numDays = item.days || calculateDateDiffDays(item.start_date, item.end_date);
+      const empId = item.employee_id;
+      const leaveType = item.leave_type;
+      if (empId && leaveBalancesCache[empId] && leaveBalancesCache[empId][leaveType] !== undefined) {
+        leaveBalancesCache[empId][leaveType] = Math.max(0, leaveBalancesCache[empId][leaveType] - numDays);
+      }
+    }
+
+    leaveCache.push(item);
+    renderLeaveCenter();
+    updateDashboardOverview();
+    showToast('Leave request successfully restored.', 'success');
+  }
+
+  openArchiveModal(type);
 }
 
 function renderLeaveCalendar() {
@@ -1713,7 +1949,7 @@ function closeLeaveBalancesModal() {
 
 /* =========================================================
    SCHEDULE MANAGEMENT MODULE
-========================================================= */
+========================================================= -->
 function renderScheduleEmployeeList() {
   const tbody = document.getElementById('scheduleEmployeeTableBody');
   if (!tbody) return;
@@ -2262,7 +2498,7 @@ function registerEventListeners() {
     }
   });
 
-  // Overtime Approval Center Filters & Search
+  // Overtime Approval Center Filters & Search & Archives
   document.getElementById('otSearchInput').addEventListener('input', renderOvertimeCenter);
   document.getElementById('otFilterDept').addEventListener('change', renderOvertimeCenter);
   document.getElementById('otFilterStatus').addEventListener('change', renderOvertimeCenter);
@@ -2274,8 +2510,9 @@ function registerEventListeners() {
     document.getElementById('otFilterMonth').value = '';
     renderOvertimeCenter();
   });
+  document.getElementById('openOtArchiveBtn').addEventListener('click', () => openArchiveModal('overtime'));
 
-  // Leave Approval Center Filters & Search & Modal
+  // Leave Approval Center Filters & Search & Archives & Balances
   document.getElementById('leaveSearchInput').addEventListener('input', renderLeaveCenter);
   document.getElementById('leaveFilterDept').addEventListener('change', renderLeaveCenter);
   document.getElementById('leaveFilterType').addEventListener('change', renderLeaveCenter);
@@ -2294,6 +2531,16 @@ function registerEventListeners() {
   document.getElementById('openLeaveBalancesBtn').addEventListener('click', openLeaveBalancesModal);
   document.getElementById('closeLeaveBalancesModalBtn').addEventListener('click', closeLeaveBalancesModal);
   document.getElementById('closeLeaveBalancesBtn').addEventListener('click', closeLeaveBalancesModal);
+  document.getElementById('openLeaveArchiveBtn').addEventListener('click', () => openArchiveModal('leave'));
+
+  // Delete Modal listeners
+  document.getElementById('closeDeleteModalBtn').addEventListener('click', closeDeleteModal);
+  document.getElementById('deleteCancelBtn').addEventListener('click', closeDeleteModal);
+  document.getElementById('deleteConfirmBtn').addEventListener('click', confirmDeleteAction);
+
+  // Archive Modal listeners
+  document.getElementById('closeArchiveModalBtn').addEventListener('click', closeArchiveModal);
+  document.getElementById('closeArchiveBtn').addEventListener('click', closeArchiveModal);
 
   // Attendance Form
   document.getElementById('attendanceForm').addEventListener('submit', (e) => {
@@ -2354,7 +2601,8 @@ async function handleLogout() {
 function showAppShell(session) {
   document.getElementById('loginScreen').classList.add('hidden');
   document.getElementById('appShell').classList.remove('hidden');
-  document.getElementById('sidebarAdminEmail').textContent = session.user.email || '';
+  currentAdminEmail = session.user.email || 'admin@company.com';
+  document.getElementById('sidebarAdminEmail').textContent = currentAdminEmail;
   setConnectionStatus(credentialsArePlaceholders() ? 'unconfigured' : 'connecting');
   setDefaultDates();
   fetchEmployees();
