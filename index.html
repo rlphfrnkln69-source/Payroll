@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>HRIS — Philippine Payroll & Statutory Compliance</title>
+<title>HRIS — Philippine Payroll & Workforce Management System</title>
 
 <!-- Tailwind CSS CDN -->
 <script src="https://cdn.tailwindcss.com"></script>
@@ -16,7 +16,7 @@
     --accent: #f59e0b; /* amber-500, used sparingly as the signature accent */
   }
   html, body { background-color: #ffffff; }
-  ::-webkit-scrollbar { height: 10px; width: 10px; }
+  ::-webkit-scrollbar { height: 8px; width: 8px; }
   ::-webkit-scrollbar-track { background: #f1f5f9; }
   ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 9999px; }
   ::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
@@ -49,7 +49,7 @@
 </style>
 </head>
 
-<body class="bg-white text-slate-900 min-h-screen antialiased">
+<body class="bg-white text-slate-900 min-h-screen antialiased flex">
 
 <!-- =========================================================
      TOAST / NOTIFICATION CONTAINER
@@ -59,14 +59,14 @@
 <!-- =========================================================
      LOGIN SCREEN (shown when no authenticated session exists)
 ========================================================= -->
-<div id="loginScreen" class="min-h-screen flex items-center justify-center px-4">
+<div id="loginScreen" class="min-h-screen w-full flex items-center justify-center px-4 bg-white">
   <div class="w-full max-w-sm">
     <div class="flex flex-col items-center mb-6">
       <div class="w-12 h-12 rounded-lg bg-amber-500/10 border border-amber-500/30 flex items-center justify-center text-amber-500 font-bold text-xl mb-3">
         K
       </div>
       <h1 class="text-xl font-semibold text-slate-900 tracking-tight">HRIS Admin Login</h1>
-      <p class="text-sm text-slate-500 mt-1 text-center">Sign in with your administrator account to access payroll records.</p>
+      <p class="text-sm text-slate-500 mt-1 text-center">Sign in with your administrator account to access payroll and workforce records.</p>
     </div>
 
     <form id="loginForm" class="border border-slate-200 rounded-xl p-5 space-y-4" novalidate>
@@ -103,308 +103,785 @@
 </div>
 
 <!-- =========================================================
-     APP SHELL (header + dashboard) — hidden until authenticated
+     APP SHELL (Sidebar + Main Content) — hidden until authenticated
 ========================================================= -->
-<div id="appShell" class="hidden">
+<div id="appShell" class="hidden min-h-screen w-full flex bg-white">
 
-<!-- =========================================================
-     HEADER
-========================================================= -->
-<header class="border-b border-slate-200 bg-white/95 backdrop-blur sticky top-0 z-40">
-  <div class="max-w-7xl mx-auto px-4 sm:px-6 py-4 flex items-center justify-between gap-4">
-    <div class="flex items-center gap-3">
-      <div class="w-10 h-10 rounded-lg bg-amber-500/10 border border-amber-500/30 flex items-center justify-center text-amber-400 font-bold text-lg">
+  <!-- =========================================================
+       SIDEBAR NAVIGATION (Dark Slate Theme)
+  ========================================================= -->
+  <aside class="w-64 bg-slate-900 text-slate-300 flex flex-col shrink-0 border-r border-slate-800 select-none">
+    <!-- Brand / Header -->
+    <div class="p-5 border-b border-slate-800 flex items-center gap-3">
+      <div class="w-9 h-9 rounded-lg bg-amber-500/15 border border-amber-500/30 flex items-center justify-center text-amber-400 font-bold text-base">
         K
       </div>
       <div>
-        <h1 class="text-lg sm:text-xl font-semibold text-slate-900 tracking-tight">HRIS</h1>
-        <p class="text-xs sm:text-sm text-slate-500">Philippine Payroll &amp; Statutory Compliance</p>
+        <h1 class="text-sm font-semibold text-white tracking-tight">HRIS Platform</h1>
+        <p class="text-[11px] text-slate-400">PH Payroll &amp; Workforce</p>
       </div>
     </div>
-    <div class="flex items-center gap-2 sm:gap-3">
-      <div id="connectionStatus" class="flex items-center gap-2 text-xs sm:text-sm bg-slate-100 border border-slate-300 rounded-full px-3 py-1.5">
-        <span id="connectionDot" class="w-2 h-2 rounded-full bg-slate-500 pulse-dot"></span>
-        <span id="connectionText" class="text-slate-600">Connecting…</span>
+
+    <!-- Navigation Menu -->
+    <nav class="flex-1 px-3 py-4 space-y-6 overflow-y-auto text-sm">
+      <!-- Main Overview -->
+      <div class="space-y-1">
+        <button data-target="dashboard" class="nav-btn w-full flex items-center justify-between px-3 py-2 rounded-lg text-slate-300 hover:bg-slate-800 hover:text-white transition-colors">
+          <span class="flex items-center gap-2.5 font-medium">
+            <svg class="w-4 h-4 text-slate-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
+            Dashboard
+          </span>
+        </button>
       </div>
-      <div class="hidden sm:flex items-center gap-2 text-xs text-slate-500 border border-slate-200 rounded-full px-3 py-1.5">
-        <span id="adminEmailLabel" class="truncate max-w-[160px]"></span>
+
+      <!-- Workforce Management Section -->
+      <div class="space-y-1">
+        <div class="px-3 text-[10px] font-semibold uppercase tracking-wider text-slate-500 mb-1">Workforce Management</div>
+        
+        <button data-target="schedule" class="nav-btn w-full flex items-center justify-between px-3 py-2 rounded-lg text-slate-300 hover:bg-slate-800 hover:text-white transition-colors">
+          <span class="flex items-center gap-2.5 font-medium">
+            <svg class="w-4 h-4 text-slate-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+            Schedule Management
+          </span>
+        </button>
+
+        <button data-target="attendance" class="nav-btn w-full flex items-center justify-between px-3 py-2 rounded-lg text-slate-300 hover:bg-slate-800 hover:text-white transition-colors">
+          <span class="flex items-center gap-2.5 font-medium">
+            <svg class="w-4 h-4 text-slate-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+            Attendance Management
+          </span>
+        </button>
+
+        <button data-target="overtime" class="nav-btn w-full flex items-center justify-between px-3 py-2 rounded-lg text-slate-300 hover:bg-slate-800 hover:text-white transition-colors">
+          <span class="flex items-center gap-2.5 font-medium">
+            <svg class="w-4 h-4 text-slate-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+            Overtime Management
+          </span>
+          <span id="badgeOvertime" class="hidden text-[10px] bg-amber-500/20 border border-amber-500/40 text-amber-400 px-1.5 py-0.5 rounded-full font-mono">0</span>
+        </button>
+
+        <button data-target="leave" class="nav-btn w-full flex items-center justify-between px-3 py-2 rounded-lg text-slate-300 hover:bg-slate-800 hover:text-white transition-colors">
+          <span class="flex items-center gap-2.5 font-medium">
+            <svg class="w-4 h-4 text-slate-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 8h1a4 4 0 0 1 0 8h-1"/><path d="M2 8h16v9a4 4 0 0 1-4 4H6a4 4 0 0 1-4-4V8z"/><line x1="6" y1="1" x2="6" y2="4"/><line x1="10" y1="1" x2="10" y2="4"/><line x1="14" y1="1" x2="14" y2="4"/></svg>
+            Leave Management
+          </span>
+          <span id="badgeLeave" class="hidden text-[10px] bg-amber-500/20 border border-amber-500/40 text-amber-400 px-1.5 py-0.5 rounded-full font-mono">0</span>
+        </button>
       </div>
-      <button id="logoutBtn" title="Sign out"
-        class="text-slate-500 hover:text-slate-900 border border-slate-300 hover:border-slate-400 rounded-lg p-2 transition-colors">
+
+      <!-- Payroll Section -->
+      <div class="space-y-1">
+        <div class="px-3 text-[10px] font-semibold uppercase tracking-wider text-slate-500 mb-1">Payroll &amp; Compensation</div>
+        
+        <button data-target="payroll" class="nav-btn w-full flex items-center justify-between px-3 py-2 rounded-lg text-slate-300 hover:bg-slate-800 hover:text-white transition-colors">
+          <span class="flex items-center gap-2.5 font-medium">
+            <svg class="w-4 h-4 text-slate-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+            Payroll Management
+          </span>
+        </button>
+      </div>
+
+      <!-- Employee Records Section -->
+      <div class="space-y-1">
+        <div class="px-3 text-[10px] font-semibold uppercase tracking-wider text-slate-500 mb-1">Employee Records</div>
+        
+        <button data-target="inactive" class="nav-btn w-full flex items-center justify-between px-3 py-2 rounded-lg text-slate-300 hover:bg-slate-800 hover:text-white transition-colors">
+          <span class="flex items-center gap-2.5 font-medium">
+            <svg class="w-4 h-4 text-slate-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><line x1="17" y1="8" x2="23" y2="14"/><line x1="23" y1="8" x2="17" y2="14"/></svg>
+            Inactive Employees
+          </span>
+        </button>
+      </div>
+    </nav>
+
+    <!-- Sidebar Footer / Admin Info -->
+    <div class="p-4 border-t border-slate-800 flex items-center justify-between">
+      <div class="truncate">
+        <p id="sidebarAdminEmail" class="text-xs font-medium text-slate-300 truncate">admin@company.com</p>
+        <p class="text-[10px] text-slate-500">Administrator</p>
+      </div>
+      <button id="sidebarLogoutBtn" title="Sign out"
+        class="text-slate-400 hover:text-white border border-slate-700 hover:border-slate-600 rounded-lg p-1.5 transition-colors">
         <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
           <path stroke-linecap="round" stroke-linejoin="round" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
         </svg>
       </button>
     </div>
-  </div>
-</header>
-
-<main class="max-w-7xl mx-auto px-4 sm:px-6 py-6 space-y-8">
+  </aside>
 
   <!-- =========================================================
-       CREDENTIAL WARNING (shown if placeholders not replaced)
+       MAIN CONTENT AREA
   ========================================================= -->
-  <div id="credentialWarning" class="hidden rounded-xl border border-amber-500/40 bg-amber-500/10 px-4 py-3 text-sm text-amber-700">
-    <strong class="font-semibold">Supabase not configured.</strong>
-    Replace <code class="bg-slate-100 px-1 py-0.5 rounded text-amber-700">SUPABASE_URL</code> and
-    <code class="bg-slate-100 px-1 py-0.5 rounded text-amber-700">SUPABASE_KEY</code> near the top of the
-    <code class="bg-slate-100 px-1 py-0.5 rounded text-amber-700">&lt;script&gt;</code> tag with your project's values.
-  </div>
-
-  <!-- =========================================================
-       DASHBOARD SUMMARY CARDS
-  ========================================================= -->
-  <section>
-    <h2 class="text-sm font-semibold uppercase tracking-wider text-slate-500 mb-3">Payroll Overview</h2>
-    <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3">
-
-      <div class="rounded-xl border border-slate-300 bg-slate-50 p-4">
-        <p class="text-xs text-slate-500 mb-1">Total Employees</p>
-        <p id="cardTotalEmployees" class="text-2xl font-semibold text-slate-900 font-mono-tabular">0</p>
+  <div class="flex-1 flex flex-col min-w-0 overflow-y-auto">
+    <!-- Top Header Bar -->
+    <header class="border-b border-slate-200 bg-white/95 backdrop-blur sticky top-0 z-30 px-6 py-4 flex items-center justify-between">
+      <div class="flex items-center gap-3">
+        <h2 id="pageTitle" class="text-lg font-semibold text-slate-900 tracking-tight">Dashboard Overview</h2>
       </div>
-
-      <div class="rounded-xl border border-slate-300 bg-slate-50 p-4">
-        <p class="text-xs text-slate-500 mb-1">Total Gross Payroll</p>
-        <p id="cardGrossPayroll" class="text-2xl font-semibold text-slate-900 font-mono-tabular">₱0.00</p>
-      </div>
-
-      <div class="rounded-xl border border-slate-300 bg-slate-50 p-4">
-        <p class="text-xs text-slate-500 mb-1">Employee Deductions</p>
-        <p id="cardEeDeductions" class="text-2xl font-semibold text-rose-700 font-mono-tabular">₱0.00</p>
-      </div>
-
-      <div class="rounded-xl border border-slate-300 bg-slate-50 p-4">
-        <p class="text-xs text-slate-500 mb-1">Employer Liability</p>
-        <p id="cardErLiability" class="text-2xl font-semibold text-amber-700 font-mono-tabular">₱0.00</p>
-      </div>
-
-      <div class="rounded-xl border border-slate-300 bg-slate-50 p-4">
-        <p class="text-xs text-slate-500 mb-1">Est. Net Payroll</p>
-        <p id="cardNetPayroll" class="text-2xl font-semibold text-emerald-700 font-mono-tabular">₱0.00</p>
-      </div>
-
-      <div class="rounded-xl border border-slate-300 bg-slate-50 p-4">
-        <p class="text-xs text-slate-500 mb-1">SIL Eligible</p>
-        <p id="cardSilEligible" class="text-2xl font-semibold text-sky-700 font-mono-tabular">0</p>
-      </div>
-
-    </div>
-  </section>
-
-  <!-- =========================================================
-       EMPLOYEE REGISTRATION FORM
-  ========================================================= -->
-  <section class="rounded-xl border border-slate-300 bg-slate-50">
-    <div class="px-5 py-4 border-b border-slate-300">
-      <h2 class="text-base font-semibold text-slate-900">Add Employee</h2>
-      <p class="text-xs text-slate-500 mt-0.5">New profiles are added to the roster and appear immediately below.</p>
-    </div>
-
-    <form id="employeeForm" class="p-5 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4" novalidate>
-
-      <div class="flex flex-col gap-1">
-        <label for="employeeNumber" class="text-xs font-medium text-slate-500">Employee Number</label>
-        <input id="employeeNumber" name="employeeNumber" type="text" inputmode="numeric" pattern="[0-9]{7}" maxlength="7" required
-          class="bg-white border border-slate-300 rounded-lg px-3 py-2 text-sm text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-amber-500/60 focus:border-amber-500/60"
-          placeholder="0001234" />
-      </div>
-
-      <div class="flex flex-col gap-1">
-        <label for="firstName" class="text-xs font-medium text-slate-500">First Name</label>
-        <input id="firstName" name="firstName" type="text" required
-          class="bg-white border border-slate-300 rounded-lg px-3 py-2 text-sm text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-amber-500/60 focus:border-amber-500/60"
-          placeholder="Juan" />
-      </div>
-
-      <div class="flex flex-col gap-1">
-        <label for="lastName" class="text-xs font-medium text-slate-500">Last Name</label>
-        <input id="lastName" name="lastName" type="text" required
-          class="bg-white border border-slate-300 rounded-lg px-3 py-2 text-sm text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-amber-500/60 focus:border-amber-500/60"
-          placeholder="Dela Cruz" />
-      </div>
-
-      <div class="flex flex-col gap-1">
-        <label for="email" class="text-xs font-medium text-slate-500">Corporate Email</label>
-        <input id="email" name="email" type="email" required
-          class="bg-white border border-slate-300 rounded-lg px-3 py-2 text-sm text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-amber-500/60 focus:border-amber-500/60"
-          placeholder="juan.delacruz@company.com" />
-      </div>
-
-      <div class="flex flex-col gap-1">
-        <label for="hireDate" class="text-xs font-medium text-slate-500">Hire Date</label>
-        <input id="hireDate" name="hireDate" type="date" required
-          class="bg-white border border-slate-300 rounded-lg px-3 py-2 text-sm text-slate-900 focus:outline-none focus:ring-2 focus:ring-amber-500/60 focus:border-amber-500/60" />
-      </div>
-
-      <div class="flex flex-col gap-1">
-        <label for="department" class="text-xs font-medium text-slate-500">Department</label>
-        <input id="department" name="department" type="text" required
-          class="bg-white border border-slate-300 rounded-lg px-3 py-2 text-sm text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-amber-500/60 focus:border-amber-500/60"
-          placeholder="Operations" />
-      </div>
-
-      <div class="flex flex-col gap-1">
-        <label for="jobTitle" class="text-xs font-medium text-slate-500">Job Title</label>
-        <input id="jobTitle" name="jobTitle" type="text" required
-          class="bg-white border border-slate-300 rounded-lg px-3 py-2 text-sm text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-amber-500/60 focus:border-amber-500/60"
-          placeholder="Payroll Officer" />
-      </div>
-
-      <div class="flex flex-col gap-1">
-        <label for="basicSalary" class="text-xs font-medium text-slate-500">Monthly Basic Salary (₱)</label>
-        <input id="basicSalary" name="basicSalary" type="number" min="0" step="0.01" required
-          class="bg-white border border-slate-300 rounded-lg px-3 py-2 text-sm text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-amber-500/60 focus:border-amber-500/60"
-          placeholder="25000.00" />
-      </div>
-
-      <div class="flex flex-col gap-1">
-        <label for="allowance" class="text-xs font-medium text-slate-500">Monthly Allowance (₱)</label>
-        <input id="allowance" name="allowance" type="number" min="0" step="0.01" value="0"
-          class="bg-white border border-slate-300 rounded-lg px-3 py-2 text-sm text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-amber-500/60 focus:border-amber-500/60"
-          placeholder="0.00" />
-      </div>
-
-      <div class="lg:col-span-4 flex items-center justify-end gap-3 pt-1">
-        <span id="formError" class="text-xs text-rose-400 hidden"></span>
-        <button id="submitBtn" type="submit"
-          class="inline-flex items-center gap-2 bg-amber-500 hover:bg-amber-400 disabled:bg-slate-300 disabled:cursor-not-allowed text-slate-900 font-semibold text-sm px-5 py-2.5 rounded-lg transition-colors">
-          <svg id="submitSpinner" class="hidden animate-spin h-4 w-4" viewBox="0 0 24 24" fill="none">
-            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"></path>
+      <div class="flex items-center gap-3">
+        <div id="connectionStatus" class="flex items-center gap-2 text-xs bg-slate-100 border border-slate-300 rounded-full px-3 py-1.5">
+          <span id="connectionDot" class="w-2 h-2 rounded-full bg-slate-500 pulse-dot"></span>
+          <span id="connectionText" class="text-slate-600">Connecting…</span>
+        </div>
+        <button id="topRefreshBtn" title="Refresh Data"
+          class="text-slate-500 hover:text-slate-900 border border-slate-300 hover:border-slate-400 rounded-lg p-2 transition-colors">
+          <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
           </svg>
-          <span id="submitBtnLabel">Add Employee</span>
         </button>
       </div>
-    </form>
-  </section>
+    </header>
 
-  <!-- =========================================================
-       EMPLOYEE ROSTER
-  ========================================================= -->
-  <section class="rounded-xl border border-slate-300 bg-slate-50">
-    <div class="px-5 py-4 border-b border-slate-300 flex items-center justify-between">
-      <div>
-        <h2 class="text-base font-semibold text-slate-900">Employee Payroll Roster</h2>
-        <p class="text-xs text-slate-500 mt-0.5">Estimated Net Pay shown below is <strong>before withholding tax</strong>.</p>
+    <main class="max-w-7xl w-full mx-auto px-6 py-6 space-y-8 flex-1">
+
+      <!-- =========================================================
+           CREDENTIAL WARNING
+      ========================================================= -->
+      <div id="credentialWarning" class="hidden rounded-xl border border-amber-500/40 bg-amber-500/10 px-4 py-3 text-sm text-amber-700">
+        <strong class="font-semibold">Supabase not configured.</strong>
+        Replace <code class="bg-slate-100 px-1 py-0.5 rounded text-amber-700">SUPABASE_URL</code> and
+        <code class="bg-slate-100 px-1 py-0.5 rounded text-amber-700">SUPABASE_KEY</code> near the top of the script tag.
       </div>
-      <button id="refreshBtn" title="Refresh"
-        class="text-slate-500 hover:text-slate-900 border border-slate-300 hover:border-slate-400 rounded-lg p-2 transition-colors">
-        <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-          <path stroke-linecap="round" stroke-linejoin="round" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
-        </svg>
-      </button>
-    </div>
 
-    <!-- Loading state -->
-    <div id="rosterLoading" class="p-5 space-y-2">
-      <div class="skeleton h-10 rounded-lg"></div>
-      <div class="skeleton h-10 rounded-lg"></div>
-      <div class="skeleton h-10 rounded-lg"></div>
-    </div>
+      <!-- =========================================================
+           MODULE: DASHBOARD
+      ========================================================= -->
+      <section id="moduleDashboard" class="space-y-6">
+        <div>
+          <h3 class="text-base font-semibold text-slate-900">Executive Summary</h3>
+          <p class="text-xs text-slate-500 mt-0.5">High-level operational overview of active workforce, attendance, and payroll obligations.</p>
+        </div>
 
-    <!-- Empty state -->
-    <div id="rosterEmpty" class="hidden p-10 text-center">
-      <p class="text-slate-600 font-medium">No employee profiles found.</p>
-      <p class="text-slate-400 text-sm mt-1">Add your first employee above.</p>
-    </div>
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+          <div class="rounded-xl border border-slate-300 bg-slate-50 p-4">
+            <p class="text-xs text-slate-500 mb-1">Total Active Employees</p>
+            <p id="dashTotalActive" class="text-2xl font-semibold text-slate-900 font-mono-tabular">0</p>
+          </div>
+          <div class="rounded-xl border border-slate-300 bg-slate-50 p-4">
+            <p class="text-xs text-slate-500 mb-1">Total Inactive Employees</p>
+            <p id="dashTotalInactive" class="text-2xl font-semibold text-slate-700 font-mono-tabular">0</p>
+          </div>
+          <div class="rounded-xl border border-slate-300 bg-slate-50 p-4">
+            <p class="text-xs text-slate-500 mb-1">Employees Present Today</p>
+            <p id="dashPresentToday" class="text-2xl font-semibold text-emerald-700 font-mono-tabular">0</p>
+          </div>
+          <div class="rounded-xl border border-slate-300 bg-slate-50 p-4">
+            <p class="text-xs text-slate-500 mb-1">Employees Absent Today</p>
+            <p id="dashAbsentToday" class="text-2xl font-semibold text-rose-700 font-mono-tabular">0</p>
+          </div>
+          <div class="rounded-xl border border-slate-300 bg-slate-50 p-4">
+            <p class="text-xs text-slate-500 mb-1">Pending Overtime Requests</p>
+            <p id="dashPendingOT" class="text-2xl font-semibold text-amber-700 font-mono-tabular">0</p>
+          </div>
+          <div class="rounded-xl border border-slate-300 bg-slate-50 p-4">
+            <p class="text-xs text-slate-500 mb-1">Pending Leave Applications</p>
+            <p id="dashPendingLeave" class="text-2xl font-semibold text-amber-700 font-mono-tabular">0</p>
+          </div>
+          <div class="rounded-xl border border-slate-300 bg-slate-50 p-4">
+            <p class="text-xs text-slate-500 mb-1">Current Payroll Period</p>
+            <p id="dashPayrollPeriod" class="text-base font-semibold text-slate-900 mt-1">Current Month</p>
+          </div>
+          <div class="rounded-xl border border-slate-300 bg-slate-50 p-4">
+            <p class="text-xs text-slate-500 mb-1">Estimated Payroll Cost</p>
+            <p id="dashEstimatedCost" class="text-2xl font-semibold text-slate-900 font-mono-tabular">₱0.00</p>
+          </div>
+        </div>
+      </section>
 
-    <!-- Error state -->
-    <div id="rosterError" class="hidden p-10 text-center">
-      <p class="text-rose-700 font-medium">Unable to load employee records.</p>
-      <p class="text-slate-400 text-sm mt-1">Check your Supabase configuration and try again.</p>
-    </div>
+      <!-- =========================================================
+           MODULE: SCHEDULE MANAGEMENT
+      ========================================================= -->
+      <section id="moduleSchedule" class="hidden space-y-6">
+        <div class="flex items-center justify-between">
+          <div>
+            <h3 class="text-base font-semibold text-slate-900">Work Schedules &amp; Shifts</h3>
+            <p class="text-xs text-slate-500 mt-0.5">Create and assign work shifts and rest days across employees.</p>
+          </div>
+        </div>
 
-    <!-- Table -->
-    <div id="rosterTableWrap" class="hidden overflow-x-auto">
-      <table class="roster w-full text-sm border-collapse min-w-[1800px]">
-        <thead>
-          <tr class="bg-slate-100 text-slate-500 text-xs uppercase tracking-wide">
-            <th class="text-left px-3 py-2.5 border-b border-slate-300">Emp. #</th>
-            <th class="text-left px-3 py-2.5 border-b border-slate-300">Employee</th>
-            <th class="text-left px-3 py-2.5 border-b border-slate-300">Department / Title</th>
-            <th class="text-left px-3 py-2.5 border-b border-slate-300">Hire Date</th>
-            <th class="text-right px-3 py-2.5 border-b border-slate-300">Basic Salary</th>
-            <th class="text-right px-3 py-2.5 border-b border-slate-300">Allowance</th>
-            <th class="text-right px-3 py-2.5 border-b border-slate-300">Gross Comp.</th>
-            <th class="text-right px-3 py-2.5 border-b border-slate-300 bg-rose-500/5">SSS EE</th>
-            <th class="text-right px-3 py-2.5 border-b border-slate-300 bg-rose-500/5">PhilHealth EE</th>
-            <th class="text-right px-3 py-2.5 border-b border-slate-300 bg-rose-500/5">Pag-IBIG EE</th>
-            <th class="text-right px-3 py-2.5 border-b border-slate-300 bg-rose-500/5">Total EE Ded.</th>
-            <th class="text-right px-3 py-2.5 border-b border-slate-300 bg-amber-500/5">SSS ER</th>
-            <th class="text-right px-3 py-2.5 border-b border-slate-300 bg-amber-500/5">EC</th>
-            <th class="text-right px-3 py-2.5 border-b border-slate-300 bg-amber-500/5">PhilHealth ER</th>
-            <th class="text-right px-3 py-2.5 border-b border-slate-300 bg-amber-500/5">Pag-IBIG ER</th>
-            <th class="text-right px-3 py-2.5 border-b border-slate-300 bg-amber-500/5">Total ER Liab.</th>
-            <th class="text-left px-3 py-2.5 border-b border-slate-300">SIL Status</th>
-            <th class="text-right px-3 py-2.5 border-b border-slate-300">Months Worked</th>
-            <th class="text-right px-3 py-2.5 border-b border-slate-300">13th-Month Accrual</th>
-            <th class="text-right px-3 py-2.5 border-b border-slate-300 bg-emerald-500/5">Net Monthly</th>
-            <th class="text-right px-3 py-2.5 border-b border-slate-300 bg-emerald-500/5">Net Semi-Monthly</th>
-            <th class="text-center px-3 py-2.5 border-b border-slate-300">Actions</th>
-          </tr>
-        </thead>
-        <tbody id="rosterTableBody" class="divide-y divide-slate-200"></tbody>
-      </table>
-    </div>
-  </section>
+        <!-- Add Schedule Form -->
+        <div class="rounded-xl border border-slate-300 bg-slate-50 p-5">
+          <h4 class="text-sm font-semibold text-slate-900 mb-3">Assign / Create Schedule</h4>
+          <form id="scheduleForm" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4" novalidate>
+            <div class="flex flex-col gap-1">
+              <label class="text-xs font-medium text-slate-500">Employee</label>
+              <select id="schedEmployeeId" required class="bg-white border border-slate-300 rounded-lg px-3 py-2 text-sm text-slate-900 focus:outline-none focus:ring-2 focus:ring-amber-500/65">
+                <option value="">Select Employee...</option>
+              </select>
+            </div>
+            <div class="flex flex-col gap-1">
+              <label class="text-xs font-medium text-slate-500">Schedule Date</label>
+              <input id="schedDate" type="date" required class="bg-white border border-slate-300 rounded-lg px-3 py-2 text-sm text-slate-900 focus:outline-none focus:ring-2 focus:ring-amber-500/65" />
+            </div>
+            <div class="flex flex-col gap-1">
+              <label class="text-xs font-medium text-slate-500">Shift Type</label>
+              <select id="schedShiftName" class="bg-white border border-slate-300 rounded-lg px-3 py-2 text-sm text-slate-900 focus:outline-none focus:ring-2 focus:ring-amber-500/65">
+                <option value="Regular Shift">Regular Shift</option>
+                <option value="Morning Shift">Morning Shift</option>
+                <option value="Afternoon Shift">Afternoon Shift</option>
+                <option value="Night Shift">Night Shift</option>
+                <option value="Rest Day">Rest Day</option>
+                <option value="Custom Shift">Custom Shift</option>
+              </select>
+            </div>
+            <div class="flex flex-col gap-1">
+              <label class="text-xs font-medium text-slate-500">Start Time</label>
+              <input id="schedStartTime" type="time" value="08:00" class="bg-white border border-slate-300 rounded-lg px-3 py-2 text-sm text-slate-900 focus:outline-none focus:ring-2 focus:ring-amber-500/65" />
+            </div>
+            <div class="flex flex-col gap-1">
+              <label class="text-xs font-medium text-slate-500">End Time</label>
+              <input id="schedEndTime" type="time" value="17:00" class="bg-white border border-slate-300 rounded-lg px-3 py-2 text-sm text-slate-900 focus:outline-none focus:ring-2 focus:ring-amber-500/65" />
+            </div>
+            <div class="flex flex-col gap-1">
+              <label class="text-xs font-medium text-slate-500">Break Start</label>
+              <input id="schedBreakStart" type="time" value="12:00" class="bg-white border border-slate-300 rounded-lg px-3 py-2 text-sm text-slate-900 focus:outline-none focus:ring-2 focus:ring-amber-500/65" />
+            </div>
+            <div class="flex flex-col gap-1">
+              <label class="text-xs font-medium text-slate-500">Break End</label>
+              <input id="schedBreakEnd" type="time" value="13:00" class="bg-white border border-slate-300 rounded-lg px-3 py-2 text-sm text-slate-900 focus:outline-none focus:ring-2 focus:ring-amber-500/65" />
+            </div>
+            <div class="flex flex-col gap-1">
+              <label class="text-xs font-medium text-slate-500">Notes</label>
+              <input id="schedNotes" type="text" placeholder="Optional notes" class="bg-white border border-slate-300 rounded-lg px-3 py-2 text-sm text-slate-900 focus:outline-none focus:ring-2 focus:ring-amber-500/65" />
+            </div>
+            <div class="lg:col-span-4 flex justify-end">
+              <button type="submit" class="bg-amber-500 hover:bg-amber-400 text-slate-900 font-semibold text-sm px-5 py-2.5 rounded-lg transition-colors">
+                Save Schedule
+              </button>
+            </div>
+          </form>
+        </div>
 
-  <!-- =========================================================
-       DISCLAIMER
-  ========================================================= -->
-  <footer class="text-xs text-slate-400 leading-relaxed border-t border-slate-200 pt-5 pb-10">
-    <p>
-      <strong class="text-slate-500">Disclaimer:</strong>
-      Payroll calculations are provided for informational and estimation purposes. Philippine statutory
-      contribution schedules, salary credit tables, tax rules, and labor regulations may change. Verify
-      current requirements with SSS, PhilHealth, Pag-IBIG, DOLE, and qualified payroll/accounting
-      professionals before using this system for actual payroll processing.
-    </p>
-  </footer>
+        <!-- Schedule List Table -->
+        <div class="rounded-xl border border-slate-300 bg-slate-50 overflow-hidden">
+          <div class="px-5 py-4 border-b border-slate-300 flex items-center justify-between">
+            <h4 class="text-base font-semibold text-slate-900">Assigned Schedules</h4>
+          </div>
+          <div class="overflow-x-auto">
+            <table class="w-full text-sm border-collapse">
+              <thead>
+                <tr class="bg-slate-100 text-slate-500 text-xs uppercase tracking-wide">
+                  <th class="text-left px-4 py-3 border-b border-slate-300">Employee</th>
+                  <th class="text-left px-4 py-3 border-b border-slate-300">Date</th>
+                  <th class="text-left px-4 py-3 border-b border-slate-300">Shift Name</th>
+                  <th class="text-left px-4 py-3 border-b border-slate-300">Time Window</th>
+                  <th class="text-left px-4 py-3 border-b border-slate-300">Break</th>
+                  <th class="text-left px-4 py-3 border-b border-slate-300">Notes</th>
+                  <th class="text-center px-4 py-3 border-b border-slate-300">Action</th>
+                </tr>
+              </thead>
+              <tbody id="scheduleTableBody" class="divide-y divide-slate-200"></tbody>
+            </table>
+          </div>
+        </div>
+      </section>
 
-</main>
+      <!-- =========================================================
+           MODULE: ATTENDANCE MANAGEMENT
+      ========================================================= -->
+      <section id="moduleAttendance" class="hidden space-y-6">
+        <div class="flex items-center justify-between">
+          <div>
+            <h3 class="text-base font-semibold text-slate-900">Attendance Monitoring &amp; Logging</h3>
+            <p class="text-xs text-slate-500 mt-0.5">Track time-in/out, hours worked, tardiness, undertime, and manual overrides.</p>
+          </div>
+        </div>
+
+        <!-- Add Attendance Form -->
+        <div class="rounded-xl border border-slate-300 bg-slate-50 p-5">
+          <h4 class="text-sm font-semibold text-slate-900 mb-3">Record / Adjust Attendance</h4>
+          <form id="attendanceForm" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4" novalidate>
+            <div class="flex flex-col gap-1">
+              <label class="text-xs font-medium text-slate-500">Employee</label>
+              <select id="attEmployeeId" required class="bg-white border border-slate-300 rounded-lg px-3 py-2 text-sm text-slate-900 focus:outline-none focus:ring-2 focus:ring-amber-500/65">
+                <option value="">Select Employee...</option>
+              </select>
+            </div>
+            <div class="flex flex-col gap-1">
+              <label class="text-xs font-medium text-slate-500">Attendance Date</label>
+              <input id="attDate" type="date" required class="bg-white border border-slate-300 rounded-lg px-3 py-2 text-sm text-slate-900 focus:outline-none focus:ring-2 focus:ring-amber-500/65" />
+            </div>
+            <div class="flex flex-col gap-1">
+              <label class="text-xs font-medium text-slate-500">Time In</label>
+              <input id="attTimeIn" type="time" value="08:00" class="bg-white border border-slate-300 rounded-lg px-3 py-2 text-sm text-slate-900 focus:outline-none focus:ring-2 focus:ring-amber-500/65" />
+            </div>
+            <div class="flex flex-col gap-1">
+              <label class="text-xs font-medium text-slate-500">Time Out</label>
+              <input id="attTimeOut" type="time" value="17:00" class="bg-white border border-slate-300 rounded-lg px-3 py-2 text-sm text-slate-900 focus:outline-none focus:ring-2 focus:ring-amber-500/65" />
+            </div>
+            <div class="flex flex-col gap-1">
+              <label class="text-xs font-medium text-slate-500">Status</label>
+              <select id="attStatus" class="bg-white border border-slate-300 rounded-lg px-3 py-2 text-sm text-slate-900 focus:outline-none focus:ring-2 focus:ring-amber-500/65">
+                <option value="Present">Present</option>
+                <option value="Late">Late</option>
+                <option value="Undertime">Undertime</option>
+                <option value="Half Day">Half Day</option>
+                <option value="Absent">Absent</option>
+                <option value="On Leave">On Leave</option>
+                <option value="Rest Day">Rest Day</option>
+                <option value="Holiday">Holiday</option>
+              </select>
+            </div>
+            <div class="flex flex-col gap-1">
+              <label class="text-xs font-medium text-slate-500">Remarks / Override Reason</label>
+              <input id="attRemarks" type="text" placeholder="HR Admin adjustment notes" class="bg-white border border-slate-300 rounded-lg px-3 py-2 text-sm text-slate-900 focus:outline-none focus:ring-2 focus:ring-amber-500/65" />
+            </div>
+            <div class="lg:col-span-2 flex items-end justify-end">
+              <button type="submit" class="bg-amber-500 hover:bg-amber-400 text-slate-900 font-semibold text-sm px-5 py-2.5 rounded-lg transition-colors">
+                Save Attendance Record
+              </button>
+            </div>
+          </form>
+        </div>
+
+        <!-- Attendance Table -->
+        <div class="rounded-xl border border-slate-300 bg-slate-50 overflow-hidden">
+          <div class="px-5 py-4 border-b border-slate-300 flex items-center justify-between">
+            <h4 class="text-base font-semibold text-slate-900">Attendance Log</h4>
+          </div>
+          <div class="overflow-x-auto">
+            <table class="w-full text-sm border-collapse min-w-[1000px]">
+              <thead>
+                <tr class="bg-slate-100 text-slate-500 text-xs uppercase tracking-wide">
+                  <th class="text-left px-4 py-3 border-b border-slate-300">Employee</th>
+                  <th class="text-left px-4 py-3 border-b border-slate-300">Date</th>
+                  <th class="text-left px-4 py-3 border-b border-slate-300">Time In / Out</th>
+                  <th class="text-right px-4 py-3 border-b border-slate-300">Hours Worked</th>
+                  <th class="text-right px-4 py-3 border-b border-slate-300">Late (mins)</th>
+                  <th class="text-right px-4 py-3 border-b border-slate-300">Undertime</th>
+                  <th class="text-left px-4 py-3 border-b border-slate-300">Status</th>
+                  <th class="text-left px-4 py-3 border-b border-slate-300">Remarks</th>
+                  <th class="text-center px-4 py-3 border-b border-slate-300">Action</th>
+                </tr>
+              </thead>
+              <tbody id="attendanceTableBody" class="divide-y divide-slate-200"></tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <!-- =========================================================
+           MODULE: OVERTIME MANAGEMENT
+      ========================================================= -->
+      <section id="moduleOvertime" class="hidden space-y-6">
+        <div class="flex items-center justify-between">
+          <div>
+            <h3 class="text-base font-semibold text-slate-900">Overtime Requests &amp; Approvals</h3>
+            <p class="text-xs text-slate-500 mt-0.5">Review, approve, or reject employee overtime submissions prior to payroll inclusion.</p>
+          </div>
+        </div>
+
+        <!-- Submit OT Form (Admin simulation) -->
+        <div class="rounded-xl border border-slate-300 bg-slate-50 p-5">
+          <h4 class="text-sm font-semibold text-slate-900 mb-3">Submit Overtime Request</h4>
+          <form id="overtimeForm" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4" novalidate>
+            <div class="flex flex-col gap-1">
+              <label class="text-xs font-medium text-slate-500">Employee</label>
+              <select id="otEmployeeId" required class="bg-white border border-slate-300 rounded-lg px-3 py-2 text-sm text-slate-900 focus:outline-none focus:ring-2 focus:ring-amber-500/65">
+                <option value="">Select Employee...</option>
+              </select>
+            </div>
+            <div class="flex flex-col gap-1">
+              <label class="text-xs font-medium text-slate-500">Overtime Date</label>
+              <input id="otDate" type="date" required class="bg-white border border-slate-300 rounded-lg px-3 py-2 text-sm text-slate-900 focus:outline-none focus:ring-2 focus:ring-amber-500/65" />
+            </div>
+            <div class="flex flex-col gap-1">
+              <label class="text-xs font-medium text-slate-500">OT Start Time</label>
+              <input id="otStart" type="time" value="17:00" class="bg-white border border-slate-300 rounded-lg px-3 py-2 text-sm text-slate-900 focus:outline-none focus:ring-2 focus:ring-amber-500/65" />
+            </div>
+            <div class="flex flex-col gap-1">
+              <label class="text-xs font-medium text-slate-500">OT End Time</label>
+              <input id="otEnd" type="time" value="20:00" class="bg-white border border-slate-300 rounded-lg px-3 py-2 text-sm text-slate-900 focus:outline-none focus:ring-2 focus:ring-amber-500/65" />
+            </div>
+            <div class="lg:col-span-3 flex flex-col gap-1">
+              <label class="text-xs font-medium text-slate-500">Reason / Justification</label>
+              <input id="otReason" type="text" placeholder="Project deadline extension" class="bg-white border border-slate-300 rounded-lg px-3 py-2 text-sm text-slate-900 focus:outline-none focus:ring-2 focus:ring-amber-500/65" />
+            </div>
+            <div class="flex items-end justify-end">
+              <button type="submit" class="w-full bg-amber-500 hover:bg-amber-400 text-slate-900 font-semibold text-sm px-5 py-2.5 rounded-lg transition-colors">
+                Submit Request
+              </button>
+            </div>
+          </form>
+        </div>
+
+        <!-- Overtime Table -->
+        <div class="rounded-xl border border-slate-300 bg-slate-50 overflow-hidden">
+          <div class="px-5 py-4 border-b border-slate-300 flex items-center justify-between">
+            <h4 class="text-base font-semibold text-slate-900">Overtime Requests Queue</h4>
+          </div>
+          <div class="overflow-x-auto">
+            <table class="w-full text-sm border-collapse min-w-[900px]">
+              <thead>
+                <tr class="bg-slate-100 text-slate-500 text-xs uppercase tracking-wide">
+                  <th class="text-left px-4 py-3 border-b border-slate-300">Employee</th>
+                  <th class="text-left px-4 py-3 border-b border-slate-300">Date</th>
+                  <th class="text-left px-4 py-3 border-b border-slate-300">Time Window</th>
+                  <th class="text-right px-4 py-3 border-b border-slate-300">OT Hours</th>
+                  <th class="text-left px-4 py-3 border-b border-slate-300">Reason</th>
+                  <th class="text-left px-4 py-3 border-b border-slate-300">Status</th>
+                  <th class="text-center px-4 py-3 border-b border-slate-300">Actions</th>
+                </tr>
+              </thead>
+              <tbody id="overtimeTableBody" class="divide-y divide-slate-200"></tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <!-- =========================================================
+           MODULE: LEAVE MANAGEMENT
+      ========================================================= -->
+      <section id="moduleLeave" class="hidden space-y-6">
+        <div class="flex items-center justify-between">
+          <div>
+            <h3 class="text-base font-semibold text-slate-900">Leave Applications &amp; Monitoring</h3>
+            <p class="text-xs text-slate-500 mt-0.5">Manage vacation, sick, and statutory leave requests with automatic attendance integration.</p>
+          </div>
+        </div>
+
+        <!-- Leave Form -->
+        <div class="rounded-xl border border-slate-300 bg-slate-50 p-5">
+          <h4 class="text-sm font-semibold text-slate-900 mb-3">File Leave Application</h4>
+          <form id="leaveForm" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4" novalidate>
+            <div class="flex flex-col gap-1">
+              <label class="text-xs font-medium text-slate-500">Employee</label>
+              <select id="leaveEmployeeId" required class="bg-white border border-slate-300 rounded-lg px-3 py-2 text-sm text-slate-900 focus:outline-none focus:ring-2 focus:ring-amber-500/65">
+                <option value="">Select Employee...</option>
+              </select>
+            </div>
+            <div class="flex flex-col gap-1">
+              <label class="text-xs font-medium text-slate-500">Leave Type</label>
+              <select id="leaveType" class="bg-white border border-slate-300 rounded-lg px-3 py-2 text-sm text-slate-900 focus:outline-none focus:ring-2 focus:ring-amber-500/65">
+                <option value="Vacation Leave">Vacation Leave</option>
+                <option value="Sick Leave">Sick Leave</option>
+                <option value="Service Incentive Leave">Service Incentive Leave</option>
+                <option value="Emergency Leave">Emergency Leave</option>
+                <option value="Bereavement Leave">Bereavement Leave</option>
+                <option value="Maternity Leave">Maternity Leave</option>
+                <option value="Paternity Leave">Paternity Leave</option>
+                <option value="Unpaid Leave">Unpaid Leave</option>
+              </select>
+            </div>
+            <div class="flex flex-col gap-1">
+              <label class="text-xs font-medium text-slate-500">Start Date</label>
+              <input id="leaveStartDate" type="date" required class="bg-white border border-slate-300 rounded-lg px-3 py-2 text-sm text-slate-900 focus:outline-none focus:ring-2 focus:ring-amber-500/65" />
+            </div>
+            <div class="flex flex-col gap-1">
+              <label class="text-xs font-medium text-slate-500">End Date</label>
+              <input id="leaveEndDate" type="date" required class="bg-white border border-slate-300 rounded-lg px-3 py-2 text-sm text-slate-900 focus:outline-none focus:ring-2 focus:ring-amber-500/65" />
+            </div>
+            <div class="lg:col-span-3 flex flex-col gap-1">
+              <label class="text-xs font-medium text-slate-500">Reason</label>
+              <input id="leaveReason" type="text" placeholder="Medical checkup / Vacation trip" class="bg-white border border-slate-300 rounded-lg px-3 py-2 text-sm text-slate-900 focus:outline-none focus:ring-2 focus:ring-amber-500/65" />
+            </div>
+            <div class="flex items-end justify-end">
+              <button type="submit" class="w-full bg-amber-500 hover:bg-amber-400 text-slate-900 font-semibold text-sm px-5 py-2.5 rounded-lg transition-colors">
+                File Application
+              </button>
+            </div>
+          </form>
+        </div>
+
+        <!-- Leave Table -->
+        <div class="rounded-xl border border-slate-300 bg-slate-50 overflow-hidden">
+          <div class="px-5 py-4 border-b border-slate-300 flex items-center justify-between">
+            <h4 class="text-base font-semibold text-slate-900">Leave Applications Queue</h4>
+          </div>
+          <div class="overflow-x-auto">
+            <table class="w-full text-sm border-collapse min-w-[900px]">
+              <thead>
+                <tr class="bg-slate-100 text-slate-500 text-xs uppercase tracking-wide">
+                  <th class="text-left px-4 py-3 border-b border-slate-300">Employee</th>
+                  <th class="text-left px-4 py-3 border-b border-slate-300">Leave Type</th>
+                  <th class="text-left px-4 py-3 border-b border-slate-300">Date Range</th>
+                  <th class="text-left px-4 py-3 border-b border-slate-300">Reason</th>
+                  <th class="text-left px-4 py-3 border-b border-slate-300">Status</th>
+                  <th class="text-center px-4 py-3 border-b border-slate-300">Actions</th>
+                </tr>
+              </thead>
+              <tbody id="leaveTableBody" class="divide-y divide-slate-200"></tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <!-- =========================================================
+           MODULE: PAYROLL MANAGEMENT
+      ========================================================= -->
+      <section id="modulePayroll" class="hidden space-y-8">
+        <!-- Summary Cards -->
+        <section>
+          <h3 class="text-sm font-semibold uppercase tracking-wider text-slate-500 mb-3">Payroll Overview</h3>
+          <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3">
+            <div class="rounded-xl border border-slate-300 bg-slate-50 p-4">
+              <p class="text-xs text-slate-500 mb-1">Total Employees</p>
+              <p id="cardTotalEmployees" class="text-2xl font-semibold text-slate-900 font-mono-tabular">0</p>
+            </div>
+            <div class="rounded-xl border border-slate-300 bg-slate-50 p-4">
+              <p class="text-xs text-slate-500 mb-1">Total Gross Payroll</p>
+              <p id="cardGrossPayroll" class="text-2xl font-semibold text-slate-900 font-mono-tabular">₱0.00</p>
+            </div>
+            <div class="rounded-xl border border-slate-300 bg-slate-50 p-4">
+              <p class="text-xs text-slate-500 mb-1">Employee Deductions</p>
+              <p id="cardEeDeductions" class="text-2xl font-semibold text-rose-700 font-mono-tabular">₱0.00</p>
+            </div>
+            <div class="rounded-xl border border-slate-300 bg-slate-50 p-4">
+              <p class="text-xs text-slate-500 mb-1">Employer Liability</p>
+              <p id="cardErLiability" class="text-2xl font-semibold text-amber-700 font-mono-tabular">₱0.00</p>
+            </div>
+            <div class="rounded-xl border border-slate-300 bg-slate-50 p-4">
+              <p class="text-xs text-slate-500 mb-1">Est. Net Payroll</p>
+              <p id="cardNetPayroll" class="text-2xl font-semibold text-emerald-700 font-mono-tabular">₱0.00</p>
+            </div>
+            <div class="rounded-xl border border-slate-300 bg-slate-50 p-4">
+              <p class="text-xs text-slate-500 mb-1">SIL Eligible</p>
+              <p id="cardSilEligible" class="text-2xl font-semibold text-sky-700 font-mono-tabular">0</p>
+            </div>
+          </div>
+        </section>
+
+        <!-- Employee Registration Form -->
+        <section class="rounded-xl border border-slate-300 bg-slate-50">
+          <div class="px-5 py-4 border-b border-slate-300">
+            <h3 class="text-base font-semibold text-slate-900">Add Employee</h3>
+            <p class="text-xs text-slate-500 mt-0.5">New profiles are added to the roster and appear immediately below.</p>
+          </div>
+
+          <form id="employeeForm" class="p-5 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4" novalidate>
+            <div class="flex flex-col gap-1">
+              <label for="employeeNumber" class="text-xs font-medium text-slate-500">Employee Number</label>
+              <input id="employeeNumber" name="employeeNumber" type="text" inputmode="numeric" pattern="[0-9]{7}" maxlength="7" required
+                class="bg-white border border-slate-300 rounded-lg px-3 py-2 text-sm text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-amber-500/60 focus:border-amber-500/60"
+                placeholder="0001234" />
+            </div>
+
+            <div class="flex flex-col gap-1">
+              <label for="firstName" class="text-xs font-medium text-slate-500">First Name</label>
+              <input id="firstName" name="firstName" type="text" required
+                class="bg-white border border-slate-300 rounded-lg px-3 py-2 text-sm text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-amber-500/60 focus:border-amber-500/60"
+                placeholder="Juan" />
+            </div>
+
+            <div class="flex flex-col gap-1">
+              <label for="lastName" class="text-xs font-medium text-slate-500">Last Name</label>
+              <input id="lastName" name="lastName" type="text" required
+                class="bg-white border border-slate-300 rounded-lg px-3 py-2 text-sm text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-amber-500/60 focus:border-amber-500/60"
+                placeholder="Dela Cruz" />
+            </div>
+
+            <div class="flex flex-col gap-1">
+              <label for="email" class="text-xs font-medium text-slate-500">Corporate Email</label>
+              <input id="email" name="email" type="email" required
+                class="bg-white border border-slate-300 rounded-lg px-3 py-2 text-sm text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-amber-500/60 focus:border-amber-500/60"
+                placeholder="juan.delacruz@company.com" />
+            </div>
+
+            <div class="flex flex-col gap-1">
+              <label for="hireDate" class="text-xs font-medium text-slate-500">Hire Date</label>
+              <input id="hireDate" name="hireDate" type="date" required
+                class="bg-white border border-slate-300 rounded-lg px-3 py-2 text-sm text-slate-900 focus:outline-none focus:ring-2 focus:ring-amber-500/60 focus:border-amber-500/60" />
+            </div>
+
+            <div class="flex flex-col gap-1">
+              <label for="department" class="text-xs font-medium text-slate-500">Department</label>
+              <input id="department" name="department" type="text" required
+                class="bg-white border border-slate-300 rounded-lg px-3 py-2 text-sm text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-amber-500/60 focus:border-amber-500/60"
+                placeholder="Operations" />
+            </div>
+
+            <div class="flex flex-col gap-1">
+              <label for="jobTitle" class="text-xs font-medium text-slate-500">Job Title</label>
+              <input id="jobTitle" name="jobTitle" type="text" required
+                class="bg-white border border-slate-300 rounded-lg px-3 py-2 text-sm text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-amber-500/60 focus:border-amber-500/60"
+                placeholder="Payroll Officer" />
+            </div>
+
+            <div class="flex flex-col gap-1">
+              <label for="basicSalary" class="text-xs font-medium text-slate-500">Monthly Basic Salary (₱)</label>
+              <input id="basicSalary" name="basicSalary" type="number" min="0" step="0.01" required
+                class="bg-white border border-slate-300 rounded-lg px-3 py-2 text-sm text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-amber-500/60 focus:border-amber-500/60"
+                placeholder="25000.00" />
+            </div>
+
+            <div class="flex flex-col gap-1">
+              <label for="allowance" class="text-xs font-medium text-slate-500">Monthly Allowance (₱)</label>
+              <input id="allowance" name="allowance" type="number" min="0" step="0.01" value="0"
+                class="bg-white border border-slate-300 rounded-lg px-3 py-2 text-sm text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-amber-500/60 focus:border-amber-500/60"
+                placeholder="0.00" />
+            </div>
+
+            <div class="lg:col-span-4 flex items-center justify-end gap-3 pt-1">
+              <span id="formError" class="text-xs text-rose-400 hidden"></span>
+              <button id="submitBtn" type="submit"
+                class="inline-flex items-center gap-2 bg-amber-500 hover:bg-amber-400 disabled:bg-slate-300 disabled:cursor-not-allowed text-slate-900 font-semibold text-sm px-5 py-2.5 rounded-lg transition-colors">
+                <svg id="submitSpinner" class="hidden animate-spin h-4 w-4" viewBox="0 0 24 24" fill="none">
+                  <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                  <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"></path>
+                </svg>
+                <span id="submitBtnLabel">Add Employee</span>
+              </button>
+            </div>
+          </form>
+        </section>
+
+        <!-- Employee Roster -->
+        <section class="rounded-xl border border-slate-300 bg-slate-50">
+          <div class="px-5 py-4 border-b border-slate-300 flex items-center justify-between">
+            <div>
+              <h3 class="text-base font-semibold text-slate-900">Employee Payroll Roster</h3>
+              <p class="text-xs text-slate-500 mt-0.5">Estimated Net Pay shown below is <strong>before withholding tax</strong>.</p>
+            </div>
+          </div>
+
+          <!-- Loading state -->
+          <div id="rosterLoading" class="p-5 space-y-2">
+            <div class="skeleton h-10 rounded-lg"></div>
+            <div class="skeleton h-10 rounded-lg"></div>
+            <div class="skeleton h-10 rounded-lg"></div>
+          </div>
+
+          <!-- Empty state -->
+          <div id="rosterEmpty" class="hidden p-10 text-center">
+            <p class="text-slate-600 font-medium">No employee profiles found.</p>
+            <p class="text-slate-400 text-sm mt-1">Add your first employee above.</p>
+          </div>
+
+          <!-- Error state -->
+          <div id="rosterError" class="hidden p-10 text-center">
+            <p class="text-rose-700 font-medium">Unable to load employee records.</p>
+            <p class="text-slate-400 text-sm mt-1">Check your Supabase configuration and try again.</p>
+          </div>
+
+          <!-- Table -->
+          <div id="rosterTableWrap" class="hidden overflow-x-auto">
+            <table class="roster w-full text-sm border-collapse min-w-[1800px]">
+              <thead>
+                <tr class="bg-slate-100 text-slate-500 text-xs uppercase tracking-wide">
+                  <th class="text-left px-3 py-2.5 border-b border-slate-300">Emp. #</th>
+                  <th class="text-left px-3 py-2.5 border-b border-slate-300">Employee</th>
+                  <th class="text-left px-3 py-2.5 border-b border-slate-300">Department / Title</th>
+                  <th class="text-left px-3 py-2.5 border-b border-slate-300">Hire Date</th>
+                  <th class="text-right px-3 py-2.5 border-b border-slate-300">Basic Salary</th>
+                  <th class="text-right px-3 py-2.5 border-b border-slate-300">Allowance</th>
+                  <th class="text-right px-3 py-2.5 border-b border-slate-300">Gross Comp.</th>
+                  <th class="text-right px-3 py-2.5 border-b border-slate-300 bg-rose-500/5">SSS EE</th>
+                  <th class="text-right px-3 py-2.5 border-b border-slate-300 bg-rose-500/5">PhilHealth EE</th>
+                  <th class="text-right px-3 py-2.5 border-b border-slate-300 bg-rose-500/5">Pag-IBIG EE</th>
+                  <th class="text-right px-3 py-2.5 border-b border-slate-300 bg-rose-500/5">Total EE Ded.</th>
+                  <th class="text-right px-3 py-2.5 border-b border-slate-300 bg-amber-500/5">SSS ER</th>
+                  <th class="text-right px-3 py-2.5 border-b border-slate-300 bg-amber-500/5">EC</th>
+                  <th class="text-right px-3 py-2.5 border-b border-slate-300 bg-amber-500/5">PhilHealth ER</th>
+                  <th class="text-right px-3 py-2.5 border-b border-slate-300 bg-amber-500/5">Pag-IBIG ER</th>
+                  <th class="text-right px-3 py-2.5 border-b border-slate-300 bg-amber-500/5">Total ER Liab.</th>
+                  <th class="text-left px-3 py-2.5 border-b border-slate-300">SIL Status</th>
+                  <th class="text-right px-3 py-2.5 border-b border-slate-300">Months Worked</th>
+                  <th class="text-right px-3 py-2.5 border-b border-slate-300">13th-Month Accrual</th>
+                  <th class="text-right px-3 py-2.5 border-b border-slate-300 bg-emerald-500/5">Net Monthly</th>
+                  <th class="text-right px-3 py-2.5 border-b border-slate-300 bg-emerald-500/5">Net Semi-Monthly</th>
+                  <th class="text-center px-3 py-2.5 border-b border-slate-300">Actions</th>
+                </tr>
+              </thead>
+              <tbody id="rosterTableBody" class="divide-y divide-slate-200"></tbody>
+            </table>
+          </div>
+        </section>
+      </section>
+
+      <!-- =========================================================
+           MODULE: INACTIVE EMPLOYEES
+      ========================================================= -->
+      <section id="moduleInactive" class="hidden space-y-6">
+        <div>
+          <h3 class="text-base font-semibold text-slate-900">Inactive &amp; Separated Employee Records</h3>
+          <p class="text-xs text-slate-500 mt-0.5">Archive of separated personnel with historical logs and reactivation options.</p>
+        </div>
+
+        <div class="rounded-xl border border-slate-300 bg-slate-50 overflow-hidden">
+          <div class="px-5 py-4 border-b border-slate-300">
+            <h4 class="text-base font-semibold text-slate-900">Separated Employees Roster</h4>
+          </div>
+          <div class="overflow-x-auto">
+            <table class="w-full text-sm border-collapse min-w-[1000px]">
+              <thead>
+                <tr class="bg-slate-100 text-slate-500 text-xs uppercase tracking-wide">
+                  <th class="text-left px-4 py-3 border-b border-slate-300">Employee</th>
+                  <th class="text-left px-4 py-3 border-b border-slate-300">Department / Title</th>
+                  <th class="text-left px-4 py-3 border-b border-slate-300">Separation Date</th>
+                  <th class="text-left px-4 py-3 border-b border-slate-300">Reason</th>
+                  <th class="text-left px-4 py-3 border-b border-slate-300">Remarks</th>
+                  <th class="text-center px-4 py-3 border-b border-slate-300">Action</th>
+                </tr>
+              </thead>
+              <tbody id="inactiveTableBody" class="divide-y divide-slate-200"></tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+    </main>
+  </div>
+</div>
 
 <!-- =========================================================
-     CUSTOM CONFIRM MODAL (for delete/separate action)
+     SEPARATION MODAL
 ========================================================= -->
-<div id="confirmModal" class="hidden fixed inset-0 z-50 items-center justify-center bg-black/60 px-4">
-  <div class="bg-slate-100 border border-slate-300 rounded-xl max-w-sm w-full p-5">
-    <h3 class="text-slate-900 font-semibold text-base">Remove / Separate Profile</h3>
-    <p id="confirmModalText" class="text-sm text-slate-500 mt-2">Are you sure you want to remove this employee profile? This cannot be undone.</p>
-    <div class="flex justify-end gap-2 mt-5">
-      <button id="confirmCancelBtn" class="px-4 py-2 text-sm rounded-lg border border-slate-300 text-slate-600 hover:bg-slate-100 transition-colors">Cancel</button>
-      <button id="confirmOkBtn" class="px-4 py-2 text-sm rounded-lg bg-rose-600 hover:bg-rose-500 text-white font-medium transition-colors">Remove</button>
+<div id="separationModal" class="hidden fixed inset-0 z-50 items-center justify-center bg-black/60 px-4">
+  <div class="bg-white border border-slate-300 rounded-xl max-w-md w-full p-6 space-y-4">
+    <h3 class="text-slate-900 font-semibold text-base">Separate / Inactivate Employee</h3>
+    <p id="separationModalText" class="text-sm text-slate-500">Provide separation details for this employee profile.</p>
+    
+    <div class="space-y-3">
+      <div class="flex flex-col gap-1">
+        <label class="text-xs font-medium text-slate-500">Separation Reason</label>
+        <select id="sepReason" class="bg-white border border-slate-300 rounded-lg px-3 py-2 text-sm text-slate-900 focus:outline-none focus:ring-2 focus:ring-amber-500/65">
+          <option value="Resigned">Resigned</option>
+          <option value="Terminated">Terminated</option>
+          <option value="Retired">Retired</option>
+          <option value="End of Contract">End of Contract</option>
+          <option value="Redundancy">Redundancy</option>
+          <option value="Other">Other</option>
+        </select>
+      </div>
+      <div class="flex flex-col gap-1">
+        <label class="text-xs font-medium text-slate-500">Separation Date</label>
+        <input id="sepDate" type="date" class="bg-white border border-slate-300 rounded-lg px-3 py-2 text-sm text-slate-900 focus:outline-none focus:ring-2 focus:ring-amber-500/65" />
+      </div>
+      <div class="flex flex-col gap-1">
+        <label class="text-xs font-medium text-slate-500">Remarks</label>
+        <input id="sepRemarks" type="text" placeholder="Optional notes" class="bg-white border border-slate-300 rounded-lg px-3 py-2 text-sm text-slate-900 focus:outline-none focus:ring-2 focus:ring-amber-500/65" />
+      </div>
+    </div>
+
+    <div class="flex justify-end gap-2 pt-2">
+      <button id="sepCancelBtn" class="px-4 py-2 text-sm rounded-lg border border-slate-300 text-slate-600 hover:bg-slate-100 transition-colors">Cancel</button>
+      <button id="sepConfirmBtn" class="px-4 py-2 text-sm rounded-lg bg-rose-600 hover:bg-rose-500 text-white font-medium transition-colors">Confirm Separation</button>
     </div>
   </div>
 </div>
 
-</div> <!-- /#appShell -->
-
 <script>
 /* =========================================================
    SUPABASE CONFIGURATION
-   Replace the two placeholder values below with your own
-   Supabase project URL and anon/public API key.
-   Find these in: Supabase Dashboard → Project Settings → API
 ========================================================= */
 const SUPABASE_URL = 'https://vdhloboribrqofhifluu.supabase.co';
 const SUPABASE_KEY = 'sb_publishable_VsbbODbWKrv2g9HUKz7EzA_wUh9bXzm';
 
-/*
- * SECURITY NOTE:
- * - SUPABASE_KEY above must be the "anon" / "public" key only.
- *   This key is safe to expose in client-side code by design.
- * - NEVER place a Supabase "service_role" key in this file — that key
- *   bypasses Row Level Security (RLS) and must stay server-side only.
- * - In production, configure Row Level Security (RLS) policies on the
- *   `employees` table so that only authorized/authenticated requests
- *   can select, insert, update, or delete records. Without RLS, anyone
- *   with the anon key (i.e. anyone who loads this page) can read/write
- *   the table.
- */
-
 const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
 const EMPLOYEES_TABLE = 'employees';
+
+/* =========================================================
+   GLOBAL STATE
+========================================================= */
+let activeEmployeesCache = [];
+let inactiveEmployeesCache = [];
+let schedulesCache = [];
+let attendanceCache = [];
+let overtimeCache = [];
+let leaveCache = [];
+
+let pendingSeparationId = null;
 
 /* =========================================================
    STATUTORY CONSTANTS (Philippines)
@@ -432,9 +909,8 @@ const PAGIBIG_MAX_ER = 200;
 const SIL_ELIGIBILITY_DAYS = 365;
 
 /* =========================================================
-   UTILITIES
+   UTILITY FUNCTIONS
 ========================================================= */
-
 function formatCurrency(value) {
   const safeValue = Number.isFinite(value) ? value : 0;
   return new Intl.NumberFormat('en-PH', {
@@ -461,69 +937,42 @@ function formatDate(dateStr) {
 }
 
 /* =========================================================
-   PAYROLL CALCULATION ENGINE
+   PAYROLL ENGINE
 ========================================================= */
-
 function calculateEmployeePayroll(employee) {
   const basicSalary = Number(employee.monthly_basic_salary) || 0;
   const allowance = Number(employee.allowance_allowance) || 0;
 
-  // --- Gross Monthly Compensation ---
   const grossMonthlyCompensation = basicSalary + allowance;
 
-  // --- SSS ---
   const sssMsc = Math.min(basicSalary, SSS_MAX_MSC);
   const sssEmployee = sssMsc * SSS_RATE_EE;
   const sssEmployer = sssMsc * SSS_RATE_ER;
   const sssEmployerEc = sssMsc < SSS_EC_LOW_MSC_THRESHOLD ? SSS_EC_LOW : SSS_EC_HIGH;
   const sssEmployerTotalLiability = sssEmployer + sssEmployerEc;
 
-  // --- PhilHealth ---
   const philhealthBase = Math.min(Math.max(basicSalary, PHILHEALTH_MIN_BASE), PHILHEALTH_MAX_BASE);
   const philhealthEmployee = philhealthBase * PHILHEALTH_RATE_EE;
   const philhealthEmployer = philhealthBase * PHILHEALTH_RATE_ER;
 
-  // --- Pag-IBIG / HDMF ---
   const pagibigBase = Math.min(basicSalary, PAGIBIG_MAX_BASE);
   const pagibigEmployee = Math.min(pagibigBase * PAGIBIG_RATE_EE, PAGIBIG_MAX_EE);
   const pagibigEmployer = Math.min(pagibigBase * PAGIBIG_RATE_ER, PAGIBIG_MAX_ER);
 
-  // --- Totals ---
   const totalEmployeeDeductions = sssEmployee + philhealthEmployee + pagibigEmployee;
   const totalEmployerLiability = sssEmployer + sssEmployerEc + philhealthEmployer + pagibigEmployer;
 
-  // --- Net Pay ---
   const estimatedNetMonthlyPay = grossMonthlyCompensation - totalEmployeeDeductions;
   const estimatedSemiMonthlyPay = estimatedNetMonthlyPay / 2;
 
-  // --- 13th Month Pay Accrual (PD 851) ---
-  const { monthsWorkedThisYear, thirteenthMonthAccrual } = calculate13thMonthAccrual(
-    employee.hire_date,
-    basicSalary
-  );
-
-  // --- Service Incentive Leave (SIL) ---
+  const { monthsWorkedThisYear, thirteenthMonthAccrual } = calculate13thMonthAccrual(employee.hire_date, basicSalary);
   const { serviceDays, silEligible, silStatusLabel } = calculateSilStatus(employee.hire_date);
 
   return {
     grossMonthlyCompensation,
-    sss: {
-      msc: sssMsc,
-      employee: sssEmployee,
-      employer: sssEmployer,
-      employerEc: sssEmployerEc,
-      employerTotalLiability: sssEmployerTotalLiability,
-    },
-    philhealth: {
-      base: philhealthBase,
-      employee: philhealthEmployee,
-      employer: philhealthEmployer,
-    },
-    pagibig: {
-      base: pagibigBase,
-      employee: pagibigEmployee,
-      employer: pagibigEmployer,
-    },
+    sss: { msc: sssMsc, employee: sssEmployee, employer: sssEmployer, employerEc: sssEmployerEc, employerTotalLiability: sssEmployerTotalLiability },
+    philhealth: { base: philhealthBase, employee: philhealthEmployee, employer: philhealthEmployer },
+    pagibig: { base: pagibigBase, employee: pagibigEmployee, employer: pagibigEmployer },
     totalEmployeeDeductions,
     totalEmployerLiability,
     estimatedNetMonthlyPay,
@@ -536,92 +985,47 @@ function calculateEmployeePayroll(employee) {
   };
 }
 
-/**
- * Computes completed months of service within the CURRENT calendar year,
- * per Presidential Decree No. 851. Capped at 12, never negative.
- *
- * Rule:
- * - If hired before this calendar year: count completed months from
- *   Jan 1 of this year through today.
- * - If hired during this calendar year: count completed months from
- *   the hire date through today.
- * A month counts as "completed" once the same day-of-month (or later)
- * has been reached in the following month, consistent with how service
- * months are normally counted (avoids simple calendar-month subtraction
- * which can overcount partial months).
- */
 function calculate13thMonthAccrual(hireDateStr, basicSalary) {
-  if (!hireDateStr) {
-    return { monthsWorkedThisYear: 0, thirteenthMonthAccrual: 0 };
-  }
-
+  if (!hireDateStr) return { monthsWorkedThisYear: 0, thirteenthMonthAccrual: 0 };
   const hireDate = new Date(hireDateStr + 'T00:00:00');
-  if (isNaN(hireDate.getTime())) {
-    return { monthsWorkedThisYear: 0, thirteenthMonthAccrual: 0 };
-  }
+  if (isNaN(hireDate.getTime())) return { monthsWorkedThisYear: 0, thirteenthMonthAccrual: 0 };
 
   const today = new Date();
   const currentYear = today.getFullYear();
-
-  // Determine the effective start date for counting within this calendar year.
   const jan1ThisYear = new Date(currentYear, 0, 1);
   const startDate = hireDate > jan1ThisYear ? hireDate : jan1ThisYear;
 
-  if (startDate > today) {
-    return { monthsWorkedThisYear: 0, thirteenthMonthAccrual: 0 };
-  }
+  if (startDate > today) return { monthsWorkedThisYear: 0, thirteenthMonthAccrual: 0 };
 
-  // Count completed months between startDate and today.
-  let months =
-    (today.getFullYear() - startDate.getFullYear()) * 12 +
-    (today.getMonth() - startDate.getMonth());
-
-  // If today's day-of-month hasn't reached the start day-of-month yet,
-  // the current month is not yet "completed" — subtract it.
-  if (today.getDate() < startDate.getDate()) {
-    months -= 1;
-  }
-
+  let months = (today.getFullYear() - startDate.getFullYear()) * 12 + (today.getMonth() - startDate.getMonth());
+  if (today.getDate() < startDate.getDate()) months -= 1;
   months = Math.max(0, Math.min(12, months));
 
   const thirteenthMonthAccrual = (basicSalary * months) / 12;
-
   return { monthsWorkedThisYear: months, thirteenthMonthAccrual };
 }
 
-/**
- * Determines Service Incentive Leave eligibility based on continuous
- * service of at least 365 days from hire date to today.
- */
 function calculateSilStatus(hireDateStr) {
-  if (!hireDateStr) {
-    return { serviceDays: 0, silEligible: false, silStatusLabel: 'Pending — New Hire' };
-  }
-
+  if (!hireDateStr) return { serviceDays: 0, silEligible: false, silStatusLabel: 'Pending — New Hire' };
   const hireDate = new Date(hireDateStr + 'T00:00:00');
-  if (isNaN(hireDate.getTime())) {
-    return { serviceDays: 0, silEligible: false, silStatusLabel: 'Pending — New Hire' };
-  }
+  if (isNaN(hireDate.getTime())) return { serviceDays: 0, silEligible: false, silStatusLabel: 'Pending — New Hire' };
 
   const today = new Date();
   const msPerDay = 1000 * 60 * 60 * 24;
   const serviceDays = Math.max(0, Math.floor((today - hireDate) / msPerDay));
-
   const silEligible = serviceDays >= SIL_ELIGIBILITY_DAYS;
   const silStatusLabel = silEligible ? 'Eligible — 5 Days Paid Leave' : 'Pending — New Hire';
-
   return { serviceDays, silEligible, silStatusLabel };
 }
 
 /* =========================================================
    NOTIFICATION / TOAST SYSTEM
 ========================================================= */
-
 const TOAST_STYLES = {
   success: { border: 'border-emerald-500/40', bg: 'bg-emerald-500/10', text: 'text-emerald-700', icon: '✓' },
   error: { border: 'border-rose-500/40', bg: 'bg-rose-500/10', text: 'text-rose-700', icon: '✕' },
   warning: { border: 'border-amber-500/40', bg: 'bg-amber-500/10', text: 'text-amber-700', icon: '!' },
-  info: { border: 'border-sky-500/40', bg: 'bg-sky-500/10', text: 'text-sky-200', icon: 'i' },
+  info: { border: 'border-sky-500/40', bg: 'bg-sky-500/10', text: 'text-sky-700', icon: 'i' },
 };
 
 function showToast(message, type = 'info', durationMs = 4000) {
@@ -629,7 +1033,7 @@ function showToast(message, type = 'info', durationMs = 4000) {
   const style = TOAST_STYLES[type] || TOAST_STYLES.info;
 
   const toast = document.createElement('div');
-  toast.className = `toast-anim flex items-start gap-2.5 border ${style.border} ${style.bg} ${style.text} rounded-lg px-3.5 py-3 text-sm shadow-lg shadow-black/30`;
+  toast.className = `toast-anim flex items-start gap-2.5 border ${style.border} ${style.bg} ${style.text} rounded-lg px-3.5 py-3 text-sm shadow-lg shadow-black/10`;
   toast.innerHTML = `
     <span class="mt-0.5 font-bold text-xs w-4 h-4 flex items-center justify-center rounded-full bg-black/10 shrink-0">${style.icon}</span>
     <span class="flex-1">${escapeHtml(message)}</span>
@@ -649,7 +1053,6 @@ function showToast(message, type = 'info', durationMs = 4000) {
 /* =========================================================
    CONNECTION STATUS
 ========================================================= */
-
 function setConnectionStatus(state) {
   const dot = document.getElementById('connectionDot');
   const text = document.getElementById('connectionText');
@@ -677,19 +1080,295 @@ function credentialsArePlaceholders() {
 }
 
 /* =========================================================
-   ROSTER STATE RENDERING (loading / empty / error / data)
+   NAVIGATION & MODULE SWITCHING
 ========================================================= */
+const MODULES = ['dashboard', 'schedule', 'attendance', 'overtime', 'leave', 'payroll', 'inactive'];
 
-function showRosterState(state) {
-  document.getElementById('rosterLoading').classList.toggle('hidden', state !== 'loading');
-  document.getElementById('rosterEmpty').classList.toggle('hidden', state !== 'empty');
-  document.getElementById('rosterError').classList.toggle('hidden', state !== 'error');
-  document.getElementById('rosterTableWrap').classList.toggle('hidden', state !== 'data');
+function switchModule(targetId) {
+  MODULES.forEach(mod => {
+    const el = document.getElementById('module' + mod.charAt(0).toUpperCase() + mod.slice(1));
+    if (el) {
+      el.classList.toggle('hidden', mod !== targetId);
+    }
+  });
+
+  document.querySelectorAll('.nav-btn').forEach(btn => {
+    const isTarget = btn.getAttribute('data-target') === targetId;
+    if (isTarget) {
+      btn.classList.add('bg-slate-800', 'text-white');
+      btn.classList.remove('text-slate-300');
+    } else {
+      btn.classList.remove('bg-slate-800', 'text-white');
+      btn.classList.add('text-slate-300');
+    }
+  });
+
+  const titles = {
+    dashboard: 'Dashboard Overview',
+    schedule: 'Schedule Management',
+    attendance: 'Attendance Management',
+    overtime: 'Overtime Management',
+    leave: 'Leave Management',
+    payroll: 'Payroll Management',
+    inactive: 'Inactive Employee Records'
+  };
+  document.getElementById('pageTitle').textContent = titles[targetId] || 'HRIS Platform';
 }
 
 /* =========================================================
-   DASHBOARD SUMMARY CARDS
+   EMPLOYEE MANAGEMENT & FETCHING
 ========================================================= */
+async function fetchEmployees() {
+  if (credentialsArePlaceholders()) {
+    setConnectionStatus('unconfigured');
+    return;
+  }
+
+  try {
+    const { data, error } = await supabaseClient
+      .from(EMPLOYEES_TABLE)
+      .select('*')
+      .order('last_name', { ascending: true });
+
+    if (error) throw error;
+    setConnectionStatus('connected');
+
+    const allEmps = data || [];
+    activeEmployeesCache = allEmps.filter(e => !e.is_inactive);
+    inactiveEmployeesCache = allEmps.filter(e => e.is_inactive);
+
+    updateDashboardOverview();
+    updatePayrollModule();
+    updateInactiveModule();
+    populateEmployeeDropdowns();
+  } catch (err) {
+    console.error('fetchEmployees error:', err);
+    setConnectionStatus('error');
+    showToast('Unable to load employee records.', 'error');
+  }
+}
+
+/* =========================================================
+   DASHBOARD OVERVIEW
+========================================================= */
+function updateDashboardOverview() {
+  const totalActive = activeEmployeesCache.length;
+  const totalInactive = inactiveEmployeesCache.length;
+  
+  let totalGross = 0;
+  activeEmployeesCache.forEach(e => {
+    const p = calculateEmployeePayroll(e);
+    totalGross += p.estimatedNetMonthlyPay;
+  });
+
+  document.getElementById('dashTotalActive').textContent = totalActive.toLocaleString('en-PH');
+  document.getElementById('dashTotalInactive').textContent = totalInactive.toLocaleString('en-PH');
+  document.getElementById('dashPresentToday').textContent = totalActive; // simulated full attendance for active
+  document.getElementById('dashAbsentToday').textContent = 0;
+  
+  // Pending counts
+  const pendingOTCount = overtimeCache.filter(o => o.status === 'Pending').length;
+  const pendingLeaveCount = leaveCache.filter(l => l.status === 'Pending').length;
+
+  document.getElementById('dashPendingOT').textContent = pendingOTCount;
+  document.getElementById('dashPendingLeave').textContent = pendingLeaveCount;
+
+  document.getElementById('dashEstimatedCost').textContent = formatCurrency(totalGross);
+
+  // Badge updates in sidebar
+  const badgeOT = document.getElementById('badgeOvertime');
+  if (pendingOTCount > 0) {
+    badgeOT.textContent = pendingOTCount;
+    badgeOT.classList.remove('hidden');
+  } else {
+    badgeOT.classList.add('hidden');
+  }
+
+  const badgeLeave = document.getElementById('badgeLeave');
+  if (pendingLeaveCount > 0) {
+    badgeLeave.textContent = pendingLeaveCount;
+    badgeLeave.classList.remove('hidden');
+  } else {
+    badgeLeave.classList.add('hidden');
+  }
+}
+
+/* =========================================================
+   SCHEDULE MANAGEMENT MODULE
+========================================================= */
+function renderSchedules() {
+  const tbody = document.getElementById('scheduleTableBody');
+  if (schedulesCache.length === 0) {
+    tbody.innerHTML = `<tr><td colspan="7" class="px-4 py-8 text-center text-slate-400">No work schedules created yet.</td></tr>`;
+    return;
+  }
+
+  tbody.innerHTML = schedulesCache.map(s => {
+    const emp = activeEmployeesCache.find(e => e.id === s.employee_id) || {};
+    const empName = `${emp.first_name || ''} ${emp.last_name || ''}`.trim() || 'Unknown';
+    return `
+      <tr class="hover:bg-slate-100 transition-colors">
+        <td class="px-4 py-3 font-medium text-slate-900">${escapeHtml(empName)}</td>
+        <td class="px-4 py-3 text-slate-600">${formatDate(s.schedule_date)}</td>
+        <td class="px-4 py-3 text-slate-700">${escapeHtml(s.shift_name)}</td>
+        <td class="px-4 py-3 font-mono-tabular text-slate-600">${escapeHtml(s.start_time)} → ${escapeHtml(s.end_time)}</td>
+        <td class="px-4 py-3 font-mono-tabular text-slate-500">${escapeHtml(s.break_start || '—')} - ${escapeHtml(s.break_end || '—')}</td>
+        <td class="px-4 py-3 text-slate-500 text-xs">${escapeHtml(s.notes || '—')}</td>
+        <td class="px-4 py-3 text-center">
+          <button onclick="deleteSchedule('${s.id}')" class="text-xs px-2 py-1 rounded border border-rose-300 text-rose-700 hover:bg-rose-50">Delete</button>
+        </td>
+      </tr>
+    `;
+  }).join('');
+}
+
+function deleteSchedule(id) {
+  schedulesCache = schedulesCache.filter(s => s.id !== id);
+  renderSchedules();
+  showToast('Schedule removed.', 'info');
+}
+
+/* =========================================================
+   ATTENDANCE MANAGEMENT MODULE
+========================================================= */
+function renderAttendance() {
+  const tbody = document.getElementById('attendanceTableBody');
+  if (attendanceCache.length === 0) {
+    tbody.innerHTML = `<tr><td colspan="9" class="px-4 py-8 text-center text-slate-400">No attendance records logged yet.</td></tr>`;
+    return;
+  }
+
+  tbody.innerHTML = attendanceCache.map(a => {
+    const emp = activeEmployeesCache.find(e => e.id === a.employee_id) || {};
+    const empName = `${emp.first_name || ''} ${emp.last_name || ''}`.trim() || 'Unknown';
+    const statusBadge = a.status === 'Present' ? 'bg-emerald-500/15 text-emerald-700 border-emerald-500/30' : 'bg-amber-500/15 text-amber-700 border-amber-500/30';
+    return `
+      <tr class="hover:bg-slate-100 transition-colors">
+        <td class="px-4 py-3 font-medium text-slate-900">${escapeHtml(empName)}</td>
+        <td class="px-4 py-3 text-slate-600">${formatDate(a.attendance_date)}</td>
+        <td class="px-4 py-3 font-mono-tabular text-slate-700">${escapeHtml(a.time_in)} - ${escapeHtml(a.time_out)}</td>
+        <td class="px-4 py-3 text-right font-mono-tabular text-slate-900 font-medium">${a.hours_worked || '8.0'} hrs</td>
+        <td class="px-4 py-3 text-right font-mono-tabular text-rose-600">${a.late_minutes || 0}</td>
+        <td class="px-4 py-3 text-right font-mono-tabular text-slate-600">${a.undertime_minutes || 0}</td>
+        <td class="px-4 py-3"><span class="text-xs px-2 py-0.5 rounded-full border ${statusBadge}">${escapeHtml(a.status)}</span></td>
+        <td class="px-4 py-3 text-xs text-slate-500">${escapeHtml(a.remarks || '—')}</td>
+        <td class="px-4 py-3 text-center">
+          <button onclick="deleteAttendance('${a.id}')" class="text-xs px-2 py-1 rounded border border-rose-300 text-rose-700 hover:bg-rose-50">Remove</button>
+        </td>
+      </tr>
+    `;
+  }).join('');
+}
+
+function deleteAttendance(id) {
+  attendanceCache = attendanceCache.filter(a => a.id !== id);
+  renderAttendance();
+  showToast('Attendance log removed.', 'info');
+}
+
+/* =========================================================
+   OVERTIME MANAGEMENT MODULE
+========================================================= */
+function renderOvertime() {
+  const tbody = document.getElementById('overtimeTableBody');
+  if (overtimeCache.length === 0) {
+    tbody.innerHTML = `<tr><td colspan="7" class="px-4 py-8 text-center text-slate-400">No overtime requests submitted.</td></tr>`;
+    return;
+  }
+
+  tbody.innerHTML = overtimeCache.map(o => {
+    const emp = activeEmployeesCache.find(e => e.id === o.employee_id) || {};
+    const empName = `${emp.first_name || ''} ${emp.last_name || ''}`.trim() || 'Unknown';
+    let statusClass = 'bg-amber-500/15 text-amber-700 border-amber-500/30';
+    if (o.status === 'Approved') statusClass = 'bg-emerald-500/15 text-emerald-700 border-emerald-500/30';
+    if (o.status === 'Rejected') statusClass = 'bg-rose-500/15 text-rose-700 border-rose-500/30';
+
+    return `
+      <tr class="hover:bg-slate-100 transition-colors">
+        <td class="px-4 py-3 font-medium text-slate-900">${escapeHtml(empName)}</td>
+        <td class="px-4 py-3 text-slate-600">${formatDate(o.request_date)}</td>
+        <td class="px-4 py-3 font-mono-tabular text-slate-700">${escapeHtml(o.start_time)} → ${escapeHtml(o.end_time)}</td>
+        <td class="px-4 py-3 text-right font-mono-tabular text-slate-900 font-medium">${o.hours || 2.0} hrs</td>
+        <td class="px-4 py-3 text-xs text-slate-600">${escapeHtml(o.reason)}</td>
+        <td class="px-4 py-3"><span class="text-xs px-2 py-0.5 rounded-full border ${statusClass}">${escapeHtml(o.status)}</span></td>
+        <td class="px-4 py-3 text-center space-x-1">
+          ${o.status === 'Pending' ? `
+            <button onclick="updateOvertimeStatus('${o.id}', 'Approved')" class="text-xs px-2 py-1 rounded bg-emerald-600 text-white hover:bg-emerald-500">Approve</button>
+            <button onclick="updateOvertimeStatus('${o.id}', 'Rejected')" class="text-xs px-2 py-1 rounded bg-rose-600 text-white hover:bg-rose-500">Reject</button>
+          ` : `<span class="text-xs text-slate-400">Processed</span>`}
+        </td>
+      </tr>
+    `;
+  }).join('');
+}
+
+function updateOvertimeStatus(id, newStatus) {
+  const req = overtimeCache.find(o => o.id === id);
+  if (req) {
+    req.status = newStatus;
+    renderOvertime();
+    updateDashboardOverview();
+    showToast(`Overtime request ${newStatus.toLowerCase()}.`, newStatus === 'Approved' ? 'success' : 'warning');
+  }
+}
+
+/* =========================================================
+   LEAVE MANAGEMENT MODULE
+========================================================= */
+function renderLeave() {
+  const tbody = document.getElementById('leaveTableBody');
+  if (leaveCache.length === 0) {
+    tbody.innerHTML = `<tr><td colspan="6" class="px-4 py-8 text-center text-slate-400">No leave applications filed.</td></tr>`;
+    return;
+  }
+
+  tbody.innerHTML = leaveCache.map(l => {
+    const emp = activeEmployeesCache.find(e => e.id === l.employee_id) || {};
+    const empName = `${emp.first_name || ''} ${emp.last_name || ''}`.trim() || 'Unknown';
+    let statusClass = 'bg-amber-500/15 text-amber-700 border-amber-500/30';
+    if (l.status === 'Approved') statusClass = 'bg-emerald-500/15 text-emerald-700 border-emerald-500/30';
+    if (l.status === 'Rejected') statusClass = 'bg-rose-500/15 text-rose-700 border-rose-500/30';
+
+    return `
+      <tr class="hover:bg-slate-100 transition-colors">
+        <td class="px-4 py-3 font-medium text-slate-900">${escapeHtml(empName)}</td>
+        <td class="px-4 py-3 text-slate-700">${escapeHtml(l.leave_type)}</td>
+        <td class="px-4 py-3 text-slate-600">${formatDate(l.start_date)} to ${formatDate(l.end_date)}</td>
+        <td class="px-4 py-3 text-xs text-slate-600">${escapeHtml(l.reason)}</td>
+        <td class="px-4 py-3"><span class="text-xs px-2 py-0.5 rounded-full border ${statusClass}">${escapeHtml(l.status)}</span></td>
+        <td class="px-4 py-3 text-center space-x-1">
+          ${l.status === 'Pending' ? `
+            <button onclick="updateLeaveStatus('${l.id}', 'Approved')" class="text-xs px-2 py-1 rounded bg-emerald-600 text-white hover:bg-emerald-500">Approve</button>
+            <button onclick="updateLeaveStatus('${l.id}', 'Rejected')" class="text-xs px-2 py-1 rounded bg-rose-600 text-white hover:bg-rose-500">Reject</button>
+          ` : `<span class="text-xs text-slate-400">Processed</span>`}
+        </td>
+      </tr>
+    `;
+  }).join('');
+}
+
+function updateLeaveStatus(id, newStatus) {
+  const req = leaveCache.find(l => l.id === id);
+  if (req) {
+    req.status = newStatus;
+    renderLeave();
+    updateDashboardOverview();
+    showToast(`Leave application ${newStatus.toLowerCase()}.`, newStatus === 'Approved' ? 'success' : 'warning');
+  }
+}
+
+/* =========================================================
+   PAYROLL MANAGEMENT MODULE
+========================================================= */
+function updatePayrollModule() {
+  const employeesWithPayroll = activeEmployeesCache.map(employee => ({
+    employee,
+    payroll: calculateEmployeePayroll(employee),
+  }));
+
+  updateDashboardCards(employeesWithPayroll);
+  renderRoster(employeesWithPayroll);
+}
 
 function updateDashboardCards(employeesWithPayroll) {
   const totalEmployees = employeesWithPayroll.length;
@@ -716,13 +1395,8 @@ function updateDashboardCards(employeesWithPayroll) {
   document.getElementById('cardSilEligible').textContent = silEligibleCount.toLocaleString('en-PH');
 }
 
-/* =========================================================
-   ROSTER TABLE RENDERING
-========================================================= */
-
 function renderRosterRow(employee, payroll) {
   const fullName = `${employee.first_name || ''} ${employee.last_name || ''}`.trim();
-
   const silBadgeClass = payroll.silEligible
     ? 'bg-emerald-500/15 text-emerald-700 border border-emerald-500/30'
     : 'bg-slate-100 text-slate-600 border border-slate-300';
@@ -768,7 +1442,7 @@ function renderRosterRow(employee, payroll) {
 
       <td class="px-3 py-2.5 align-top text-center">
         <button
-          class="delete-btn text-xs px-3 py-1.5 rounded-lg border border-rose-500/40 text-rose-700 hover:bg-rose-500/10 transition-colors whitespace-nowrap"
+          class="separate-btn text-xs px-3 py-1.5 rounded-lg border border-rose-500/40 text-rose-700 hover:bg-rose-500/10 transition-colors whitespace-nowrap"
           data-id="${escapeHtml(employee.id)}"
           data-name="${escapeHtml(fullName)}"
         >
@@ -781,236 +1455,291 @@ function renderRosterRow(employee, payroll) {
 
 function renderRoster(employeesWithPayroll) {
   const tbody = document.getElementById('rosterTableBody');
+  const loading = document.getElementById('rosterLoading');
+  const empty = document.getElementById('rosterEmpty');
+  const tableWrap = document.getElementById('rosterTableWrap');
+
+  loading.classList.add('hidden');
 
   if (employeesWithPayroll.length === 0) {
     tbody.innerHTML = '';
-    showRosterState('empty');
+    empty.classList.remove('hidden');
+    tableWrap.classList.add('hidden');
     return;
   }
+
+  empty.classList.add('hidden');
+  tableWrap.classList.remove('hidden');
 
   tbody.innerHTML = employeesWithPayroll
     .map(({ employee, payroll }) => renderRosterRow(employee, payroll))
     .join('');
 
-  showRosterState('data');
-
-  tbody.querySelectorAll('.delete-btn').forEach((btn) => {
+  tbody.querySelectorAll('.separate-btn').forEach((btn) => {
     btn.addEventListener('click', () => {
       const id = btn.getAttribute('data-id');
       const name = btn.getAttribute('data-name');
-      requestDeleteConfirmation(id, name);
+      openSeparationModal(id, name);
     });
   });
 }
 
 /* =========================================================
-   FETCH EMPLOYEES
+   INACTIVE EMPLOYEES MODULE
 ========================================================= */
-
-async function fetchEmployees() {
-  showRosterState('loading');
-
-  if (credentialsArePlaceholders()) {
-    setConnectionStatus('unconfigured');
-    showRosterState('empty');
-    updateDashboardCards([]);
+function updateInactiveModule() {
+  const tbody = document.getElementById('inactiveTableBody');
+  if (inactiveEmployeesCache.length === 0) {
+    tbody.innerHTML = `<tr><td colspan="6" class="px-4 py-8 text-center text-slate-400">No separated employee records found.</td></tr>`;
     return;
   }
 
+  tbody.innerHTML = inactiveEmployeesCache.map(emp => {
+    const fullName = `${emp.first_name || ''} ${emp.last_name || ''}`.trim();
+    return `
+      <tr class="hover:bg-slate-100 transition-colors">
+        <td class="px-4 py-3">
+          <div class="font-medium text-slate-900">${escapeHtml(fullName)}</div>
+          <div class="text-xs text-slate-400">${escapeHtml(emp.email)}</div>
+        </td>
+        <td class="px-4 py-3">
+          <div class="text-slate-700">${escapeHtml(emp.job_title)}</div>
+          <div class="text-xs text-slate-400">${escapeHtml(emp.department)}</div>
+        </td>
+        <td class="px-4 py-3 text-slate-600">${formatDate(emp.separation_date)}</td>
+        <td class="px-4 py-3"><span class="text-xs px-2 py-0.5 rounded border border-rose-300 text-rose-700 bg-rose-50">${escapeHtml(emp.separation_reason || 'Resigned')}</span></td>
+        <td class="px-4 py-3 text-xs text-slate-500">${escapeHtml(emp.separation_remarks || '—')}</td>
+        <td class="px-4 py-3 text-center">
+          <button onclick="restoreEmployee('${emp.id}')" class="text-xs px-3 py-1.5 rounded-lg border border-emerald-500/40 text-emerald-700 hover:bg-emerald-50 transition-colors">Restore</button>
+        </td>
+      </tr>
+    `;
+  }).join('');
+}
+
+async function restoreEmployee(id) {
   try {
-    const { data, error } = await supabaseClient
+    const { error } = await supabaseClient
       .from(EMPLOYEES_TABLE)
-      .select('*')
-      .order('last_name', { ascending: true })
-      .order('first_name', { ascending: true });
+      .update({ is_inactive: false, separation_date: null, separation_reason: null, separation_remarks: null })
+      .eq('id', id);
 
     if (error) throw error;
-
-    setConnectionStatus('connected');
-
-    const employees = data || [];
-    const employeesWithPayroll = employees.map((employee) => ({
-      employee,
-      payroll: calculateEmployeePayroll(employee),
-    }));
-
-    updateDashboardCards(employeesWithPayroll);
-    renderRoster(employeesWithPayroll);
-  } catch (err) {
-    console.error('fetchEmployees error:', err);
-    setConnectionStatus('error');
-    showRosterState('error');
-    updateDashboardCards([]);
-    showToast('Unable to load employee records.', 'error');
-  }
-}
-
-/* =========================================================
-   CREATE EMPLOYEE
-========================================================= */
-
-function setFormError(message) {
-  const el = document.getElementById('formError');
-  if (!message) {
-    el.classList.add('hidden');
-    el.textContent = '';
-  } else {
-    el.classList.remove('hidden');
-    el.textContent = message;
-  }
-}
-
-function setSubmitLoading(isLoading) {
-  const btn = document.getElementById('submitBtn');
-  const spinner = document.getElementById('submitSpinner');
-  const label = document.getElementById('submitBtnLabel');
-
-  btn.disabled = isLoading;
-  spinner.classList.toggle('hidden', !isLoading);
-  label.textContent = isLoading ? 'Adding…' : 'Add Employee';
-}
-
-function validateEmployeeForm(values) {
-  if (!values.employeeNumber || !values.firstName || !values.lastName || !values.email || !values.hireDate || !values.department || !values.jobTitle) {
-    return 'Please correct the highlighted fields.';
-  }
-
-  const employeeNumberPattern = /^[0-9]{7}$/;
-  if (!employeeNumberPattern.test(values.employeeNumber)) {
-    return 'Employee number must be exactly 7 digits.';
-  }
-
-  const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-  if (!emailPattern.test(values.email)) {
-    return 'Please enter a valid email address.';
-  }
-
-  if (!Number.isFinite(values.basicSalary) || values.basicSalary < 0) {
-    return 'Monthly basic salary must be a non-negative number.';
-  }
-
-  if (!Number.isFinite(values.allowance) || values.allowance < 0) {
-    return 'Monthly allowance must be a non-negative number.';
-  }
-
-  return null;
-}
-
-async function handleEmployeeFormSubmit(evt) {
-  evt.preventDefault();
-  setFormError(null);
-
-  if (credentialsArePlaceholders()) {
-    showToast('Supabase is not configured yet.', 'warning');
-    return;
-  }
-
-  const form = evt.target;
-
-  const values = {
-    employeeNumber: form.employeeNumber.value.trim(),
-    firstName: form.firstName.value.trim(),
-    lastName: form.lastName.value.trim(),
-    email: form.email.value.trim(),
-    hireDate: form.hireDate.value,
-    department: form.department.value.trim(),
-    jobTitle: form.jobTitle.value.trim(),
-    basicSalary: parseFloat(form.basicSalary.value),
-    allowance: form.allowance.value === '' ? 0 : parseFloat(form.allowance.value),
-  };
-
-  const validationError = validateEmployeeForm(values);
-  if (validationError) {
-    setFormError(validationError);
-    showToast(validationError, 'warning');
-    return;
-  }
-
-  setSubmitLoading(true);
-
-  try {
-    const { error } = await supabaseClient.from(EMPLOYEES_TABLE).insert([
-      {
-        employee_number: values.employeeNumber,
-        first_name: values.firstName,
-        last_name: values.lastName,
-        email: values.email,
-        department: values.department,
-        job_title: values.jobTitle,
-        hire_date: values.hireDate,
-        monthly_basic_salary: values.basicSalary,
-        allowance_allowance: values.allowance,
-      },
-    ]);
-
-    if (error) {
-      if (error.code === '23505' || /duplicate|unique/i.test(error.message || '')) {
-        if (/employee_number/i.test(error.message || '')) {
-          throw new Error('A record with this employee number already exists.');
-        }
-        throw new Error('A record with this email already exists.');
-      }
-      throw new Error(error.message || 'Unable to add employee.');
-    }
-
-    showToast('Employee successfully added.', 'success');
-    form.reset();
-    form.allowance.value = '0';
+    showToast('Employee successfully restored to active status.', 'success');
     await fetchEmployees();
   } catch (err) {
-    console.error('createEmployee error:', err);
-    setFormError(err.message);
-    showToast(err.message || 'Unable to add employee.', 'error');
-  } finally {
-    setSubmitLoading(false);
+    console.error('restoreEmployee error:', err);
+    showToast('Unable to restore employee.', 'error');
   }
 }
 
 /* =========================================================
-   DELETE / SEPARATE EMPLOYEE
+   SEPARATION WORKFLOW MODAL
 ========================================================= */
-
-let pendingDeleteId = null;
-
-function requestDeleteConfirmation(id, name) {
-  pendingDeleteId = id;
-  const modal = document.getElementById('confirmModal');
-  const text = document.getElementById('confirmModalText');
-  text.textContent = `Are you sure you want to remove ${name || 'this employee'}'s profile? This cannot be undone.`;
+function openSeparationModal(id, name) {
+  pendingSeparationId = id;
+  document.getElementById('separationModalText').textContent = `Provide separation details for ${name || 'this employee'}.`;
+  document.getElementById('sepDate').value = new Date().toISOString().split('T')[0];
+  const modal = document.getElementById('separationModal');
   modal.classList.remove('hidden');
   modal.classList.add('flex');
 }
 
-function closeConfirmModal() {
-  pendingDeleteId = null;
-  const modal = document.getElementById('confirmModal');
+function closeSeparationModal() {
+  pendingSeparationId = null;
+  const modal = document.getElementById('separationModal');
   modal.classList.add('hidden');
   modal.classList.remove('flex');
 }
 
-async function deleteEmployee(id) {
+async function confirmSeparation() {
+  if (!pendingSeparationId) return;
+  const reason = document.getElementById('sepReason').value;
+  const date = document.getElementById('sepDate').value;
+  const remarks = document.getElementById('sepRemarks').value.trim();
+
   try {
-    const { error } = await supabaseClient.from(EMPLOYEES_TABLE).delete().eq('id', id);
+    const { error } = await supabaseClient
+      .from(EMPLOYEES_TABLE)
+      .update({ is_inactive: true, separation_date: date, separation_reason: reason, separation_remarks: remarks })
+      .eq('id', pendingSeparationId);
+
     if (error) throw error;
 
-    showToast('Employee successfully removed.', 'success');
+    closeSeparationModal();
+    showToast('Employee successfully separated and moved to Inactive records.', 'success');
     await fetchEmployees();
   } catch (err) {
-    console.error('deleteEmployee error:', err);
-    showToast('Unable to remove employee record.', 'error');
+    console.error('confirmSeparation error:', err);
+    showToast('Unable to process employee separation.', 'error');
   }
 }
 
 /* =========================================================
-   ADMIN AUTHENTICATION (Supabase Auth)
+   POPULATE DROPDOWNS
 ========================================================= */
+function populateEmployeeDropdowns() {
+  const selects = ['schedEmployeeId', 'attEmployeeId', 'otEmployeeId', 'leaveEmployeeId'];
+  selects.forEach(id => {
+    const select = document.getElementById(id);
+    if (!select) return;
+    const currentVal = select.value;
+    select.innerHTML = '<option value="">Select Employee...</option>' + 
+      activeEmployeesCache.map(e => `<option value="${e.id}">${escapeHtml(e.first_name)} ${escapeHtml(e.last_name)} (${escapeHtml(e.employee_number)})</option>`).join('');
+    select.value = currentVal;
+  });
+}
+
+/* =========================================================
+   FORM SUBMISSIONS & EVENT LISTENERS
+========================================================= */
+function registerEventListeners() {
+  // Navigation
+  document.querySelectorAll('.nav-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const target = btn.getAttribute('data-target');
+      switchModule(target);
+    });
+  });
+
+  // Login
+  document.getElementById('loginForm').addEventListener('submit', handleLoginSubmit);
+  document.getElementById('sidebarLogoutBtn').addEventListener('click', handleLogout);
+
+  // Top Refresh
+  document.getElementById('topRefreshBtn').addEventListener('click', fetchEmployees);
+
+  // Employee Add Form
+  document.getElementById('employeeForm').addEventListener('submit', handleEmployeeFormSubmit);
+
+  // Schedule Form
+  document.getElementById('scheduleForm').addEventListener('submit', (e) => {
+    e.preventDefault();
+    const empId = document.getElementById('schedEmployeeId').value;
+    if (!empId) { showToast('Please select an employee.', 'warning'); return; }
+    
+    schedulesCache.push({
+      id: 'sch_' + Date.now(),
+      employee_id: empId,
+      schedule_date: document.getElementById('schedDate').value || new Date().toISOString().split('T')[0],
+      shift_name: document.getElementById('schedShiftName').value,
+      start_time: document.getElementById('schedStartTime').value,
+      end_time: document.getElementById('schedEndTime').value,
+      break_start: document.getElementById('schedBreakStart').value,
+      break_end: document.getElementById('schedBreakEnd').value,
+      notes: document.getElementById('schedNotes').value
+    });
+    renderSchedules();
+    showToast('Schedule successfully created.', 'success');
+    e.target.reset();
+  });
+
+  // Attendance Form
+  document.getElementById('attendanceForm').addEventListener('submit', (e) => {
+    e.preventDefault();
+    const empId = document.getElementById('attEmployeeId').value;
+    if (!empId) { showToast('Please select an employee.', 'warning'); return; }
+
+    attendanceCache.push({
+      id: 'att_' + Date.now(),
+      employee_id: empId,
+      attendance_date: document.getElementById('attDate').value || new Date().toISOString().split('T')[0],
+      time_in: document.getElementById('attTimeIn').value,
+      time_out: document.getElementById('attTimeOut').value,
+      hours_worked: 8.0,
+      late_minutes: document.getElementById('attStatus').value === 'Late' ? 12 : 0,
+      undertime_minutes: 0,
+      status: document.getElementById('attStatus').value,
+      remarks: document.getElementById('attRemarks').value
+    });
+    renderAttendance();
+    updateDashboardOverview();
+    showToast('Attendance record logged successfully.', 'success');
+    e.target.reset();
+  });
+
+  // Overtime Form
+  document.getElementById('overtimeForm').addEventListener('submit', (e) => {
+    e.preventDefault();
+    const empId = document.getElementById('otEmployeeId').value;
+    if (!empId) { showToast('Please select an employee.', 'warning'); return; }
+
+    overtimeCache.push({
+      id: 'ot_' + Date.now(),
+      employee_id: empId,
+      request_date: new Date().toISOString().split('T')[0],
+      start_time: document.getElementById('otStart').value,
+      end_time: document.getElementById('otEnd').value,
+      hours: 2.0,
+      reason: document.getElementById('otReason').value || 'Overtime work',
+      status: 'Pending'
+    });
+    renderOvertime();
+    updateDashboardOverview();
+    showToast('Overtime request submitted for review.', 'success');
+    e.target.reset();
+  });
+
+  // Leave Form
+  document.getElementById('leaveForm').addEventListener('submit', (e) => {
+    e.preventDefault();
+    const empId = document.getElementById('leaveEmployeeId').value;
+    if (!empId) { showToast('Please select an employee.', 'warning'); return; }
+
+    leaveCache.push({
+      id: 'leave_' + Date.now(),
+      employee_id: empId,
+      leave_type: document.getElementById('leaveType').value,
+      start_date: document.getElementById('leaveStartDate').value,
+      end_date: document.getElementById('leaveEndDate').value,
+      reason: document.getElementById('leaveReason').value || 'Leave application',
+      status: 'Pending'
+    });
+    renderLeave();
+    updateDashboardOverview();
+    showToast('Leave application submitted for approval.', 'success');
+    e.target.reset();
+  });
+
+  // Separation Modal Actions
+  document.getElementById('sepCancelBtn').addEventListener('click', closeSeparationModal);
+  document.getElementById('sepConfirmBtn').addEventListener('click', confirmSeparation);
+}
+
+/* =========================================================
+   AUTH HANDLERS
+========================================================= */
+async function handleLoginSubmit(evt) {
+  evt.preventDefault();
+  const email = document.getElementById('loginEmail').value.trim();
+  const password = document.getElementById('loginPassword').value;
+
+  if (!email || !password) {
+    document.getElementById('loginError').textContent = 'Please enter email and password.';
+    document.getElementById('loginError').classList.remove('hidden');
+    return;
+  }
+
+  try {
+    const { error } = await supabaseClient.auth.signInWithPassword({ email, password });
+    if (error) throw error;
+  } catch (err) {
+    document.getElementById('loginError').textContent = 'Invalid login credentials.';
+    document.getElementById('loginError').classList.remove('hidden');
+  }
+}
+
+async function handleLogout() {
+  await supabaseClient.auth.signOut();
+}
 
 function showAppShell(session) {
   document.getElementById('loginScreen').classList.add('hidden');
   document.getElementById('appShell').classList.remove('hidden');
-  document.getElementById('adminEmailLabel').textContent = session.user.email || '';
+  document.getElementById('sidebarAdminEmail').textContent = session.user.email || '';
   setConnectionStatus(credentialsArePlaceholders() ? 'unconfigured' : 'connecting');
   fetchEmployees();
+  switchModule('dashboard');
 }
 
 function showLoginScreen() {
@@ -1018,94 +1747,42 @@ function showLoginScreen() {
   document.getElementById('loginScreen').classList.remove('hidden');
 }
 
-function setLoginLoading(isLoading) {
-  const btn = document.getElementById('loginBtn');
-  const spinner = document.getElementById('loginSpinner');
-  const label = document.getElementById('loginBtnLabel');
-
-  btn.disabled = isLoading;
-  spinner.classList.toggle('hidden', !isLoading);
-  label.textContent = isLoading ? 'Signing in…' : 'Sign In';
-}
-
-function setLoginError(message) {
-  const el = document.getElementById('loginError');
-  if (!message) {
-    el.classList.add('hidden');
-    el.textContent = '';
-  } else {
-    el.classList.remove('hidden');
-    el.textContent = message;
-  }
-}
-
-async function handleLoginSubmit(evt) {
+/* =========================================================
+   EMPLOYEE CREATION IN PAYROLL
+========================================================= */
+async function handleEmployeeFormSubmit(evt) {
   evt.preventDefault();
-  setLoginError(null);
-
-  if (credentialsArePlaceholders()) {
-    setLoginError('Supabase is not configured yet.');
-    return;
-  }
-
   const form = evt.target;
-  const email = form.loginEmail.value.trim();
-  const password = form.loginPassword.value;
-
-  if (!email || !password) {
-    setLoginError('Please enter your email and password.');
-    return;
-  }
-
-  setLoginLoading(true);
+  const values = {
+    employee_number: form.employeeNumber.value.trim(),
+    first_name: form.firstName.value.trim(),
+    last_name: form.lastName.value.trim(),
+    email: form.email.value.trim(),
+    hire_date: form.hireDate.value,
+    department: form.department.value.trim(),
+    job_title: form.jobTitle.value.trim(),
+    monthly_basic_salary: parseFloat(form.basicSalary.value),
+    allowance_allowance: form.allowance.value === '' ? 0 : parseFloat(form.allowance.value),
+    is_inactive: false
+  };
 
   try {
-    const { error } = await supabaseClient.auth.signInWithPassword({ email, password });
+    const { error } = await supabaseClient.from(EMPLOYEES_TABLE).insert([values]);
     if (error) throw error;
-    // onAuthStateChange handles showing the app shell once the session is set.
+
+    showToast('Employee successfully added.', 'success');
     form.reset();
+    form.allowance.value = '0';
+    await fetchEmployees();
   } catch (err) {
-    console.error('login error:', err);
-    setLoginError('Invalid email or password.');
-  } finally {
-    setLoginLoading(false);
-  }
-}
-
-async function handleLogout() {
-  try {
-    const { error } = await supabaseClient.auth.signOut();
-    if (error) throw error;
-    showToast('Signed out.', 'info');
-  } catch (err) {
-    console.error('logout error:', err);
-    showToast('Unable to sign out.', 'error');
+    console.error('createEmployee error:', err);
+    showToast('Unable to add employee.', 'error');
   }
 }
 
 /* =========================================================
    INITIALIZATION
 ========================================================= */
-
-function registerEventListeners() {
-  document.getElementById('loginForm').addEventListener('submit', handleLoginSubmit);
-  document.getElementById('logoutBtn').addEventListener('click', handleLogout);
-
-  document.getElementById('employeeForm').addEventListener('submit', handleEmployeeFormSubmit);
-  document.getElementById('refreshBtn').addEventListener('click', fetchEmployees);
-
-  document.getElementById('confirmCancelBtn').addEventListener('click', closeConfirmModal);
-  document.getElementById('confirmOkBtn').addEventListener('click', async () => {
-    const id = pendingDeleteId;
-    closeConfirmModal();
-    if (id) await deleteEmployee(id);
-  });
-
-  document.getElementById('confirmModal').addEventListener('click', (evt) => {
-    if (evt.target.id === 'confirmModal') closeConfirmModal();
-  });
-}
-
 async function init() {
   registerEventListeners();
 
@@ -1115,7 +1792,6 @@ async function init() {
     return;
   }
 
-  // Restore an existing session on page load, if any.
   const { data: { session } } = await supabaseClient.auth.getSession();
   if (session) {
     showAppShell(session);
@@ -1123,7 +1799,6 @@ async function init() {
     showLoginScreen();
   }
 
-  // Keep the UI in sync with sign-in / sign-out events (including from other tabs).
   supabaseClient.auth.onAuthStateChange((event, session) => {
     if (event === 'SIGNED_IN' && session) {
       showAppShell(session);
