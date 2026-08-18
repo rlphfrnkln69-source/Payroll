@@ -111,7 +111,6 @@
         SIDEBAR NAVIGATION (Dark Slate Theme)
   ========================================================= -->
   <aside class="w-64 bg-slate-900 text-slate-300 flex flex-col shrink-0 border-r border-slate-800 select-none">
-    <!-- Brand / Header -->
     <div class="p-5 border-b border-slate-800 flex items-center gap-3">
       <div class="w-9 h-9 rounded-lg bg-amber-500/15 border border-amber-500/30 flex items-center justify-center text-amber-400 font-bold text-base">
         K
@@ -122,9 +121,7 @@
       </div>
     </div>
 
-    <!-- Navigation Menu -->
     <nav class="flex-1 px-3 py-4 space-y-6 overflow-y-auto text-sm">
-      <!-- Main Overview -->
       <div class="space-y-1">
         <button data-target="dashboard" class="nav-btn w-full flex items-center justify-between px-3 py-2 rounded-lg text-slate-300 hover:bg-slate-800 hover:text-white transition-colors">
           <span class="flex items-center gap-2.5 font-medium">
@@ -134,7 +131,6 @@
         </button>
       </div>
 
-      <!-- Workforce Management Section -->
       <div class="space-y-1">
         <div class="px-3 text-[10px] font-semibold uppercase tracking-wider text-slate-500 mb-1">Workforce Management</div>
         
@@ -169,7 +165,6 @@
         </button>
       </div>
 
-      <!-- Payroll Section -->
       <div class="space-y-1">
         <div class="px-3 text-[10px] font-semibold uppercase tracking-wider text-slate-500 mb-1">Payroll &amp; Compensation</div>
         
@@ -181,7 +176,6 @@
         </button>
       </div>
 
-      <!-- Employee Records Section -->
       <div class="space-y-1">
         <div class="px-3 text-[10px] font-semibold uppercase tracking-wider text-slate-500 mb-1">Employee Records</div>
         
@@ -194,7 +188,6 @@
       </div>
     </nav>
 
-    <!-- Sidebar Footer / Admin Info -->
     <div class="p-4 border-t border-slate-800 flex items-center justify-between">
       <div class="truncate">
         <p id="sidebarAdminEmail" class="text-xs font-medium text-slate-300 truncate">admin@company.com</p>
@@ -213,7 +206,6 @@
         MAIN CONTENT AREA
   ========================================================= -->
   <div class="flex-1 flex flex-col min-w-0 overflow-y-auto">
-    <!-- Top Header Bar -->
     <header class="border-b border-slate-200 bg-white/95 backdrop-blur sticky top-0 z-30 px-6 py-4 flex items-center justify-between">
       <div class="flex items-center gap-3">
         <h2 id="pageTitle" class="text-lg font-semibold text-slate-900 tracking-tight">Dashboard Overview</h2>
@@ -234,9 +226,6 @@
 
     <main class="max-w-7xl w-full mx-auto px-6 py-6 space-y-8 flex-1">
 
-      <!-- =========================================================
-            CREDENTIAL WARNING
-      ========================================================= -->
       <div id="credentialWarning" class="hidden rounded-xl border border-amber-500/40 bg-amber-500/10 px-4 py-3 text-sm text-amber-700">
         <strong class="font-semibold">Supabase not configured.</strong>
         Replace <code class="bg-slate-100 px-1 py-0.5 rounded text-amber-700">SUPABASE_URL</code> and
@@ -413,7 +402,6 @@
           </div>
         </div>
 
-        <!-- KPI Cards -->
         <div class="grid grid-cols-2 md:grid-cols-5 gap-4">
           <div class="rounded-xl border border-slate-300 bg-slate-50 p-4">
             <p class="text-xs text-slate-500 mb-1">Total OT Requests</p>
@@ -437,7 +425,6 @@
           </div>
         </div>
 
-        <!-- Filter & Search Toolbar -->
         <div class="rounded-xl border border-slate-300 bg-slate-50 p-4 flex flex-wrap gap-3 items-center justify-between">
           <div class="flex flex-wrap items-center gap-3 flex-1">
             <div class="flex flex-col gap-1">
@@ -469,7 +456,6 @@
           </div>
         </div>
 
-        <!-- Overtime Requests Queue Table -->
         <div class="rounded-xl border border-slate-300 bg-slate-50 overflow-hidden">
           <div class="px-5 py-4 border-b border-slate-300 flex items-center justify-between">
             <h4 class="text-base font-semibold text-slate-900">Overtime Requests Queue</h4>
@@ -496,28 +482,60 @@
       </section>
 
       <!-- =========================================================
-            MODULE: LEAVE MANAGEMENT
+            MODULE: LEAVE MANAGEMENT (APPROVAL CENTER)
       ========================================================= -->
       <section id="moduleLeave" class="hidden space-y-6">
         <div class="flex items-center justify-between">
           <div>
-            <h3 class="text-base font-semibold text-slate-900">Leave Applications &amp; Monitoring</h3>
-            <p class="text-xs text-slate-500 mt-0.5">Manage vacation, sick, and statutory leave requests with automatic attendance integration.</p>
+            <h3 class="text-base font-semibold text-slate-900">Leave Approval Center</h3>
+            <p class="text-xs text-slate-500 mt-0.5">Review, approve, or reject employee leave applications, monitor leave balances, and track approved leaves.</p>
+          </div>
+          <button id="openLeaveBalancesBtn" class="text-xs bg-slate-900 text-white font-medium px-4 py-2 rounded-lg hover:bg-slate-800 transition-colors">
+            📊 View Employee Leave Balances
+          </button>
+        </div>
+
+        <!-- KPI Cards -->
+        <div class="grid grid-cols-2 md:grid-cols-5 gap-4">
+          <div class="rounded-xl border border-slate-300 bg-slate-50 p-4">
+            <p class="text-xs text-slate-500 mb-1">Total Leave Requests</p>
+            <p id="kpiTotalLeave" class="text-2xl font-semibold text-slate-900 font-mono-tabular">0</p>
+          </div>
+          <div class="rounded-xl border border-slate-300 bg-slate-50 p-4">
+            <p class="text-xs text-slate-500 mb-1">Pending Requests</p>
+            <p id="kpiPendingLeave" class="text-2xl font-semibold text-amber-700 font-mono-tabular">0</p>
+          </div>
+          <div class="rounded-xl border border-slate-300 bg-slate-50 p-4">
+            <p class="text-xs text-slate-500 mb-1">Approved Requests</p>
+            <p id="kpiApprovedLeave" class="text-2xl font-semibold text-emerald-700 font-mono-tabular">0</p>
+          </div>
+          <div class="rounded-xl border border-slate-300 bg-slate-50 p-4">
+            <p class="text-xs text-slate-500 mb-1">Rejected / Cancelled</p>
+            <p id="kpiRejectedLeave" class="text-2xl font-semibold text-rose-700 font-mono-tabular">0</p>
+          </div>
+          <div class="rounded-xl border border-slate-300 bg-slate-50 p-4 col-span-2 md:col-span-1">
+            <p class="text-xs text-slate-500 mb-1">Total Approved Days</p>
+            <p id="kpiTotalApprovedDays" class="text-2xl font-semibold text-slate-900 font-mono-tabular">0 days</p>
           </div>
         </div>
 
-        <div class="rounded-xl border border-slate-300 bg-slate-50 p-5">
-          <h4 class="text-sm font-semibold text-slate-900 mb-3">File Leave Application</h4>
-          <form id="leaveForm" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4" novalidate>
+        <!-- Filter & Search Toolbar -->
+        <div class="rounded-xl border border-slate-300 bg-slate-50 p-4 flex flex-wrap gap-3 items-center justify-between">
+          <div class="flex flex-wrap items-center gap-3 flex-1">
             <div class="flex flex-col gap-1">
-              <label class="text-xs font-medium text-slate-500">Employee</label>
-              <select id="leaveEmployeeId" required class="bg-white border border-slate-300 rounded-lg px-3 py-2 text-sm text-slate-900 focus:outline-none focus:ring-2 focus:ring-amber-500/65">
-                <option value="">Select Employee...</option>
+              <label class="text-[10px] font-medium text-slate-500 uppercase">Search Employee</label>
+              <input id="leaveSearchInput" type="text" placeholder="Search name..." class="bg-white border border-slate-300 rounded-lg px-3 py-1.5 text-xs text-slate-900 focus:outline-none focus:ring-2 focus:ring-amber-500/65" />
+            </div>
+            <div class="flex flex-col gap-1">
+              <label class="text-[10px] font-medium text-slate-500 uppercase">Department</label>
+              <select id="leaveFilterDept" class="bg-white border border-slate-300 rounded-lg px-3 py-1.5 text-xs text-slate-900 focus:outline-none focus:ring-2 focus:ring-amber-500/65">
+                <option value="">All Departments</option>
               </select>
             </div>
             <div class="flex flex-col gap-1">
-              <label class="text-xs font-medium text-slate-500">Leave Type</label>
-              <select id="leaveType" class="bg-white border border-slate-300 rounded-lg px-3 py-2 text-sm text-slate-900 focus:outline-none focus:ring-2 focus:ring-amber-500/65">
+              <label class="text-[10px] font-medium text-slate-500 uppercase">Leave Type</label>
+              <select id="leaveFilterType" class="bg-white border border-slate-300 rounded-lg px-3 py-1.5 text-xs text-slate-900 focus:outline-none focus:ring-2 focus:ring-amber-500/65">
+                <option value="">All Leave Types</option>
                 <option value="Vacation Leave">Vacation Leave</option>
                 <option value="Sick Leave">Sick Leave</option>
                 <option value="Service Incentive Leave">Service Incentive Leave</option>
@@ -529,43 +547,64 @@
               </select>
             </div>
             <div class="flex flex-col gap-1">
-              <label class="text-xs font-medium text-slate-500">Start Date</label>
-              <input id="leaveStartDate" type="date" required class="bg-white border border-slate-300 rounded-lg px-3 py-2 text-sm text-slate-900 focus:outline-none focus:ring-2 focus:ring-amber-500/65" />
+              <label class="text-[10px] font-medium text-slate-500 uppercase">Status</label>
+              <select id="leaveFilterStatus" class="bg-white border border-slate-300 rounded-lg px-3 py-1.5 text-xs text-slate-900 focus:outline-none focus:ring-2 focus:ring-amber-500/65">
+                <option value="">All Statuses</option>
+                <option value="Pending">Pending</option>
+                <option value="Approved">Approved</option>
+                <option value="Rejected">Rejected</option>
+                <option value="Cancelled">Cancelled</option>
+              </select>
             </div>
             <div class="flex flex-col gap-1">
-              <label class="text-xs font-medium text-slate-500">End Date</label>
-              <input id="leaveEndDate" type="date" required class="bg-white border border-slate-300 rounded-lg px-3 py-2 text-sm text-slate-900 focus:outline-none focus:ring-2 focus:ring-amber-500/65" />
+              <label class="text-[10px] font-medium text-slate-500 uppercase">Month</label>
+              <input id="leaveFilterMonth" type="month" class="bg-white border border-slate-300 rounded-lg px-2.5 py-1 text-xs text-slate-900 focus:outline-none focus:ring-2 focus:ring-amber-500/65" />
             </div>
-            <div class="lg:col-span-3 flex flex-col gap-1">
-              <label class="text-xs font-medium text-slate-500">Reason</label>
-              <input id="leaveReason" type="text" placeholder="Medical checkup / Vacation trip" class="bg-white border border-slate-300 rounded-lg px-3 py-2 text-sm text-slate-900 focus:outline-none focus:ring-2 focus:ring-amber-500/65" />
-            </div>
-            <div class="flex items-end justify-end">
-              <button type="submit" class="w-full bg-amber-500 hover:bg-amber-400 text-slate-900 font-semibold text-sm px-5 py-2.5 rounded-lg transition-colors">
-                File Application
-              </button>
-            </div>
-          </form>
+          </div>
+          <div class="flex items-end gap-2">
+            <button id="leaveResetFiltersBtn" class="text-xs px-3 py-1.5 rounded-lg border border-slate-300 text-slate-600 hover:bg-slate-100 transition-colors">Reset Filters</button>
+          </div>
         </div>
 
+        <!-- Leave Applications Queue Table -->
         <div class="rounded-xl border border-slate-300 bg-slate-50 overflow-hidden">
           <div class="px-5 py-4 border-b border-slate-300 flex items-center justify-between">
             <h4 class="text-base font-semibold text-slate-900">Leave Applications Queue</h4>
           </div>
           <div class="overflow-x-auto">
-            <table class="w-full text-sm border-collapse min-w-[900px]">
+            <table class="w-full text-sm border-collapse min-w-[1100px]">
               <thead>
                 <tr class="bg-slate-100 text-slate-500 text-xs uppercase tracking-wide">
-                  <th class="text-left px-4 py-3 border-b border-slate-300">Employee</th>
+                  <th class="text-left px-4 py-3 border-b border-slate-300">Employee Name</th>
+                  <th class="text-left px-4 py-3 border-b border-slate-300">Department / Position</th>
                   <th class="text-left px-4 py-3 border-b border-slate-300">Leave Type</th>
                   <th class="text-left px-4 py-3 border-b border-slate-300">Date Range</th>
+                  <th class="text-right px-4 py-3 border-b border-slate-300">Days</th>
                   <th class="text-left px-4 py-3 border-b border-slate-300">Reason</th>
-                  <th class="text-left px-4 py-3 border-b border-slate-300">Status</th>
+                  <th class="text-left px-4 py-3 border-b border-slate-300">Date Filed</th>
+                  <th class="text-left px-4 py-3 border-b border-slate-300">Current Status</th>
                   <th class="text-center px-4 py-3 border-b border-slate-300">Actions</th>
                 </tr>
               </thead>
               <tbody id="leaveTableBody" class="divide-y divide-slate-200"></tbody>
             </table>
+          </div>
+        </div>
+
+        <!-- Optional Approved Leave Calendar View -->
+        <div class="rounded-xl border border-slate-300 bg-slate-50 p-5 space-y-4">
+          <div class="flex items-center justify-between border-b border-slate-200 pb-3">
+            <div>
+              <h4 class="text-base font-semibold text-slate-900">Approved Leave Calendar</h4>
+              <p class="text-xs text-slate-500 mt-0.5">Overview of approved employee absences by date.</p>
+            </div>
+            <div class="flex items-center gap-2">
+              <label class="text-xs font-medium text-slate-600">Filter Month:</label>
+              <input id="calendarMonthPicker" type="month" class="bg-white border border-slate-300 rounded-md px-3 py-1 text-xs text-slate-900 focus:outline-none focus:ring-2 focus:ring-amber-500/65" />
+            </div>
+          </div>
+          <div id="leaveCalendarContainer" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
+            <!-- Populated dynamically -->
           </div>
         </div>
       </section>
@@ -574,7 +613,6 @@
             MODULE: PAYROLL MANAGEMENT
       ========================================================= -->
       <section id="modulePayroll" class="hidden space-y-8">
-        <!-- Summary Cards -->
         <section>
           <h3 class="text-sm font-semibold uppercase tracking-wider text-slate-500 mb-3">Payroll Overview</h3>
           <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3">
@@ -605,7 +643,6 @@
           </div>
         </section>
 
-        <!-- Employee Registration Form -->
         <section class="rounded-xl border border-slate-300 bg-slate-50">
           <div class="px-5 py-4 border-b border-slate-300">
             <h3 class="text-base font-semibold text-slate-900">Add Employee</h3>
@@ -689,7 +726,6 @@
           </form>
         </section>
 
-        <!-- Employee Roster -->
         <section class="rounded-xl border border-slate-300 bg-slate-50">
           <div class="px-5 py-4 border-b border-slate-300 flex items-center justify-between">
             <div>
@@ -780,6 +816,41 @@
       </section>
 
     </main>
+  </div>
+</div>
+
+<!-- =========================================================
+     EMPLOYEE LEAVE BALANCES MODAL
+========================================================= -->
+<div id="leaveBalancesModal" class="hidden fixed inset-0 z-50 items-center justify-center bg-black/60 px-4">
+  <div class="bg-white border border-slate-300 rounded-xl max-w-4xl w-full max-h-[85vh] flex flex-col p-6 space-y-4 overflow-hidden shadow-2xl">
+    <div class="flex items-center justify-between border-b border-slate-200 pb-3">
+      <div>
+        <h3 class="text-slate-900 font-semibold text-lg">Employee Leave Balances</h3>
+        <p class="text-xs text-slate-500">Remaining leave credits per employee.</p>
+      </div>
+      <button id="closeLeaveBalancesModalBtn" class="text-slate-400 hover:text-slate-700 p-1 font-bold text-lg">✕</button>
+    </div>
+
+    <div class="flex-1 overflow-y-auto border border-slate-200 rounded-lg">
+      <table class="w-full text-sm border-collapse">
+        <thead>
+          <tr class="bg-slate-100 text-slate-600 text-xs uppercase tracking-wide sticky top-0 z-10">
+            <th class="text-left px-4 py-2.5 border-b border-slate-200">Employee Name</th>
+            <th class="text-left px-4 py-2.5 border-b border-slate-200">Department</th>
+            <th class="text-right px-4 py-2.5 border-b border-slate-200">Vacation Leave</th>
+            <th class="text-right px-4 py-2.5 border-b border-slate-200">Sick Leave</th>
+            <th class="text-right px-4 py-2.5 border-b border-slate-200">Service Incentive</th>
+            <th class="text-right px-4 py-2.5 border-b border-slate-200">Emergency Leave</th>
+          </tr>
+        </thead>
+        <tbody id="leaveBalancesTableBody" class="divide-y divide-slate-200"></tbody>
+      </table>
+    </div>
+
+    <div class="flex justify-end pt-2 border-t border-slate-200">
+      <button id="closeLeaveBalancesBtn" class="px-4 py-2 text-sm rounded-lg border border-slate-300 text-slate-600 hover:bg-slate-100 transition-colors">Close</button>
+    </div>
   </div>
 </div>
 
@@ -887,7 +958,6 @@ let inactiveEmployeesCache = [];
 let schedulesCache = {};
 let attendanceCache = [];
 let overtimeCache = [
-  // Sample initial records to populate the Overtime Approval Center
   {
     id: 'ot_1',
     employee_id: '',
@@ -913,7 +983,36 @@ let overtimeCache = [
     action_timestamp: '2026-08-11 15:20'
   }
 ];
-let leaveCache = [];
+
+let leaveCache = [
+  {
+    id: 'leave_1',
+    employee_id: '',
+    leave_type: 'Vacation Leave',
+    start_date: '2026-08-20',
+    end_date: '2026-08-22',
+    days: 3,
+    reason: 'Family vacation trip',
+    date_filed: '2026-08-10 10:00',
+    status: 'Pending',
+    action_timestamp: null
+  },
+  {
+    id: 'leave_2',
+    employee_id: '',
+    leave_type: 'Sick Leave',
+    start_date: '2026-08-05',
+    end_date: '2026-08-05',
+    days: 1,
+    reason: 'Medical checkup and flu',
+    date_filed: '2026-08-04 08:30',
+    status: 'Approved',
+    action_timestamp: '2026-08-04 09:15'
+  }
+];
+
+// Employee leave balances cache: employee_id -> { 'Vacation Leave': 12, 'Sick Leave': 10, 'Service Incentive Leave': 5, 'Emergency Leave': 3 }
+let leaveBalancesCache = {};
 
 let pendingSeparationId = null;
 let currentScheduleEmployeeId = null;
@@ -973,13 +1072,27 @@ function formatDate(dateStr) {
 
 function setDefaultDates() {
   const todayStr = new Date().toISOString().split('T')[0];
-  const dateInputs = ['attDate', 'leaveStartDate', 'leaveEndDate', 'hireDate', 'sepDate'];
+  const dateInputs = ['attDate', 'hireDate', 'sepDate'];
   dateInputs.forEach(id => {
     const el = document.getElementById(id);
     if (el && !el.value) {
       el.value = todayStr;
     }
   });
+
+  const calendarPicker = document.getElementById('calendarMonthPicker');
+  if (calendarPicker && !calendarPicker.value) {
+    calendarPicker.value = todayStr.slice(0, 7);
+  }
+}
+
+function calculateDateDiffDays(startDateStr, endDateStr) {
+  const start = new Date(startDateStr + 'T00:00:00');
+  const end = new Date(endDateStr + 'T00:00:00');
+  if (isNaN(start.getTime()) || isNaN(end.getTime())) return 1;
+  const diffTime = end - start;
+  const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24)) + 1;
+  return Math.max(1, diffDays);
 }
 
 /* =========================================================
@@ -1154,7 +1267,7 @@ function switchModule(targetId) {
     schedule: 'Schedule Management',
     attendance: 'Attendance Management',
     overtime: 'Overtime Approval Center',
-    leave: 'Leave Management',
+    leave: 'Leave Approval Center',
     payroll: 'Payroll Management',
     inactive: 'Inactive Employee Records'
   };
@@ -1165,6 +1278,9 @@ function switchModule(targetId) {
   }
   if (targetId === 'overtime') {
     renderOvertimeCenter();
+  }
+  if (targetId === 'leave') {
+    renderLeaveCenter();
   }
 }
 
@@ -1190,11 +1306,28 @@ async function fetchEmployees() {
     activeEmployeesCache = allEmps.filter(e => !e.is_inactive);
     inactiveEmployeesCache = allEmps.filter(e => e.is_inactive);
 
-    // Bind sample OT requests to active employees if employee_id is empty
+    // Initialize leave balances & bind sample requests to active employees if empty
+    activeEmployeesCache.forEach(emp => {
+      if (!leaveBalancesCache[emp.id]) {
+        leaveBalancesCache[emp.id] = {
+          'Vacation Leave': 15,
+          'Sick Leave': 12,
+          'Service Incentive Leave': 5,
+          'Emergency Leave': 3
+        };
+      }
+    });
+
     if (activeEmployeesCache.length > 0) {
       overtimeCache.forEach((ot, idx) => {
         if (!ot.employee_id) {
           ot.employee_id = activeEmployeesCache[idx % activeEmployeesCache.length].id;
+        }
+      });
+      leaveCache.forEach((lv, idx) => {
+        if (!lv.employee_id) {
+          lv.employee_id = activeEmployeesCache[idx % activeEmployeesCache.length].id;
+          lv.days = calculateDateDiffDays(lv.start_date, lv.end_date);
         }
       });
     }
@@ -1204,12 +1337,16 @@ async function fetchEmployees() {
     updateInactiveModule();
     populateEmployeeDropdowns();
     populateOvertimeFilters();
+    populateLeaveFilters();
 
     if (!document.getElementById('moduleSchedule').classList.contains('hidden')) {
       renderScheduleEmployeeList();
     }
     if (!document.getElementById('moduleOvertime').classList.contains('hidden')) {
       renderOvertimeCenter();
+    }
+    if (!document.getElementById('moduleLeave').classList.contains('hidden')) {
+      renderLeaveCenter();
     }
   } catch (err) {
     console.error('fetchEmployees error:', err);
@@ -1255,6 +1392,8 @@ function updateDashboardOverview() {
   const badgeLeave = document.getElementById('badgeLeave');
   if (pendingLeaveCount > 0) {
     badgeLeave.textContent = pendingLeaveCount;
+    badgeLeave.classList.add('hidden'); // wait, let's show badge
+    badgeLeave.textContent = pendingLeaveCount;
     badgeLeave.classList.remove('hidden');
   } else {
     badgeLeave.classList.add('hidden');
@@ -1284,7 +1423,6 @@ function renderOvertimeCenter() {
   const filterStatus = document.getElementById('otFilterStatus').value;
   const filterMonth = document.getElementById('otFilterMonth').value;
 
-  // Filter requests
   const filtered = overtimeCache.filter(o => {
     const emp = activeEmployeesCache.find(e => e.id === o.employee_id) || {};
     const fullName = `${emp.first_name || ''} ${emp.last_name || ''}`.toLowerCase();
@@ -1297,7 +1435,6 @@ function renderOvertimeCenter() {
     return true;
   });
 
-  // Calculate KPIs based on the entire overtimeCache (or filtered? Usually KPIs reflect the system or filtered view; let's reflect system-wide or filtered. Let's do system-wide as standard for summary cards, but total approved hours can sum approved requests).
   const totalRequests = overtimeCache.length;
   const pendingCount = overtimeCache.filter(o => o.status === 'Pending').length;
   const approvedCount = overtimeCache.filter(o => o.status === 'Approved').length;
@@ -1316,7 +1453,6 @@ function renderOvertimeCenter() {
   document.getElementById('kpiRejectedOt').textContent = rejectedCount;
   document.getElementById('kpiTotalApprovedHours').textContent = totalApprovedHours.toFixed(1) + ' hrs';
 
-  // Render Table
   if (filtered.length === 0) {
     tbody.innerHTML = `<tr><td colspan="9" class="px-4 py-8 text-center text-slate-400">No overtime requests match your filter criteria.</td></tr>`;
     return;
@@ -1371,6 +1507,208 @@ function handleOtApproval(id, newStatus) {
   updateDashboardOverview();
 
   showToast(`Overtime request successfully ${newStatus.toLowerCase()}.`, newStatus === 'Approved' ? 'success' : 'warning');
+}
+
+/* =========================================================
+   LEAVE APPROVAL CENTER MODULE (ENHANCED)
+========================================================= */
+function populateLeaveFilters() {
+  const deptSelect = document.getElementById('leaveFilterDept');
+  if (!deptSelect) return;
+
+  const departments = [...new Set(activeEmployeesCache.map(e => e.department).filter(Boolean))];
+  const currentVal = deptSelect.value;
+  deptSelect.innerHTML = '<option value="">All Departments</option>' +
+    departments.map(d => `<option value="${escapeHtml(d)}">${escapeHtml(d)}</option>`).join('');
+  deptSelect.value = currentVal;
+}
+
+function renderLeaveCenter() {
+  const tbody = document.getElementById('leaveTableBody');
+  if (!tbody) return;
+
+  const searchInput = document.getElementById('leaveSearchInput').value.toLowerCase().trim();
+  const filterDept = document.getElementById('leaveFilterDept').value;
+  const filterType = document.getElementById('leaveFilterType').value;
+  const filterStatus = document.getElementById('leaveFilterStatus').value;
+  const filterMonth = document.getElementById('leaveFilterMonth').value;
+
+  const filtered = leaveCache.filter(l => {
+    const emp = activeEmployeesCache.find(e => e.id === l.employee_id) || {};
+    const fullName = `${emp.first_name || ''} ${emp.last_name || ''}`.toLowerCase();
+    
+    if (searchInput && !fullName.includes(searchInput)) return false;
+    if (filterDept && emp.department !== filterDept) return false;
+    if (filterType && l.leave_type !== filterType) return false;
+    if (filterStatus && l.status !== filterStatus) return false;
+    if (filterMonth && !l.start_date.startsWith(filterMonth) && !l.end_date.startsWith(filterMonth)) return false;
+
+    return true;
+  });
+
+  // Calculate KPIs
+  const totalRequests = leaveCache.length;
+  const pendingCount = leaveCache.filter(l => l.status === 'Pending').length;
+  const approvedCount = leaveCache.filter(l => l.status === 'Approved').length;
+  const rejectedCount = leaveCache.filter(l => l.status === 'Rejected' || l.status === 'Cancelled').length;
+  
+  let totalApprovedDays = 0;
+  leaveCache.forEach(l => {
+    if (l.status === 'Approved') {
+      totalApprovedDays += Number(l.days) || calculateDateDiffDays(l.start_date, l.end_date);
+    }
+  });
+
+  document.getElementById('kpiTotalLeave').textContent = totalRequests;
+  document.getElementById('kpiPendingLeave').textContent = pendingCount;
+  document.getElementById('kpiApprovedLeave').textContent = approvedCount;
+  document.getElementById('kpiRejectedLeave').textContent = rejectedCount;
+  document.getElementById('kpiTotalApprovedDays').textContent = totalApprovedDays + ' days';
+
+  // Render Table
+  if (filtered.length === 0) {
+    tbody.innerHTML = `<tr><td colspan="9" class="px-4 py-8 text-center text-slate-400">No leave applications match your filter criteria.</td></tr>`;
+  } else {
+    tbody.innerHTML = filtered.map(l => {
+      const emp = activeEmployeesCache.find(e => e.id === l.employee_id) || {};
+      const empName = `${emp.first_name || ''} ${emp.last_name || ''}`.trim() || 'Unknown Employee';
+      const deptTitle = `${emp.department || '—'} / ${emp.job_title || '—'}`;
+      const numDays = l.days || calculateDateDiffDays(l.start_date, l.end_date);
+
+      let statusBadge = '<span class="text-xs px-2.5 py-1 rounded-full border bg-amber-500/15 text-amber-700 border-amber-500/30 font-medium">Pending</span>';
+      if (l.status === 'Approved') {
+        statusBadge = `<span class="text-xs px-2.5 py-1 rounded-full border bg-emerald-500/15 text-emerald-700 border-emerald-500/30 font-medium">Approved</span>
+                       <div class="text-[10px] text-slate-400 mt-0.5 font-mono">${l.action_timestamp || ''}</div>`;
+      } else if (l.status === 'Rejected') {
+        statusBadge = `<span class="text-xs px-2.5 py-1 rounded-full border bg-rose-500/15 text-rose-700 border-rose-500/30 font-medium">Rejected</span>
+                       <div class="text-[10px] text-slate-400 mt-0.5 font-mono">${l.action_timestamp || ''}</div>`;
+      } else if (l.status === 'Cancelled') {
+        statusBadge = `<span class="text-xs px-2.5 py-1 rounded-full border bg-slate-200 text-slate-700 border-slate-300 font-medium">Cancelled</span>
+                       <div class="text-[10px] text-slate-400 mt-0.5 font-mono">${l.action_timestamp || ''}</div>`;
+      }
+
+      return `
+        <tr class="hover:bg-slate-50 transition-colors">
+          <td class="px-4 py-3 font-medium text-slate-900">${escapeHtml(empName)}</td>
+          <td class="px-4 py-3 text-slate-600 text-xs">${escapeHtml(deptTitle)}</td>
+          <td class="px-4 py-3 text-slate-700 font-medium">${escapeHtml(l.leave_type)}</td>
+          <td class="px-4 py-3 text-slate-600 whitespace-nowrap">${formatDate(l.start_date)} to ${formatDate(l.end_date)}</td>
+          <td class="px-4 py-3 text-right font-mono-tabular text-slate-900 font-semibold">${numDays} d</td>
+          <td class="px-4 py-3 text-xs text-slate-600">${escapeHtml(l.reason)}</td>
+          <td class="px-4 py-3 text-xs text-slate-500 font-mono whitespace-nowrap">${escapeHtml(l.date_filed || '—')}</td>
+          <td class="px-4 py-3">${statusBadge}</td>
+          <td class="px-4 py-3 text-center whitespace-nowrap">
+            ${l.status === 'Pending' ? `
+              <button onclick="handleLeaveApproval('${l.id}', 'Approved')" class="text-xs px-2.5 py-1 rounded-lg bg-emerald-600 text-white hover:bg-emerald-500 font-medium shadow-sm transition-colors mr-1">Approve</button>
+              <button onclick="handleLeaveApproval('${l.id}', 'Rejected')" class="text-xs px-2.5 py-1 rounded-lg bg-rose-600 text-white hover:bg-rose-500 font-medium shadow-sm transition-colors mr-1">Reject</button>
+              <button onclick="handleLeaveApproval('${l.id}', 'Cancelled')" class="text-xs px-2 py-1 rounded-lg border border-slate-300 text-slate-600 hover:bg-slate-100 font-medium transition-colors">Cancel</button>
+            ` : l.status === 'Approved' ? `
+              <button onclick="handleLeaveApproval('${l.id}', 'Cancelled')" class="text-xs px-2.5 py-1 rounded-lg border border-amber-300 text-amber-700 hover:bg-amber-50 font-medium transition-colors">Cancel Leave</button>
+            ` : `<span class="text-xs text-slate-400 italic">Locked</span>`}
+          </td>
+        </tr>
+      `;
+    }).join('');
+  }
+
+  renderLeaveCalendar();
+}
+
+function handleLeaveApproval(id, newStatus) {
+  const req = leaveCache.find(l => l.id === id);
+  if (!req) return;
+
+  const now = new Date();
+  const timestampStr = now.toISOString().replace('T', ' ').substring(0, 16);
+  const numDays = req.days || calculateDateDiffDays(req.start_date, req.end_date);
+  const empId = req.employee_id;
+  const leaveType = req.leave_type;
+
+  // Handle Leave Balance updates
+  if (empId && leaveBalancesCache[empId]) {
+    if (req.status === 'Pending' && newStatus === 'Approved') {
+      // Deduct balance
+      if (leaveBalancesCache[empId][leaveType] !== undefined) {
+        leaveBalancesCache[empId][leaveType] = Math.max(0, leaveBalancesCache[empId][leaveType] - numDays);
+      }
+    } else if (req.status === 'Approved' && (newStatus === 'Cancelled' || newStatus === 'Rejected')) {
+      // Restore balance
+      if (leaveBalancesCache[empId][leaveType] !== undefined) {
+        leaveBalancesCache[empId][leaveType] += numDays;
+      }
+    }
+  }
+
+  req.status = newStatus;
+  req.action_timestamp = timestampStr;
+
+  renderLeaveCenter();
+  updateDashboardOverview();
+
+  showToast(`Leave application successfully ${newStatus.toLowerCase()}.`, newStatus === 'Approved' ? 'success' : 'warning');
+}
+
+function renderLeaveCalendar() {
+  const container = document.getElementById('leaveCalendarContainer');
+  if (!container) return;
+
+  const monthPickerVal = document.getElementById('calendarMonthPicker').value || new Date().toISOString().slice(0, 7);
+
+  const approvedLeaves = leaveCache.filter(l => l.status === 'Approved' && (l.start_date.startsWith(monthPickerVal) || l.end_date.startsWith(monthPickerVal)));
+
+  if (approvedLeaves.length === 0) {
+    container.innerHTML = `<div class="col-span-full py-6 text-center text-slate-400 text-xs">No approved leaves scheduled for ${monthPickerVal}.</div>`;
+    return;
+  }
+
+  container.innerHTML = approvedLeaves.map(l => {
+    const emp = activeEmployeesCache.find(e => e.id === l.employee_id) || {};
+    const empName = `${emp.first_name || ''} ${emp.last_name || ''}`.trim() || 'Unknown Employee';
+    return `
+      <div class="border border-emerald-500/30 bg-emerald-500/5 rounded-lg p-3 space-y-1">
+        <div class="flex items-center justify-between">
+          <span class="text-xs font-semibold text-slate-900">${escapeHtml(empName)}</span>
+          <span class="text-[10px] bg-emerald-500/20 text-emerald-800 px-2 py-0.5 rounded-full font-medium">${escapeHtml(l.leave_type)}</span>
+        </div>
+        <div class="text-xs text-slate-600 font-mono">📅 ${formatDate(l.start_date)} to ${formatDate(l.end_date)}</div>
+        <div class="text-[11px] text-slate-500 truncate">Reason: ${escapeHtml(l.reason)}</div>
+      </div>
+    `;
+  }).join('');
+}
+
+function openLeaveBalancesModal() {
+  const tbody = document.getElementById('leaveBalancesTableBody');
+  if (!tbody) return;
+
+  if (activeEmployeesCache.length === 0) {
+    tbody.innerHTML = `<tr><td colspan="6" class="px-4 py-8 text-center text-slate-400">No active employees found.</td></tr>`;
+  } else {
+    tbody.innerHTML = activeEmployeesCache.map(emp => {
+      const balances = leaveBalancesCache[emp.id] || { 'Vacation Leave': 15, 'Sick Leave': 12, 'Service Incentive Leave': 5, 'Emergency Leave': 3 };
+      const fullName = `${emp.first_name || ''} ${emp.last_name || ''}`.trim();
+      return `
+        <tr class="hover:bg-slate-50 transition-colors">
+          <td class="px-4 py-3 font-medium text-slate-900">${escapeHtml(fullName)}</td>
+          <td class="px-4 py-3 text-slate-600 text-xs">${escapeHtml(emp.department)}</td>
+          <td class="px-4 py-3 text-right font-mono-tabular text-slate-800 font-semibold">${balances['Vacation Leave'] || 0} d</td>
+          <td class="px-4 py-3 text-right font-mono-tabular text-slate-800 font-semibold">${balances['Sick Leave'] || 0} d</td>
+          <td class="px-4 py-3 text-right font-mono-tabular text-slate-800 font-semibold">${balances['Service Incentive Leave'] || 0} d</td>
+          <td class="px-4 py-3 text-right font-mono-tabular text-slate-800 font-semibold">${balances['Emergency Leave'] || 0} d</td>
+        </tr>
+      `;
+    }).join('');
+  }
+
+  const modal = document.getElementById('leaveBalancesModal');
+  modal.classList.remove('hidden');
+  modal.classList.add('flex');
+}
+
+function closeLeaveBalancesModal() {
+  const modal = document.getElementById('leaveBalancesModal');
+  modal.classList.add('hidden');
+  modal.classList.remove('flex');
 }
 
 /* =========================================================
@@ -1656,52 +1994,6 @@ function deleteAttendance(id) {
 }
 
 /* =========================================================
-   LEAVE MANAGEMENT MODULE
-========================================================= */
-function renderLeave() {
-  const tbody = document.getElementById('leaveTableBody');
-  if (!tbody) return;
-  if (leaveCache.length === 0) {
-    tbody.innerHTML = `<tr><td colspan="6" class="px-4 py-8 text-center text-slate-400">No leave applications filed.</td></tr>`;
-    return;
-  }
-
-  tbody.innerHTML = leaveCache.map(l => {
-    const emp = activeEmployeesCache.find(e => e.id === l.employee_id) || {};
-    const empName = `${emp.first_name || ''} ${emp.last_name || ''}`.trim() || 'Unknown';
-    let statusClass = 'bg-amber-500/15 text-amber-700 border-amber-500/30';
-    if (l.status === 'Approved') statusClass = 'bg-emerald-500/15 text-emerald-700 border-emerald-500/30';
-    if (l.status === 'Rejected') statusClass = 'bg-rose-500/15 text-rose-700 border-rose-500/30';
-
-    return `
-      <tr class="hover:bg-slate-100 transition-colors">
-        <td class="px-4 py-3 font-medium text-slate-900">${escapeHtml(empName)}</td>
-        <td class="px-4 py-3 text-slate-700">${escapeHtml(l.leave_type)}</td>
-        <td class="px-4 py-3 text-slate-600">${formatDate(l.start_date)} to ${formatDate(l.end_date)}</td>
-        <td class="px-4 py-3 text-xs text-slate-600">${escapeHtml(l.reason)}</td>
-        <td class="px-4 py-3"><span class="text-xs px-2 py-0.5 rounded-full border ${statusClass}">${escapeHtml(l.status)}</span></td>
-        <td class="px-4 py-3 text-center space-x-1">
-          ${l.status === 'Pending' ? `
-            <button onclick="updateLeaveStatus('${l.id}', 'Approved')" class="text-xs px-2 py-1 rounded bg-emerald-600 text-white hover:bg-emerald-500">Approve</button>
-            <button onclick="updateLeaveStatus('${l.id}', 'Rejected')" class="text-xs px-2 py-1 rounded bg-rose-600 text-white hover:bg-rose-500">Reject</button>
-          ` : `<span class="text-xs text-slate-400">Processed</span>`}
-        </td>
-      </tr>
-    `;
-  }).join('');
-}
-
-function updateLeaveStatus(id, newStatus) {
-  const req = leaveCache.find(l => l.id === id);
-  if (req) {
-    req.status = newStatus;
-    renderLeave();
-    updateDashboardOverview();
-    showToast(`Leave application ${newStatus.toLowerCase()}.`, newStatus === 'Approved' ? 'success' : 'warning');
-  }
-}
-
-/* =========================================================
    PAYROLL MANAGEMENT MODULE
 ========================================================= */
 function updatePayrollModule() {
@@ -1926,7 +2218,7 @@ async function confirmSeparation() {
    POPULATE DROPDOWNS
 ========================================================= */
 function populateEmployeeDropdowns() {
-  const selects = ['attEmployeeId', 'leaveEmployeeId'];
+  const selects = ['attEmployeeId'];
   selects.forEach(id => {
     const select = document.getElementById(id);
     if (!select) return;
@@ -1983,6 +2275,26 @@ function registerEventListeners() {
     renderOvertimeCenter();
   });
 
+  // Leave Approval Center Filters & Search & Modal
+  document.getElementById('leaveSearchInput').addEventListener('input', renderLeaveCenter);
+  document.getElementById('leaveFilterDept').addEventListener('change', renderLeaveCenter);
+  document.getElementById('leaveFilterType').addEventListener('change', renderLeaveCenter);
+  document.getElementById('leaveFilterStatus').addEventListener('change', renderLeaveCenter);
+  document.getElementById('leaveFilterMonth').addEventListener('change', renderLeaveCenter);
+  document.getElementById('calendarMonthPicker').addEventListener('change', renderLeaveCalendar);
+  document.getElementById('leaveResetFiltersBtn').addEventListener('click', () => {
+    document.getElementById('leaveSearchInput').value = '';
+    document.getElementById('leaveFilterDept').value = '';
+    document.getElementById('leaveFilterType').value = '';
+    document.getElementById('leaveFilterStatus').value = '';
+    document.getElementById('leaveFilterMonth').value = '';
+    renderLeaveCenter();
+  });
+
+  document.getElementById('openLeaveBalancesBtn').addEventListener('click', openLeaveBalancesModal);
+  document.getElementById('closeLeaveBalancesModalBtn').addEventListener('click', closeLeaveBalancesModal);
+  document.getElementById('closeLeaveBalancesBtn').addEventListener('click', closeLeaveBalancesModal);
+
   // Attendance Form
   document.getElementById('attendanceForm').addEventListener('submit', (e) => {
     e.preventDefault();
@@ -2004,27 +2316,6 @@ function registerEventListeners() {
     renderAttendance();
     updateDashboardOverview();
     showToast('Attendance record logged successfully.', 'success');
-    e.target.reset();
-  });
-
-  // Leave Form
-  document.getElementById('leaveForm').addEventListener('submit', (e) => {
-    e.preventDefault();
-    const empId = document.getElementById('leaveEmployeeId').value;
-    if (!empId) { showToast('Please select an employee.', 'warning'); return; }
-
-    leaveCache.push({
-      id: 'leave_' + Date.now(),
-      employee_id: empId,
-      leave_type: document.getElementById('leaveType').value,
-      start_date: document.getElementById('leaveStartDate').value,
-      end_date: document.getElementById('leaveEndDate').value,
-      reason: document.getElementById('leaveReason').value || 'Leave application',
-      status: 'Pending'
-    });
-    renderLeave();
-    updateDashboardOverview();
-    showToast('Leave application submitted for approval.', 'success');
     e.target.reset();
   });
 
