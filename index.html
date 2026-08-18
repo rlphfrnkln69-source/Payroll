@@ -57,6 +57,57 @@
 <div id="toastContainer" class="fixed top-4 right-4 z-50 flex flex-col gap-2 w-[92vw] max-w-sm"></div>
 
 <!-- =========================================================
+     LOGIN SCREEN (shown when no authenticated session exists)
+========================================================= -->
+<div id="loginScreen" class="min-h-screen flex items-center justify-center px-4">
+  <div class="w-full max-w-sm">
+    <div class="flex flex-col items-center mb-6">
+      <div class="w-12 h-12 rounded-lg bg-amber-500/10 border border-amber-500/30 flex items-center justify-center text-amber-500 font-bold text-xl mb-3">
+        K
+      </div>
+      <h1 class="text-xl font-semibold text-slate-900 tracking-tight">HRIS Admin Login</h1>
+      <p class="text-sm text-slate-500 mt-1 text-center">Sign in with your administrator account to access payroll records.</p>
+    </div>
+
+    <form id="loginForm" class="border border-slate-200 rounded-xl p-5 space-y-4" novalidate>
+      <div class="flex flex-col gap-1">
+        <label for="loginEmail" class="text-xs font-medium text-slate-500">Email</label>
+        <input id="loginEmail" name="loginEmail" type="email" required autocomplete="username"
+          class="bg-white border border-slate-300 rounded-lg px-3 py-2 text-sm text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-amber-500/60 focus:border-amber-500/60"
+          placeholder="admin@company.com" />
+      </div>
+
+      <div class="flex flex-col gap-1">
+        <label for="loginPassword" class="text-xs font-medium text-slate-500">Password</label>
+        <input id="loginPassword" name="loginPassword" type="password" required autocomplete="current-password"
+          class="bg-white border border-slate-300 rounded-lg px-3 py-2 text-sm text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-amber-500/60 focus:border-amber-500/60"
+          placeholder="••••••••" />
+      </div>
+
+      <span id="loginError" class="hidden text-xs text-rose-600"></span>
+
+      <button id="loginBtn" type="submit"
+        class="w-full inline-flex items-center justify-center gap-2 bg-amber-500 hover:bg-amber-400 disabled:bg-slate-300 disabled:cursor-not-allowed text-slate-900 font-semibold text-sm px-5 py-2.5 rounded-lg transition-colors">
+        <svg id="loginSpinner" class="hidden animate-spin h-4 w-4" viewBox="0 0 24 24" fill="none">
+          <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+          <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"></path>
+        </svg>
+        <span id="loginBtnLabel">Sign In</span>
+      </button>
+    </form>
+
+    <p class="text-xs text-slate-400 text-center mt-4">
+      Admin accounts are created in the Supabase dashboard under Authentication — there is no public sign-up.
+    </p>
+  </div>
+</div>
+
+<!-- =========================================================
+     APP SHELL (header + dashboard) — hidden until authenticated
+========================================================= -->
+<div id="appShell" class="hidden">
+
+<!-- =========================================================
      HEADER
 ========================================================= -->
 <header class="border-b border-slate-200 bg-white/95 backdrop-blur sticky top-0 z-40">
@@ -70,9 +121,20 @@
         <p class="text-xs sm:text-sm text-slate-500">Philippine Payroll &amp; Statutory Compliance</p>
       </div>
     </div>
-    <div id="connectionStatus" class="flex items-center gap-2 text-xs sm:text-sm bg-slate-100 border border-slate-300 rounded-full px-3 py-1.5">
-      <span id="connectionDot" class="w-2 h-2 rounded-full bg-slate-500 pulse-dot"></span>
-      <span id="connectionText" class="text-slate-600">Connecting…</span>
+    <div class="flex items-center gap-2 sm:gap-3">
+      <div id="connectionStatus" class="flex items-center gap-2 text-xs sm:text-sm bg-slate-100 border border-slate-300 rounded-full px-3 py-1.5">
+        <span id="connectionDot" class="w-2 h-2 rounded-full bg-slate-500 pulse-dot"></span>
+        <span id="connectionText" class="text-slate-600">Connecting…</span>
+      </div>
+      <div class="hidden sm:flex items-center gap-2 text-xs text-slate-500 border border-slate-200 rounded-full px-3 py-1.5">
+        <span id="adminEmailLabel" class="truncate max-w-[160px]"></span>
+      </div>
+      <button id="logoutBtn" title="Sign out"
+        class="text-slate-500 hover:text-slate-900 border border-slate-300 hover:border-slate-400 rounded-lg p-2 transition-colors">
+        <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+        </svg>
+      </button>
     </div>
   </div>
 </header>
@@ -139,6 +201,13 @@
     </div>
 
     <form id="employeeForm" class="p-5 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4" novalidate>
+
+      <div class="flex flex-col gap-1">
+        <label for="employeeNumber" class="text-xs font-medium text-slate-500">Employee Number</label>
+        <input id="employeeNumber" name="employeeNumber" type="text" inputmode="numeric" pattern="[0-9]{7}" maxlength="7" required
+          class="bg-white border border-slate-300 rounded-lg px-3 py-2 text-sm text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-amber-500/60 focus:border-amber-500/60"
+          placeholder="0001234" />
+      </div>
 
       <div class="flex flex-col gap-1">
         <label for="firstName" class="text-xs font-medium text-slate-500">First Name</label>
@@ -247,9 +316,10 @@
 
     <!-- Table -->
     <div id="rosterTableWrap" class="hidden overflow-x-auto">
-      <table class="roster w-full text-sm border-collapse min-w-[1700px]">
+      <table class="roster w-full text-sm border-collapse min-w-[1800px]">
         <thead>
           <tr class="bg-slate-100 text-slate-500 text-xs uppercase tracking-wide">
+            <th class="text-left px-3 py-2.5 border-b border-slate-300">Emp. #</th>
             <th class="text-left px-3 py-2.5 border-b border-slate-300">Employee</th>
             <th class="text-left px-3 py-2.5 border-b border-slate-300">Department / Title</th>
             <th class="text-left px-3 py-2.5 border-b border-slate-300">Hire Date</th>
@@ -306,6 +376,8 @@
     </div>
   </div>
 </div>
+
+</div> <!-- /#appShell -->
 
 <script>
 /* =========================================================
@@ -657,6 +729,7 @@ function renderRosterRow(employee, payroll) {
 
   return `
     <tr class="hover:bg-slate-100 transition-colors">
+      <td class="px-3 py-2.5 align-top font-mono-tabular text-slate-700 whitespace-nowrap">${escapeHtml(employee.employee_number)}</td>
       <td class="px-3 py-2.5 align-top">
         <div class="font-medium text-slate-900">${escapeHtml(fullName)}</div>
         <div class="text-xs text-slate-400">${escapeHtml(employee.email)}</div>
@@ -798,8 +871,13 @@ function setSubmitLoading(isLoading) {
 }
 
 function validateEmployeeForm(values) {
-  if (!values.firstName || !values.lastName || !values.email || !values.hireDate || !values.department || !values.jobTitle) {
+  if (!values.employeeNumber || !values.firstName || !values.lastName || !values.email || !values.hireDate || !values.department || !values.jobTitle) {
     return 'Please correct the highlighted fields.';
+  }
+
+  const employeeNumberPattern = /^[0-9]{7}$/;
+  if (!employeeNumberPattern.test(values.employeeNumber)) {
+    return 'Employee number must be exactly 7 digits.';
   }
 
   const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -830,6 +908,7 @@ async function handleEmployeeFormSubmit(evt) {
   const form = evt.target;
 
   const values = {
+    employeeNumber: form.employeeNumber.value.trim(),
     firstName: form.firstName.value.trim(),
     lastName: form.lastName.value.trim(),
     email: form.email.value.trim(),
@@ -852,6 +931,7 @@ async function handleEmployeeFormSubmit(evt) {
   try {
     const { error } = await supabaseClient.from(EMPLOYEES_TABLE).insert([
       {
+        employee_number: values.employeeNumber,
         first_name: values.firstName,
         last_name: values.lastName,
         email: values.email,
@@ -865,6 +945,9 @@ async function handleEmployeeFormSubmit(evt) {
 
     if (error) {
       if (error.code === '23505' || /duplicate|unique/i.test(error.message || '')) {
+        if (/employee_number/i.test(error.message || '')) {
+          throw new Error('A record with this employee number already exists.');
+        }
         throw new Error('A record with this email already exists.');
       }
       throw new Error(error.message || 'Unable to add employee.');
@@ -919,10 +1002,95 @@ async function deleteEmployee(id) {
 }
 
 /* =========================================================
+   ADMIN AUTHENTICATION (Supabase Auth)
+========================================================= */
+
+function showAppShell(session) {
+  document.getElementById('loginScreen').classList.add('hidden');
+  document.getElementById('appShell').classList.remove('hidden');
+  document.getElementById('adminEmailLabel').textContent = session.user.email || '';
+  setConnectionStatus(credentialsArePlaceholders() ? 'unconfigured' : 'connecting');
+  fetchEmployees();
+}
+
+function showLoginScreen() {
+  document.getElementById('appShell').classList.add('hidden');
+  document.getElementById('loginScreen').classList.remove('hidden');
+}
+
+function setLoginLoading(isLoading) {
+  const btn = document.getElementById('loginBtn');
+  const spinner = document.getElementById('loginSpinner');
+  const label = document.getElementById('loginBtnLabel');
+
+  btn.disabled = isLoading;
+  spinner.classList.toggle('hidden', !isLoading);
+  label.textContent = isLoading ? 'Signing in…' : 'Sign In';
+}
+
+function setLoginError(message) {
+  const el = document.getElementById('loginError');
+  if (!message) {
+    el.classList.add('hidden');
+    el.textContent = '';
+  } else {
+    el.classList.remove('hidden');
+    el.textContent = message;
+  }
+}
+
+async function handleLoginSubmit(evt) {
+  evt.preventDefault();
+  setLoginError(null);
+
+  if (credentialsArePlaceholders()) {
+    setLoginError('Supabase is not configured yet.');
+    return;
+  }
+
+  const form = evt.target;
+  const email = form.loginEmail.value.trim();
+  const password = form.loginPassword.value;
+
+  if (!email || !password) {
+    setLoginError('Please enter your email and password.');
+    return;
+  }
+
+  setLoginLoading(true);
+
+  try {
+    const { error } = await supabaseClient.auth.signInWithPassword({ email, password });
+    if (error) throw error;
+    // onAuthStateChange handles showing the app shell once the session is set.
+    form.reset();
+  } catch (err) {
+    console.error('login error:', err);
+    setLoginError('Invalid email or password.');
+  } finally {
+    setLoginLoading(false);
+  }
+}
+
+async function handleLogout() {
+  try {
+    const { error } = await supabaseClient.auth.signOut();
+    if (error) throw error;
+    showToast('Signed out.', 'info');
+  } catch (err) {
+    console.error('logout error:', err);
+    showToast('Unable to sign out.', 'error');
+  }
+}
+
+/* =========================================================
    INITIALIZATION
 ========================================================= */
 
 function registerEventListeners() {
+  document.getElementById('loginForm').addEventListener('submit', handleLoginSubmit);
+  document.getElementById('logoutBtn').addEventListener('click', handleLogout);
+
   document.getElementById('employeeForm').addEventListener('submit', handleEmployeeFormSubmit);
   document.getElementById('refreshBtn').addEventListener('click', fetchEmployees);
 
@@ -938,10 +1106,31 @@ function registerEventListeners() {
   });
 }
 
-function init() {
+async function init() {
   registerEventListeners();
-  setConnectionStatus(credentialsArePlaceholders() ? 'unconfigured' : 'connecting');
-  fetchEmployees();
+
+  if (credentialsArePlaceholders()) {
+    setConnectionStatus('unconfigured');
+    showLoginScreen();
+    return;
+  }
+
+  // Restore an existing session on page load, if any.
+  const { data: { session } } = await supabaseClient.auth.getSession();
+  if (session) {
+    showAppShell(session);
+  } else {
+    showLoginScreen();
+  }
+
+  // Keep the UI in sync with sign-in / sign-out events (including from other tabs).
+  supabaseClient.auth.onAuthStateChange((event, session) => {
+    if (event === 'SIGNED_IN' && session) {
+      showAppShell(session);
+    } else if (event === 'SIGNED_OUT') {
+      showLoginScreen();
+    }
+  });
 }
 
 document.addEventListener('DOMContentLoaded', init);
