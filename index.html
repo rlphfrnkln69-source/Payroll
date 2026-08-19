@@ -287,97 +287,118 @@
 
       <!-- MODULE: SCHEDULE MANAGEMENT -->
       <section id="moduleSchedule" class="hidden space-y-6">
-        <div class="flex flex-wrap items-center justify-between gap-4">
+
+        <!-- SUB-VIEW: EMPLOYEE LIST -->
+        <div id="scheduleListView" class="space-y-6">
           <div>
             <h3 class="text-base font-semibold text-slate-900">Schedule Management</h3>
-            <p class="text-xs text-slate-500 mt-0.5">Create, assign, and monitor employee work schedules.</p>
+            <p class="text-xs text-slate-500 mt-0.5">Select an employee to view and assign their monthly work schedule.</p>
           </div>
-          <button id="scheduleAddBtn" class="bg-amber-500 hover:bg-amber-400 text-slate-900 font-semibold text-xs px-4 py-2.5 rounded-lg transition-colors shadow-sm">+ Add Schedule</button>
-        </div>
 
-        <!-- Filters -->
-        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3 bg-slate-50 p-4 rounded-xl border border-slate-300">
-          <select id="scheduleFilterEmployee" data-placeholder="All Employees" class="employee-select w-full bg-white border border-slate-300 rounded-lg px-3 py-2 text-xs text-slate-900"><option value="">All Employees</option></select>
-          <select id="scheduleFilterDepartment" class="department-select w-full bg-white border border-slate-300 rounded-lg px-3 py-2 text-xs text-slate-900"><option value="">All Departments</option></select>
-          <input id="scheduleFilterDate" type="date" class="w-full bg-white border border-slate-300 rounded-lg px-3 py-2 text-xs text-slate-900" />
-          <select id="scheduleFilterStatus" class="w-full bg-white border border-slate-300 rounded-lg px-3 py-2 text-xs text-slate-900">
-            <option value="">All Statuses</option><option>Active</option><option>Cancelled</option>
-          </select>
-          <button id="scheduleClearFiltersBtn" class="w-full bg-slate-200 hover:bg-slate-300 text-slate-700 font-medium text-xs px-3 py-2 rounded-lg transition-colors">Reset Filters</button>
-        </div>
-
-        <!-- Add / Edit form -->
-        <form id="scheduleForm" class="hidden rounded-xl border border-slate-300 bg-slate-50 p-5 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-          <input type="hidden" id="scheduleId" />
-          <div class="flex flex-col gap-1 lg:col-span-2">
-            <label class="text-xs font-medium text-slate-500">Employee *</label>
-            <select id="scheduleEmployeeId" required data-placeholder="Select employee…" class="employee-select bg-white border border-slate-300 rounded-lg px-3 py-2 text-sm text-slate-900"><option value="">Select employee…</option></select>
-          </div>
-          <div class="flex flex-col gap-1">
-            <label class="text-xs font-medium text-slate-500">Schedule Date *</label>
-            <input id="scheduleDate" type="date" required class="bg-white border border-slate-300 rounded-lg px-3 py-2 text-sm text-slate-900" />
-          </div>
-          <div class="flex flex-col gap-1">
-            <label class="text-xs font-medium text-slate-500">Shift Name</label>
-            <select id="scheduleShiftName" class="bg-white border border-slate-300 rounded-lg px-3 py-2 text-sm text-slate-900">
-              <option>Regular Shift</option><option>Morning Shift</option><option>Afternoon Shift</option><option>Night Shift</option><option>Rest Day</option><option>Custom Shift</option>
+          <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 bg-slate-50 p-4 rounded-xl border border-slate-300">
+            <div class="sm:col-span-2">
+              <input id="scheduleEmpSearchInput" type="text" placeholder="Search employee name or ID..." class="w-full bg-white border border-slate-300 rounded-lg px-3 py-2 text-xs text-slate-900 focus:outline-none focus:ring-2 focus:ring-amber-500/60" />
+            </div>
+            <select id="scheduleEmpDeptFilter" class="w-full bg-white border border-slate-300 rounded-lg px-3 py-2 text-xs text-slate-900 focus:outline-none focus:ring-2 focus:ring-amber-500/60">
+              <option value="">All Departments</option>
+              <option value="Human Resources">Human Resources</option>
+              <option value="Operations">Operations</option>
+              <option value="Engineering">Engineering</option>
+              <option value="Finance">Finance</option>
+              <option value="Sales">Sales</option>
             </select>
           </div>
-          <div class="flex flex-col gap-1">
-            <label class="text-xs font-medium text-slate-500">Start Time</label>
-            <input id="scheduleStartTime" type="time" class="bg-white border border-slate-300 rounded-lg px-3 py-2 text-sm text-slate-900" />
-          </div>
-          <div class="flex flex-col gap-1">
-            <label class="text-xs font-medium text-slate-500">End Time</label>
-            <input id="scheduleEndTime" type="time" class="bg-white border border-slate-300 rounded-lg px-3 py-2 text-sm text-slate-900" />
-          </div>
-          <div class="flex flex-col gap-1">
-            <label class="text-xs font-medium text-slate-500">Break Start</label>
-            <input id="scheduleBreakStart" type="time" class="bg-white border border-slate-300 rounded-lg px-3 py-2 text-sm text-slate-900" />
-          </div>
-          <div class="flex flex-col gap-1">
-            <label class="text-xs font-medium text-slate-500">Break End</label>
-            <input id="scheduleBreakEnd" type="time" class="bg-white border border-slate-300 rounded-lg px-3 py-2 text-sm text-slate-900" />
-          </div>
-          <div class="flex items-center gap-2 pt-5">
-            <input id="scheduleIsRestDay" type="checkbox" class="w-4 h-4" />
-            <label for="scheduleIsRestDay" class="text-sm text-slate-700">Rest Day</label>
-          </div>
-          <div class="flex flex-col gap-1">
-            <label class="text-xs font-medium text-slate-500">Status</label>
-            <select id="scheduleStatus" class="bg-white border border-slate-300 rounded-lg px-3 py-2 text-sm text-slate-900">
-              <option>Active</option><option>Cancelled</option>
-            </select>
-          </div>
-          <div class="flex flex-col gap-1 lg:col-span-4">
-            <label class="text-xs font-medium text-slate-500">Notes</label>
-            <textarea id="scheduleNotes" rows="2" class="bg-white border border-slate-300 rounded-lg px-3 py-2 text-sm text-slate-900"></textarea>
-          </div>
-          <div class="lg:col-span-4 flex justify-end gap-2">
-            <button type="button" id="scheduleCancelBtn" class="px-4 py-2 text-sm rounded-lg border border-slate-300 text-slate-600 hover:bg-slate-100">Cancel</button>
-            <button type="submit" class="px-4 py-2 text-sm rounded-lg bg-amber-500 hover:bg-amber-400 text-slate-900 font-semibold">Save Schedule</button>
-          </div>
-        </form>
 
-        <div class="rounded-xl border border-slate-300 bg-slate-50 overflow-x-auto">
-          <table class="w-full text-sm border-collapse min-w-[1100px]">
-            <thead><tr class="bg-slate-100 text-slate-500 text-xs uppercase tracking-wide">
-              <th class="text-left px-4 py-3 border-b border-slate-300">Employee</th>
-              <th class="text-left px-4 py-3 border-b border-slate-300">Date</th>
-              <th class="text-left px-4 py-3 border-b border-slate-300">Shift</th>
-              <th class="text-left px-4 py-3 border-b border-slate-300">Start – End</th>
-              <th class="text-left px-4 py-3 border-b border-slate-300">Break</th>
-              <th class="text-right px-4 py-3 border-b border-slate-300">Expected Hrs</th>
-              <th class="text-left px-4 py-3 border-b border-slate-300">Rest Day</th>
-              <th class="text-left px-4 py-3 border-b border-slate-300">Status</th>
-              <th class="text-left px-4 py-3 border-b border-slate-300">Notes</th>
-              <th class="text-center px-4 py-3 border-b border-slate-300">Actions</th>
-            </tr></thead>
-            <tbody id="scheduleTableBody" class="divide-y divide-slate-200">
-              <tr><td colspan="10" class="px-4 py-8 text-center text-slate-400">Loading schedules…</td></tr>
-            </tbody>
-          </table>
+          <div class="rounded-xl border border-slate-300 bg-slate-50 overflow-hidden">
+            <div class="overflow-x-auto">
+              <table class="w-full text-sm border-collapse">
+                <thead>
+                  <tr class="bg-slate-100 text-slate-500 text-xs uppercase tracking-wide">
+                    <th class="text-left px-4 py-3 border-b border-slate-300">Emp ID &amp; Name</th>
+                    <th class="text-left px-4 py-3 border-b border-slate-300">Department / Position</th>
+                    <th class="text-left px-4 py-3 border-b border-slate-300">Employment Status</th>
+                    <th class="text-center px-4 py-3 border-b border-slate-300">Action</th>
+                  </tr>
+                </thead>
+                <tbody id="scheduleEmployeeListBody" class="divide-y divide-slate-200">
+                  <tr><td colspan="4" class="px-4 py-8 text-center text-slate-400">Loading employees...</td></tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
         </div>
+
+        <!-- SUB-VIEW: INDIVIDUAL EMPLOYEE MONTHLY CALENDAR -->
+        <div id="scheduleDetailView" class="hidden space-y-5">
+          <button id="scheduleBackToListBtn" class="inline-flex items-center gap-1.5 text-xs font-medium text-slate-600 hover:text-slate-900">
+            <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7" /></svg>
+            Back to Employee List
+          </button>
+
+          <div class="flex flex-wrap items-center justify-between gap-4 bg-slate-50 border border-slate-300 rounded-xl p-4">
+            <div>
+              <h3 id="scheduleDetailEmpName" class="text-base font-semibold text-slate-900">Employee Name</h3>
+              <p id="scheduleDetailEmpMeta" class="text-xs text-slate-500 mt-0.5">Department • Position</p>
+            </div>
+            <div class="flex items-center gap-2">
+              <button id="scheduleMonthPrevBtn" class="border border-slate-300 rounded-lg p-2 text-slate-600 hover:bg-slate-100" title="Previous month">
+                <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7" /></svg>
+              </button>
+              <span id="scheduleMonthLabel" class="text-sm font-semibold text-slate-900 w-36 text-center font-mono-tabular">Month Year</span>
+              <button id="scheduleMonthNextBtn" class="border border-slate-300 rounded-lg p-2 text-slate-600 hover:bg-slate-100" title="Next month">
+                <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7" /></svg>
+              </button>
+              <button id="scheduleLockToggleBtn" class="inline-flex items-center gap-1.5 text-xs font-semibold px-3.5 py-2 rounded-lg border transition-colors">
+                <svg id="scheduleLockIcon" class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"></svg>
+                <span id="scheduleLockLabel">Lock Schedule</span>
+              </button>
+            </div>
+          </div>
+
+          <div id="scheduleLockedBanner" class="hidden rounded-xl border border-rose-500/40 bg-rose-500/10 px-4 py-3 text-sm text-rose-700 flex items-center gap-2">
+            <svg class="w-4 h-4 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" /></svg>
+            <span>This month's schedule is <strong>locked</strong>. Unlock it to make changes.</span>
+          </div>
+
+          <div class="flex items-center justify-between text-xs text-slate-500 px-1">
+            <div class="flex items-center gap-4">
+              <span class="inline-flex items-center gap-1.5"><span class="w-2.5 h-2.5 rounded-full bg-emerald-500 inline-block"></span>Working Day</span>
+              <span class="inline-flex items-center gap-1.5"><span class="w-2.5 h-2.5 rounded-full bg-sky-500 inline-block"></span>Rest Day</span>
+              <span class="inline-flex items-center gap-1.5"><span class="w-2.5 h-2.5 rounded-full bg-slate-400 inline-block"></span>Unassigned</span>
+            </div>
+            <span id="scheduleUnsavedIndicator" class="hidden text-amber-600 font-medium">Unsaved changes</span>
+          </div>
+
+          <div class="rounded-xl border border-slate-300 bg-slate-50 overflow-hidden">
+            <div class="overflow-x-auto">
+              <table class="w-full text-sm border-collapse min-w-[1000px]">
+                <thead>
+                  <tr class="bg-slate-100 text-slate-500 text-xs uppercase tracking-wide">
+                    <th class="text-left px-3 py-3 border-b border-slate-300">Date</th>
+                    <th class="text-center px-3 py-3 border-b border-slate-300">Rest Day</th>
+                    <th class="text-left px-3 py-3 border-b border-slate-300">Shift</th>
+                    <th class="text-left px-3 py-3 border-b border-slate-300">Start</th>
+                    <th class="text-left px-3 py-3 border-b border-slate-300">End</th>
+                    <th class="text-left px-3 py-3 border-b border-slate-300">Break Start</th>
+                    <th class="text-left px-3 py-3 border-b border-slate-300">Break End</th>
+                    <th class="text-right px-3 py-3 border-b border-slate-300">Hrs</th>
+                    <th class="text-left px-3 py-3 border-b border-slate-300">Notes</th>
+                  </tr>
+                </thead>
+                <tbody id="scheduleCalendarBody" class="divide-y divide-slate-200">
+                  <tr><td colspan="9" class="px-4 py-8 text-center text-slate-400">Loading calendar…</td></tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          <div class="flex justify-end">
+            <button id="scheduleSaveAllBtn" class="bg-amber-500 hover:bg-amber-400 disabled:bg-slate-300 disabled:cursor-not-allowed text-slate-900 font-semibold text-sm px-5 py-2.5 rounded-lg transition-colors shadow-sm">
+              Save Month's Schedule
+            </button>
+          </div>
+        </div>
+
       </section>
 
       <!-- MODULE: ATTENDANCE MANAGEMENT -->
@@ -761,7 +782,8 @@ function switchModule(targetId) {
   } else if (targetId === 'inactive') {
     renderInactiveEmployees();
   } else if (targetId === 'schedule') {
-    fetchSchedules();
+    showScheduleListView();
+    renderScheduleEmployeeList();
   }
 }
 
@@ -1091,8 +1113,19 @@ function employeeDept(id) {
 
 /* ===============================
    SCHEDULE MANAGEMENT
+   (Employee list -> individual monthly calendar,
+    with per-employee/per-month locking and rest-day toggles)
 =============================== */
-let schedulesCache = [];
+const SHIFT_OPTIONS = ['Regular Shift', 'Morning Shift', 'Afternoon Shift', 'Night Shift', 'Custom Shift'];
+const DEFAULT_SHIFT = { shift_name: 'Regular Shift', start_time: '08:00', end_time: '17:00', break_start: '12:00', break_end: '13:00' };
+
+let scheduleSelectedEmployee = null;   // the employee currently open in the calendar view
+let scheduleViewYear = null;           // year currently shown
+let scheduleViewMonth = null;          // 0-11, month currently shown
+let scheduleMonthRows = [];            // in-memory rows for every date of the visible month
+let scheduleMonthLocked = false;       // lock state for the visible employee/month
+let scheduleMonthLockId = null;        // id of the schedule_locks row, if it exists
+let scheduleHasUnsavedChanges = false;
 
 function computeExpectedHours(startTime, endTime, breakStart, breakEnd, isRestDay) {
   if (isRestDay || !startTime || !endTime) return null;
@@ -1118,162 +1151,404 @@ function computeExpectedHours(startTime, endTime, breakStart, breakEnd, isRestDa
   return Math.max(0, totalMin / 60);
 }
 
-async function fetchSchedules() {
-  if (credentialsArePlaceholders()) return;
-
-  const tbody = document.getElementById('scheduleTableBody');
-  tbody.innerHTML = `<tr><td colspan="10" class="px-4 py-8 text-center text-slate-400">Loading schedules…</td></tr>`;
-
-  try {
-    const { data, error } = await supabaseClient
-      .from('schedules')
-      .select('*')
-      .order('schedule_date', { ascending: false });
-    if (error) throw error;
-
-    schedulesCache = data || [];
-    renderScheduleTable();
-  } catch (err) {
-    console.error('fetchSchedules error:', err);
-    tbody.innerHTML = `<tr><td colspan="10" class="px-4 py-8 text-center text-rose-600">Unable to load schedules. Check that the schedules table exists.</td></tr>`;
-    showToast('Unable to load schedules.', 'error');
-  }
+function monthKey(year, month) {
+  // month is 0-11 here; stored as YYYY-MM
+  return `${year}-${String(month + 1).padStart(2, '0')}`;
 }
 
-function renderScheduleTable() {
-  const tbody = document.getElementById('scheduleTableBody');
-  const empFilter = document.getElementById('scheduleFilterEmployee').value;
-  const deptFilter = document.getElementById('scheduleFilterDepartment').value;
-  const dateFilter = document.getElementById('scheduleFilterDate').value;
-  const statusFilter = document.getElementById('scheduleFilterStatus').value;
+/* ---------- SUB-VIEW SWITCHING ---------- */
+function showScheduleListView() {
+  document.getElementById('scheduleListView').classList.remove('hidden');
+  document.getElementById('scheduleDetailView').classList.add('hidden');
+  scheduleSelectedEmployee = null;
+}
 
-  const filtered = schedulesCache.filter(s => {
-    if (empFilter && s.employee_id !== empFilter) return false;
-    if (deptFilter && employeeDept(s.employee_id) !== deptFilter) return false;
-    if (dateFilter && s.schedule_date !== dateFilter) return false;
-    if (statusFilter && s.status !== statusFilter) return false;
+function showScheduleDetailView() {
+  document.getElementById('scheduleListView').classList.add('hidden');
+  document.getElementById('scheduleDetailView').classList.remove('hidden');
+}
+
+/* ---------- EMPLOYEE LIST (for Schedule module) ---------- */
+function renderScheduleEmployeeList() {
+  const tbody = document.getElementById('scheduleEmployeeListBody');
+  if (!tbody) return;
+
+  const searchVal = (document.getElementById('scheduleEmpSearchInput').value || '').toLowerCase();
+  const deptVal = document.getElementById('scheduleEmpDeptFilter').value;
+
+  const filtered = employeesCache.filter(e => {
+    if (e.employment_status === 'Inactive') return false;
+    const fullName = `${e.first_name || ''} ${e.last_name || ''}`.toLowerCase();
+    const empId = (e.employee_number || '').toLowerCase();
+    if (searchVal && !fullName.includes(searchVal) && !empId.includes(searchVal)) return false;
+    if (deptVal && e.department !== deptVal) return false;
     return true;
   });
 
   if (filtered.length === 0) {
-    tbody.innerHTML = `<tr><td colspan="10" class="px-4 py-8 text-center text-slate-400">No schedules found for the selected filters.</td></tr>`;
+    tbody.innerHTML = `<tr><td colspan="4" class="px-4 py-8 text-center text-slate-400">No matching employees found.</td></tr>`;
     return;
   }
 
-  tbody.innerHTML = filtered.map(s => {
-    const hours = computeExpectedHours(s.start_time, s.end_time, s.break_start, s.break_end, s.is_rest_day);
-    const statusClass = s.status === 'Cancelled'
-      ? 'bg-rose-500/15 text-rose-700 border-rose-500/30'
-      : 'bg-emerald-500/15 text-emerald-700 border-emerald-500/30';
+  tbody.innerHTML = filtered.map(e => {
+    let statusClass = 'bg-emerald-500/15 text-emerald-700 border-emerald-500/30';
+    if (e.employment_status === 'On Leave') statusClass = 'bg-amber-500/15 text-amber-700 border-amber-500/30';
+    if (e.employment_status === 'Suspended') statusClass = 'bg-rose-500/15 text-rose-700 border-rose-500/30';
 
     return `
-      <tr class="hover:bg-slate-100 transition-colors">
-        <td class="px-4 py-3 font-medium text-slate-900">${escapeHtml(employeeLabel(s.employee_id))}</td>
-        <td class="px-4 py-3 text-slate-700 whitespace-nowrap">${escapeHtml(s.schedule_date)}</td>
-        <td class="px-4 py-3 text-slate-700">${escapeHtml(s.shift_name)}</td>
-        <td class="px-4 py-3 text-slate-700 whitespace-nowrap">${s.start_time ? escapeHtml(s.start_time.slice(0,5)) + ' – ' + escapeHtml((s.end_time||'').slice(0,5)) : '—'}</td>
-        <td class="px-4 py-3 text-slate-700 whitespace-nowrap">${s.break_start ? escapeHtml(s.break_start.slice(0,5)) + ' – ' + escapeHtml((s.break_end||'').slice(0,5)) : '—'}</td>
-        <td class="px-4 py-3 text-right font-mono-tabular text-slate-900">${hours === null ? '—' : hours.toFixed(2)}</td>
-        <td class="px-4 py-3">${s.is_rest_day ? '<span class="text-xs px-2 py-0.5 rounded-full bg-sky-500/15 text-sky-700 border border-sky-500/30">Rest Day</span>' : '<span class="text-slate-400 text-xs">No</span>'}</td>
-        <td class="px-4 py-3"><span class="text-xs px-2 py-0.5 rounded-full border ${statusClass}">${escapeHtml(s.status)}</span></td>
-        <td class="px-4 py-3 text-slate-500 text-xs max-w-[160px] truncate" title="${escapeHtml(s.notes || '')}">${escapeHtml(s.notes || '—')}</td>
-        <td class="px-4 py-3 text-center">
-          <div class="flex items-center justify-center gap-2">
-            <button onclick="openScheduleForm('${s.id}')" class="text-xs px-2.5 py-1 rounded border border-slate-300 text-slate-700 hover:bg-slate-100">Edit</button>
-            <button onclick="confirmDeleteSchedule('${s.id}')" class="text-xs px-2.5 py-1 rounded border border-rose-300 text-rose-700 hover:bg-rose-50">Delete</button>
-          </div>
+      <tr class="hover:bg-slate-100 transition-colors cursor-pointer" onclick="openEmployeeSchedule('${e.id}')">
+        <td class="px-4 py-3">
+          <div class="font-medium text-slate-900">${escapeHtml(e.first_name)} ${escapeHtml(e.last_name)}</div>
+          <div class="text-[11px] text-slate-400 font-mono">ID: ${escapeHtml(e.employee_number || 'N/A')}</div>
+        </td>
+        <td class="px-4 py-3">
+          <div class="text-slate-800">${escapeHtml(e.department || 'N/A')}</div>
+          <div class="text-[11px] text-slate-400">${escapeHtml(e.job_title || e.position || 'N/A')}</div>
+        </td>
+        <td class="px-4 py-3">
+          <span class="text-xs px-2 py-0.5 rounded-full border ${statusClass} font-medium">${escapeHtml(e.employment_status || 'Active')}</span>
+        </td>
+        <td class="px-4 py-3 text-center" onclick="event.stopPropagation()">
+          <button onclick="openEmployeeSchedule('${e.id}')" class="text-xs px-3 py-1.5 rounded border border-slate-300 text-slate-700 hover:bg-slate-100">View Schedule</button>
         </td>
       </tr>
     `;
   }).join('');
 }
 
-function openScheduleForm(scheduleId) {
-  const form = document.getElementById('scheduleForm');
-  form.classList.remove('hidden');
+/* ---------- INDIVIDUAL EMPLOYEE MONTHLY CALENDAR ---------- */
+async function openEmployeeSchedule(employeeId) {
+  const emp = employeesCache.find(e => e.id === employeeId);
+  if (!emp) return;
 
-  if (scheduleId) {
-    const s = schedulesCache.find(x => x.id === scheduleId);
-    if (!s) return;
-    document.getElementById('scheduleId').value = s.id;
-    document.getElementById('scheduleEmployeeId').value = s.employee_id;
-    document.getElementById('scheduleDate').value = s.schedule_date;
-    document.getElementById('scheduleShiftName').value = s.shift_name;
-    document.getElementById('scheduleStartTime').value = s.start_time ? s.start_time.slice(0,5) : '';
-    document.getElementById('scheduleEndTime').value = s.end_time ? s.end_time.slice(0,5) : '';
-    document.getElementById('scheduleBreakStart').value = s.break_start ? s.break_start.slice(0,5) : '';
-    document.getElementById('scheduleBreakEnd').value = s.break_end ? s.break_end.slice(0,5) : '';
-    document.getElementById('scheduleIsRestDay').checked = !!s.is_rest_day;
-    document.getElementById('scheduleStatus').value = s.status;
-    document.getElementById('scheduleNotes').value = s.notes || '';
-  } else {
-    form.reset();
-    document.getElementById('scheduleId').value = '';
+  scheduleSelectedEmployee = emp;
+  const today = new Date();
+  scheduleViewYear = today.getFullYear();
+  scheduleViewMonth = today.getMonth();
+
+  document.getElementById('scheduleDetailEmpName').textContent = `${emp.first_name} ${emp.last_name}`;
+  document.getElementById('scheduleDetailEmpMeta').textContent = `${emp.department || 'General'} • ${emp.position || emp.job_title || 'Staff'} • ID: ${emp.employee_number || 'N/A'}`;
+
+  showScheduleDetailView();
+  await loadMonthSchedule();
+}
+
+async function navigateScheduleMonth(delta) {
+  if (scheduleHasUnsavedChanges) {
+    const proceed = confirm('You have unsaved changes on this month. Discard them and continue?');
+    if (!proceed) return;
   }
-
-  form.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+  scheduleViewMonth += delta;
+  if (scheduleViewMonth < 0) { scheduleViewMonth = 11; scheduleViewYear -= 1; }
+  if (scheduleViewMonth > 11) { scheduleViewMonth = 0; scheduleViewYear += 1; }
+  await loadMonthSchedule();
 }
 
-function closeScheduleForm() {
-  document.getElementById('scheduleForm').classList.add('hidden');
-  document.getElementById('scheduleForm').reset();
-  document.getElementById('scheduleId').value = '';
+async function loadMonthSchedule() {
+  if (!scheduleSelectedEmployee) return;
+
+  const label = new Date(scheduleViewYear, scheduleViewMonth, 1).toLocaleDateString('en-US', { month: 'long', year: 'numeric' });
+  document.getElementById('scheduleMonthLabel').textContent = label;
+
+  const tbody = document.getElementById('scheduleCalendarBody');
+  tbody.innerHTML = `<tr><td colspan="9" class="px-4 py-8 text-center text-slate-400">Loading calendar…</td></tr>`;
+  scheduleHasUnsavedChanges = false;
+  updateUnsavedIndicator();
+
+  const daysInMonth = new Date(scheduleViewYear, scheduleViewMonth + 1, 0).getDate();
+  const firstDate = `${scheduleViewYear}-${String(scheduleViewMonth + 1).padStart(2, '0')}-01`;
+  const lastDate = `${scheduleViewYear}-${String(scheduleViewMonth + 1).padStart(2, '0')}-${String(daysInMonth).padStart(2, '0')}`;
+
+  try {
+    const [{ data: existingRows, error: schedError }, lockResult] = await Promise.all([
+      supabaseClient
+        .from('schedules')
+        .select('*')
+        .eq('employee_id', scheduleSelectedEmployee.id)
+        .gte('schedule_date', firstDate)
+        .lte('schedule_date', lastDate),
+      supabaseClient
+        .from('schedule_locks')
+        .select('*')
+        .eq('employee_id', scheduleSelectedEmployee.id)
+        .eq('month', monthKey(scheduleViewYear, scheduleViewMonth))
+        .maybeSingle()
+    ]);
+
+    if (schedError) throw schedError;
+
+    const byDate = {};
+    (existingRows || []).forEach(r => { byDate[r.schedule_date] = r; });
+
+    scheduleMonthRows = [];
+    for (let d = 1; d <= daysInMonth; d++) {
+      const dateStr = `${scheduleViewYear}-${String(scheduleViewMonth + 1).padStart(2, '0')}-${String(d).padStart(2, '0')}`;
+      const existing = byDate[dateStr];
+      if (existing) {
+        scheduleMonthRows.push({
+          id: existing.id,
+          schedule_date: dateStr,
+          shift_name: existing.shift_name || DEFAULT_SHIFT.shift_name,
+          start_time: existing.start_time ? existing.start_time.slice(0, 5) : '',
+          end_time: existing.end_time ? existing.end_time.slice(0, 5) : '',
+          break_start: existing.break_start ? existing.break_start.slice(0, 5) : '',
+          break_end: existing.break_end ? existing.break_end.slice(0, 5) : '',
+          is_rest_day: !!existing.is_rest_day,
+          status: existing.status || 'Active',
+          notes: existing.notes || '',
+          _isNew: false
+        });
+      } else {
+        scheduleMonthRows.push({
+          id: null,
+          schedule_date: dateStr,
+          shift_name: '',
+          start_time: '',
+          end_time: '',
+          break_start: '',
+          break_end: '',
+          is_rest_day: false,
+          status: 'Active',
+          notes: '',
+          _isNew: true
+        });
+      }
+    }
+
+    // lockResult may error benignly if the schedule_locks table doesn't exist yet;
+    // treat that as "unlocked" rather than failing the whole view.
+    if (!lockResult.error && lockResult.data) {
+      scheduleMonthLocked = !!lockResult.data.is_locked;
+      scheduleMonthLockId = lockResult.data.id;
+    } else {
+      scheduleMonthLocked = false;
+      scheduleMonthLockId = null;
+    }
+
+    renderScheduleCalendar();
+    updateLockUi();
+  } catch (err) {
+    console.error('loadMonthSchedule error:', err);
+    tbody.innerHTML = `<tr><td colspan="9" class="px-4 py-8 text-center text-rose-600">Unable to load the calendar. Check that the "schedules" table exists.</td></tr>`;
+    showToast('Unable to load monthly schedule.', 'error');
+  }
 }
 
-async function handleScheduleFormSubmit(e) {
-  e.preventDefault();
+function renderScheduleCalendar() {
+  const tbody = document.getElementById('scheduleCalendarBody');
 
-  const id = document.getElementById('scheduleId').value;
-  const payload = {
-    employee_id: document.getElementById('scheduleEmployeeId').value,
-    schedule_date: document.getElementById('scheduleDate').value,
-    shift_name: document.getElementById('scheduleShiftName').value,
-    start_time: document.getElementById('scheduleStartTime').value || null,
-    end_time: document.getElementById('scheduleEndTime').value || null,
-    break_start: document.getElementById('scheduleBreakStart').value || null,
-    break_end: document.getElementById('scheduleBreakEnd').value || null,
-    is_rest_day: document.getElementById('scheduleIsRestDay').checked,
-    status: document.getElementById('scheduleStatus').value,
-    notes: document.getElementById('scheduleNotes').value.trim() || null,
-  };
+  tbody.innerHTML = scheduleMonthRows.map((row, idx) => {
+    const dateObj = new Date(row.schedule_date + 'T00:00:00');
+    const dayLabel = dateObj.toLocaleDateString('en-US', { weekday: 'short' });
+    const dayNum = dateObj.getDate();
+    const isWeekend = dateObj.getDay() === 0 || dateObj.getDay() === 6;
+    const hours = computeExpectedHours(row.start_time, row.end_time, row.break_start, row.break_end, row.is_rest_day);
+    const disabledAttr = scheduleMonthLocked ? 'disabled' : '';
+    const fieldsDisabled = scheduleMonthLocked || row.is_rest_day;
 
-  if (!payload.employee_id || !payload.schedule_date) {
-    showToast('Please select an employee and schedule date.', 'warning');
+    let rowStateClass = 'bg-white';
+    if (row.is_rest_day) rowStateClass = 'bg-sky-50';
+    else if (!row.start_time && !row.end_time) rowStateClass = isWeekend ? 'bg-slate-50' : 'bg-white';
+
+    return `
+      <tr class="${rowStateClass} ${scheduleMonthLocked ? 'opacity-70' : ''}">
+        <td class="px-3 py-2 whitespace-nowrap">
+          <div class="font-medium text-slate-900">${String(dayNum).padStart(2, '0')} <span class="text-slate-400 font-normal">${dayLabel}</span></div>
+        </td>
+        <td class="px-3 py-2 text-center">
+          <input type="checkbox" ${row.is_rest_day ? 'checked' : ''} ${disabledAttr}
+            onchange="toggleRestDay(${idx}, this.checked)" class="w-4 h-4 accent-sky-600 cursor-pointer" />
+        </td>
+        <td class="px-3 py-2">
+          <select ${fieldsDisabled ? 'disabled' : ''} onchange="updateScheduleField(${idx}, 'shift_name', this.value)"
+            class="w-full bg-white border border-slate-300 rounded-md px-2 py-1.5 text-xs text-slate-900 disabled:bg-slate-100 disabled:text-slate-400">
+            <option value="">${row.is_rest_day ? 'Rest Day' : 'Select…'}</option>
+            ${SHIFT_OPTIONS.map(opt => `<option value="${opt}" ${row.shift_name === opt ? 'selected' : ''}>${opt}</option>`).join('')}
+          </select>
+        </td>
+        <td class="px-3 py-2">
+          <input type="time" value="${row.start_time}" ${fieldsDisabled ? 'disabled' : ''}
+            onchange="updateScheduleField(${idx}, 'start_time', this.value)"
+            class="w-full bg-white border border-slate-300 rounded-md px-2 py-1.5 text-xs text-slate-900 disabled:bg-slate-100 disabled:text-slate-400" />
+        </td>
+        <td class="px-3 py-2">
+          <input type="time" value="${row.end_time}" ${fieldsDisabled ? 'disabled' : ''}
+            onchange="updateScheduleField(${idx}, 'end_time', this.value)"
+            class="w-full bg-white border border-slate-300 rounded-md px-2 py-1.5 text-xs text-slate-900 disabled:bg-slate-100 disabled:text-slate-400" />
+        </td>
+        <td class="px-3 py-2">
+          <input type="time" value="${row.break_start}" ${fieldsDisabled ? 'disabled' : ''}
+            onchange="updateScheduleField(${idx}, 'break_start', this.value)"
+            class="w-full bg-white border border-slate-300 rounded-md px-2 py-1.5 text-xs text-slate-900 disabled:bg-slate-100 disabled:text-slate-400" />
+        </td>
+        <td class="px-3 py-2">
+          <input type="time" value="${row.break_end}" ${fieldsDisabled ? 'disabled' : ''}
+            onchange="updateScheduleField(${idx}, 'break_end', this.value)"
+            class="w-full bg-white border border-slate-300 rounded-md px-2 py-1.5 text-xs text-slate-900 disabled:bg-slate-100 disabled:text-slate-400" />
+        </td>
+        <td class="px-3 py-2 text-right font-mono-tabular text-slate-700 whitespace-nowrap">${hours === null ? '—' : hours.toFixed(2)}</td>
+        <td class="px-3 py-2">
+          <input type="text" value="${escapeHtml(row.notes)}" ${disabledAttr} placeholder="—"
+            onchange="updateScheduleField(${idx}, 'notes', this.value)"
+            class="w-full bg-white border border-slate-300 rounded-md px-2 py-1.5 text-xs text-slate-900 disabled:bg-slate-100 disabled:text-slate-400" />
+        </td>
+      </tr>
+    `;
+  }).join('');
+}
+
+function updateScheduleField(idx, field, value) {
+  const row = scheduleMonthRows[idx];
+  if (!row) return;
+  row[field] = value;
+  if (field === 'shift_name' && value) {
+    // convenience: prefill sensible default times when a shift is first chosen and empty
+    if (!row.start_time && !row.end_time && value === 'Regular Shift') {
+      row.start_time = DEFAULT_SHIFT.start_time;
+      row.end_time = DEFAULT_SHIFT.end_time;
+      row.break_start = DEFAULT_SHIFT.break_start;
+      row.break_end = DEFAULT_SHIFT.break_end;
+    }
+  }
+  scheduleHasUnsavedChanges = true;
+  updateUnsavedIndicator();
+  renderScheduleCalendar();
+}
+
+function toggleRestDay(idx, checked) {
+  const row = scheduleMonthRows[idx];
+  if (!row) return;
+  row.is_rest_day = checked;
+  if (checked) {
+    // clear the work-schedule fields for that date automatically
+    row.shift_name = 'Rest Day';
+    row.start_time = '';
+    row.end_time = '';
+    row.break_start = '';
+    row.break_end = '';
+  } else {
+    // return the date to an editable, blank work schedule
+    row.shift_name = '';
+  }
+  scheduleHasUnsavedChanges = true;
+  updateUnsavedIndicator();
+  renderScheduleCalendar();
+}
+
+function updateUnsavedIndicator() {
+  document.getElementById('scheduleUnsavedIndicator').classList.toggle('hidden', !scheduleHasUnsavedChanges);
+}
+
+async function handleSaveAllSchedule() {
+  if (!scheduleSelectedEmployee || scheduleMonthLocked) return;
+
+  const rowsToUpsert = scheduleMonthRows
+    .filter(r => r.is_rest_day || r.shift_name || r.start_time || r.end_time || r.notes || !r._isNew)
+    .map(r => ({
+      ...(r.id ? { id: r.id } : {}),
+      employee_id: scheduleSelectedEmployee.id,
+      schedule_date: r.schedule_date,
+      shift_name: r.is_rest_day ? 'Rest Day' : (r.shift_name || 'Regular Shift'),
+      start_time: r.is_rest_day ? null : (r.start_time || null),
+      end_time: r.is_rest_day ? null : (r.end_time || null),
+      break_start: r.is_rest_day ? null : (r.break_start || null),
+      break_end: r.is_rest_day ? null : (r.break_end || null),
+      is_rest_day: r.is_rest_day,
+      status: r.status || 'Active',
+      notes: r.notes ? r.notes.trim() : null
+    }));
+
+  if (rowsToUpsert.length === 0) {
+    showToast('Nothing to save yet.', 'info');
     return;
   }
 
+  const saveBtn = document.getElementById('scheduleSaveAllBtn');
+  saveBtn.disabled = true;
+  saveBtn.textContent = 'Saving…';
+
   try {
-    if (id) {
-      const { error } = await supabaseClient.from('schedules').update(payload).eq('id', id);
-      if (error) throw error;
-      showToast('Schedule updated successfully.', 'success');
-    } else {
-      const { error } = await supabaseClient.from('schedules').insert([payload]);
-      if (error) throw error;
-      showToast('Schedule added successfully.', 'success');
-    }
-    closeScheduleForm();
-    await fetchSchedules();
+    const { error } = await supabaseClient
+      .from('schedules')
+      .upsert(rowsToUpsert, { onConflict: 'employee_id,schedule_date' });
+    if (error) throw error;
+
+    showToast('Monthly schedule saved successfully.', 'success');
+    scheduleHasUnsavedChanges = false;
+    updateUnsavedIndicator();
+    await loadMonthSchedule();
   } catch (err) {
-    console.error('save schedule error:', err);
-    showToast('Failed to save schedule.', 'error');
+    console.error('save monthly schedule error:', err);
+    showToast('Failed to save schedule. Ensure "schedules" has a unique constraint on (employee_id, schedule_date).', 'error');
+  } finally {
+    saveBtn.disabled = false;
+    saveBtn.textContent = "Save Month's Schedule";
   }
 }
 
-function confirmDeleteSchedule(id) {
-  const s = schedulesCache.find(x => x.id === id);
-  const label = s ? `${employeeLabel(s.employee_id)} on ${s.schedule_date}` : 'this schedule';
-  openConfirmModal('Delete Schedule', `Are you sure you want to delete the schedule for ${label}? This cannot be undone.`, async () => {
-    try {
-      const { error } = await supabaseClient.from('schedules').delete().eq('id', id);
-      if (error) throw error;
-      showToast('Schedule deleted.', 'success');
-      await fetchSchedules();
-    } catch (err) {
-      console.error('delete schedule error:', err);
-      showToast('Failed to delete schedule.', 'error');
+/* ---------- LOCK / UNLOCK ---------- */
+function updateLockUi() {
+  const btn = document.getElementById('scheduleLockToggleBtn');
+  const icon = document.getElementById('scheduleLockIcon');
+  const label = document.getElementById('scheduleLockLabel');
+  const banner = document.getElementById('scheduleLockedBanner');
+  const saveBtn = document.getElementById('scheduleSaveAllBtn');
+
+  banner.classList.toggle('hidden', !scheduleMonthLocked);
+  saveBtn.classList.toggle('hidden', scheduleMonthLocked);
+
+  if (scheduleMonthLocked) {
+    btn.className = 'inline-flex items-center gap-1.5 text-xs font-semibold px-3.5 py-2 rounded-lg border border-rose-300 bg-rose-50 text-rose-700 hover:bg-rose-100 transition-colors';
+    icon.innerHTML = '<path stroke-linecap="round" stroke-linejoin="round" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />';
+    label.textContent = 'Unlock Schedule';
+  } else {
+    btn.className = 'inline-flex items-center gap-1.5 text-xs font-semibold px-3.5 py-2 rounded-lg border border-emerald-300 bg-emerald-50 text-emerald-700 hover:bg-emerald-100 transition-colors';
+    icon.innerHTML = '<path stroke-linecap="round" stroke-linejoin="round" d="M8 11V7a4 4 0 118 0m-9 4h10a2 2 0 012 2v6a2 2 0 01-2 2H7a2 2 0 01-2-2v-6a2 2 0 012-2z" />';
+    label.textContent = 'Lock Schedule';
+  }
+}
+
+async function toggleScheduleLock() {
+  if (!scheduleSelectedEmployee) return;
+
+  const nextLocked = !scheduleMonthLocked;
+
+  if (nextLocked && scheduleHasUnsavedChanges) {
+    const proceed = confirm('You have unsaved changes. Save them before locking?');
+    if (proceed) {
+      await handleSaveAllSchedule();
     }
-  });
+  }
+
+  const label = monthKey(scheduleViewYear, scheduleViewMonth);
+  let adminEmail = '';
+  try {
+    const { data: { session } } = await supabaseClient.auth.getSession();
+    adminEmail = session && session.user ? session.user.email : '';
+  } catch (_) { /* non-fatal */ }
+
+  try {
+    const payload = {
+      employee_id: scheduleSelectedEmployee.id,
+      month: label,
+      is_locked: nextLocked,
+      locked_by: nextLocked ? adminEmail : null,
+      locked_at: nextLocked ? new Date().toISOString() : null
+    };
+
+    const { error } = await supabaseClient
+      .from('schedule_locks')
+      .upsert([payload], { onConflict: 'employee_id,month' });
+    if (error) throw error;
+
+    scheduleMonthLocked = nextLocked;
+    showToast(nextLocked ? 'Schedule locked.' : 'Schedule unlocked.', 'success');
+    renderScheduleCalendar();
+    updateLockUi();
+  } catch (err) {
+    console.error('toggleScheduleLock error:', err);
+    showToast('Failed to update lock state. Ensure the "schedule_locks" table exists.', 'error');
+  }
 }
 
 /* AUTHENTICATION (Supabase Auth) */
@@ -1384,21 +1659,22 @@ function registerEventListeners() {
     if (evt.target.id === 'confirmModal') closeConfirmModal();
   });
 
-  // Schedule Management
-  document.getElementById('scheduleAddBtn').addEventListener('click', () => openScheduleForm(null));
-  document.getElementById('scheduleCancelBtn').addEventListener('click', closeScheduleForm);
-  document.getElementById('scheduleForm').addEventListener('submit', handleScheduleFormSubmit);
-  document.getElementById('scheduleFilterEmployee').addEventListener('change', renderScheduleTable);
-  document.getElementById('scheduleFilterDepartment').addEventListener('change', renderScheduleTable);
-  document.getElementById('scheduleFilterDate').addEventListener('change', renderScheduleTable);
-  document.getElementById('scheduleFilterStatus').addEventListener('change', renderScheduleTable);
-  document.getElementById('scheduleClearFiltersBtn').addEventListener('click', () => {
-    document.getElementById('scheduleFilterEmployee').value = '';
-    document.getElementById('scheduleFilterDepartment').value = '';
-    document.getElementById('scheduleFilterDate').value = '';
-    document.getElementById('scheduleFilterStatus').value = '';
-    renderScheduleTable();
+  // Schedule Management: employee list sub-view
+  document.getElementById('scheduleEmpSearchInput').addEventListener('input', renderScheduleEmployeeList);
+  document.getElementById('scheduleEmpDeptFilter').addEventListener('change', renderScheduleEmployeeList);
+
+  // Schedule Management: individual monthly calendar sub-view
+  document.getElementById('scheduleBackToListBtn').addEventListener('click', () => {
+    if (scheduleHasUnsavedChanges) {
+      const proceed = confirm('You have unsaved changes on this month. Discard them and go back?');
+      if (!proceed) return;
+    }
+    showScheduleListView();
   });
+  document.getElementById('scheduleMonthPrevBtn').addEventListener('click', () => navigateScheduleMonth(-1));
+  document.getElementById('scheduleMonthNextBtn').addEventListener('click', () => navigateScheduleMonth(1));
+  document.getElementById('scheduleLockToggleBtn').addEventListener('click', toggleScheduleLock);
+  document.getElementById('scheduleSaveAllBtn').addEventListener('click', handleSaveAllSchedule);
 
   // Add/Edit Form submission
   document.getElementById('employeeForm').addEventListener('submit', async (e) => {
