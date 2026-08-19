@@ -35,6 +35,7 @@
 
   .font-mono-tabular { font-variant-numeric: tabular-nums; }
   table.roster th { position: sticky; top: 0; z-index: 5; }
+  .line-clamp-2 { display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
 </style>
 </head>
 
@@ -412,14 +413,84 @@
         </div>
       </section>
 
-      <!-- MODULE: OVERTIME MANAGEMENT -->
+      <!-- MODULE: OVERTIME MANAGEMENT (APPROVAL CENTER) -->
       <section id="moduleOvertime" class="hidden space-y-6">
         <div>
-          <h3 class="text-base font-semibold text-slate-900">Overtime Management</h3>
-          <p class="text-xs text-slate-500 mt-0.5">Active personnel available for overtime requests.</p>
+          <h3 class="text-base font-semibold text-slate-900">Overtime Approval Center</h3>
+          <p class="text-xs text-slate-500 mt-0.5">Review, approve, or reject overtime requests submitted by employees.</p>
         </div>
-        <div class="rounded-xl border border-slate-300 bg-slate-50 p-6 text-sm text-slate-600">
-          Integrated with Employee Management.
+
+        <!-- KPI CARDS -->
+        <div class="grid grid-cols-2 md:grid-cols-5 gap-4">
+          <div class="rounded-xl border border-slate-300 bg-slate-50 p-4">
+            <p class="text-xs text-slate-500 mb-1">Total OT Requests</p>
+            <p id="otKpiTotal" class="text-2xl font-semibold text-slate-900 font-mono-tabular">0</p>
+          </div>
+          <div class="rounded-xl border border-amber-300 bg-amber-50 p-4">
+            <p class="text-xs text-amber-700 mb-1">Pending</p>
+            <p id="otKpiPending" class="text-2xl font-semibold text-amber-700 font-mono-tabular">0</p>
+          </div>
+          <div class="rounded-xl border border-emerald-300 bg-emerald-50 p-4">
+            <p class="text-xs text-emerald-700 mb-1">Approved</p>
+            <p id="otKpiApproved" class="text-2xl font-semibold text-emerald-700 font-mono-tabular">0</p>
+          </div>
+          <div class="rounded-xl border border-rose-300 bg-rose-50 p-4">
+            <p class="text-xs text-rose-700 mb-1">Rejected</p>
+            <p id="otKpiRejected" class="text-2xl font-semibold text-rose-700 font-mono-tabular">0</p>
+          </div>
+          <div class="rounded-xl border border-slate-300 bg-slate-50 p-4">
+            <p class="text-xs text-slate-500 mb-1">Total Approved OT Hrs</p>
+            <p id="otKpiApprovedHours" class="text-2xl font-semibold text-slate-900 font-mono-tabular">0.00</p>
+          </div>
+        </div>
+
+        <!-- Filters & Search Bar -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-6 gap-3 bg-slate-50 p-4 rounded-xl border border-slate-300">
+          <div class="lg:col-span-2">
+            <input id="otSearchInput" type="text" placeholder="Search employee name..." class="w-full bg-white border border-slate-300 rounded-lg px-3 py-2 text-xs text-slate-900 focus:outline-none focus:ring-2 focus:ring-amber-500/60" />
+          </div>
+          <select id="otFilterEmployee" class="employee-select w-full bg-white border border-slate-300 rounded-lg px-3 py-2 text-xs text-slate-900 focus:outline-none focus:ring-2 focus:ring-amber-500/60" data-placeholder="All Employees"></select>
+          <select id="otFilterDept" class="department-select w-full bg-white border border-slate-300 rounded-lg px-3 py-2 text-xs text-slate-900 focus:outline-none focus:ring-2 focus:ring-amber-500/60"></select>
+          <select id="otFilterStatus" class="w-full bg-white border border-slate-300 rounded-lg px-3 py-2 text-xs text-slate-900 focus:outline-none focus:ring-2 focus:ring-amber-500/60">
+            <option value="">All Statuses</option>
+            <option value="Pending">Pending</option>
+            <option value="Approved">Approved</option>
+            <option value="Rejected">Rejected</option>
+          </select>
+          <input id="otFilterMonth" type="month" class="w-full bg-white border border-slate-300 rounded-lg px-3 py-2 text-xs text-slate-900 focus:outline-none focus:ring-2 focus:ring-amber-500/60" />
+          <div class="lg:col-span-6 flex flex-wrap items-center gap-3">
+            <label class="text-[11px] text-slate-500 font-medium">Date range:</label>
+            <input id="otFilterDateFrom" type="date" class="bg-white border border-slate-300 rounded-lg px-3 py-2 text-xs text-slate-900 focus:outline-none focus:ring-2 focus:ring-amber-500/60" />
+            <span class="text-xs text-slate-400">to</span>
+            <input id="otFilterDateTo" type="date" class="bg-white border border-slate-300 rounded-lg px-3 py-2 text-xs text-slate-900 focus:outline-none focus:ring-2 focus:ring-amber-500/60" />
+            <button id="otResetFiltersBtn" class="ml-auto bg-slate-200 hover:bg-slate-300 text-slate-700 font-medium text-xs px-3 py-2 rounded-lg transition-colors">
+              Reset Filters
+            </button>
+          </div>
+        </div>
+
+        <!-- Overtime Requests Table -->
+        <div class="rounded-xl border border-slate-300 bg-slate-50 overflow-hidden">
+          <div class="overflow-x-auto">
+            <table class="w-full text-sm border-collapse min-w-[1200px]">
+              <thead>
+                <tr class="bg-slate-100 text-slate-500 text-xs uppercase tracking-wide">
+                  <th class="text-left px-4 py-3 border-b border-slate-300">Employee</th>
+                  <th class="text-left px-4 py-3 border-b border-slate-300">Dept / Position</th>
+                  <th class="text-left px-4 py-3 border-b border-slate-300">Date of OT</th>
+                  <th class="text-left px-4 py-3 border-b border-slate-300">OT Time</th>
+                  <th class="text-right px-4 py-3 border-b border-slate-300">Total Hrs</th>
+                  <th class="text-left px-4 py-3 border-b border-slate-300">Reason / Purpose</th>
+                  <th class="text-left px-4 py-3 border-b border-slate-300">Date Filed</th>
+                  <th class="text-center px-4 py-3 border-b border-slate-300">Status</th>
+                  <th class="text-center px-4 py-3 border-b border-slate-300">Actions</th>
+                </tr>
+              </thead>
+              <tbody id="overtimeTableBody" class="divide-y divide-slate-200">
+                <tr><td colspan="9" class="px-4 py-8 text-center text-slate-400">Loading overtime requests...</td></tr>
+              </tbody>
+            </table>
+          </div>
         </div>
       </section>
 
@@ -784,6 +855,9 @@ function switchModule(targetId) {
   } else if (targetId === 'schedule') {
     showScheduleListView();
     renderScheduleEmployeeList();
+  } else if (targetId === 'overtime') {
+    populateEmployeeDropdowns();
+    fetchOvertimeRequests();
   }
 }
 
@@ -1551,6 +1625,205 @@ async function toggleScheduleLock() {
   }
 }
 
+/* ===============================
+   OVERTIME MANAGEMENT (APPROVAL CENTER)
+=============================== */
+const OVERTIME_TABLE = 'overtime_requests';
+let overtimeCache = [];
+
+function computeOtHours(startTime, endTime) {
+  if (!startTime || !endTime) return null;
+  const toMinutes = (t) => {
+    const [h, m] = t.split(':').map(Number);
+    return h * 60 + m;
+  };
+  let startMin = toMinutes(startTime);
+  let endMin = toMinutes(endTime);
+  if (endMin <= startMin) endMin += 24 * 60; // overnight OT
+  return Math.max(0, (endMin - startMin) / 60);
+}
+
+function otRowHours(row) {
+  if (row.total_hours !== null && row.total_hours !== undefined && row.total_hours !== '') {
+    const n = Number(row.total_hours);
+    if (Number.isFinite(n)) return n;
+  }
+  const computed = computeOtHours(
+    row.start_time ? row.start_time.slice(0, 5) : '',
+    row.end_time ? row.end_time.slice(0, 5) : ''
+  );
+  return computed === null ? 0 : computed;
+}
+
+async function fetchOvertimeRequests() {
+  const tbody = document.getElementById('overtimeTableBody');
+  tbody.innerHTML = `<tr><td colspan="9" class="px-4 py-8 text-center text-slate-400">Loading overtime requests...</td></tr>`;
+
+  try {
+    const { data, error } = await supabaseClient
+      .from(OVERTIME_TABLE)
+      .select('*')
+      .order('created_at', { ascending: false });
+    if (error) throw error;
+
+    overtimeCache = data || [];
+    renderOvertimeKPIs();
+    renderOvertimeTable();
+  } catch (err) {
+    console.error('fetchOvertimeRequests error:', err);
+    tbody.innerHTML = `<tr><td colspan="9" class="px-4 py-8 text-center text-rose-600">Unable to load overtime requests. Check that the "overtime_requests" table exists.</td></tr>`;
+    showToast('Unable to load overtime requests.', 'error');
+  }
+}
+
+function renderOvertimeKPIs() {
+  const total = overtimeCache.length;
+  const pending = overtimeCache.filter(r => (r.status || 'Pending') === 'Pending').length;
+  const approved = overtimeCache.filter(r => r.status === 'Approved');
+  const rejected = overtimeCache.filter(r => r.status === 'Rejected').length;
+  const approvedHours = approved.reduce((sum, r) => sum + otRowHours(r), 0);
+
+  document.getElementById('otKpiTotal').textContent = total;
+  document.getElementById('otKpiPending').textContent = pending;
+  document.getElementById('otKpiApproved').textContent = approved.length;
+  document.getElementById('otKpiRejected').textContent = rejected;
+  document.getElementById('otKpiApprovedHours').textContent = approvedHours.toFixed(2);
+}
+
+function getOtFilteredRows() {
+  const searchVal = (document.getElementById('otSearchInput').value || '').toLowerCase();
+  const empVal = document.getElementById('otFilterEmployee').value;
+  const deptVal = document.getElementById('otFilterDept').value;
+  const statusVal = document.getElementById('otFilterStatus').value;
+  const monthVal = document.getElementById('otFilterMonth').value; // YYYY-MM
+  const dateFrom = document.getElementById('otFilterDateFrom').value;
+  const dateTo = document.getElementById('otFilterDateTo').value;
+
+  return overtimeCache.filter(r => {
+    const emp = employeesCache.find(e => e.id === r.employee_id);
+    const fullName = emp ? `${emp.first_name || ''} ${emp.last_name || ''}`.toLowerCase() : '';
+    const dept = emp ? emp.department : '';
+
+    if (searchVal && !fullName.includes(searchVal)) return false;
+    if (empVal && r.employee_id !== empVal) return false;
+    if (deptVal && dept !== deptVal) return false;
+    if (statusVal && (r.status || 'Pending') !== statusVal) return false;
+    if (monthVal && !(r.ot_date || '').startsWith(monthVal)) return false;
+    if (dateFrom && (r.ot_date || '') < dateFrom) return false;
+    if (dateTo && (r.ot_date || '') > dateTo) return false;
+    return true;
+  }).sort((a, b) => (b.ot_date || '').localeCompare(a.ot_date || ''));
+}
+
+function formatTimeLabel(t) {
+  if (!t) return 'N/A';
+  const [h, m] = t.slice(0, 5).split(':').map(Number);
+  const period = h >= 12 ? 'PM' : 'AM';
+  const h12 = h % 12 === 0 ? 12 : h % 12;
+  return `${h12}:${String(m).padStart(2, '0')} ${period}`;
+}
+
+function formatDateLabel(dateStr) {
+  if (!dateStr) return 'N/A';
+  const d = new Date(dateStr + 'T00:00:00');
+  if (isNaN(d.getTime())) return dateStr;
+  return d.toLocaleDateString('en-US', { month: 'short', day: '2-digit', year: 'numeric' });
+}
+
+function formatDateTimeLabel(isoStr) {
+  if (!isoStr) return 'N/A';
+  const d = new Date(isoStr);
+  if (isNaN(d.getTime())) return isoStr;
+  return d.toLocaleDateString('en-US', { month: 'short', day: '2-digit', year: 'numeric' }) +
+    ' ' + d.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' });
+}
+
+function renderOvertimeTable() {
+  const tbody = document.getElementById('overtimeTableBody');
+  const filtered = getOtFilteredRows();
+
+  if (filtered.length === 0) {
+    tbody.innerHTML = `<tr><td colspan="9" class="px-4 py-8 text-center text-slate-400">No matching overtime requests found.</td></tr>`;
+    return;
+  }
+
+  tbody.innerHTML = filtered.map(r => {
+    const emp = employeesCache.find(e => e.id === r.employee_id);
+    const empName = emp ? `${emp.first_name} ${emp.last_name}` : 'Unknown Employee';
+    const empMeta = emp ? `${emp.department || 'N/A'} • ${emp.position || emp.job_title || 'N/A'}` : 'N/A';
+    const status = r.status || 'Pending';
+    const hours = otRowHours(r);
+
+    let statusClass = 'bg-amber-500/15 text-amber-700 border-amber-500/30';
+    if (status === 'Approved') statusClass = 'bg-emerald-500/15 text-emerald-700 border-emerald-500/30';
+    if (status === 'Rejected') statusClass = 'bg-rose-500/15 text-rose-700 border-rose-500/30';
+
+    let actionsHtml = `<span class="text-[11px] text-slate-400">${escapeHtml(r.reviewed_by || '')}${r.reviewed_at ? ' • ' + formatDateTimeLabel(r.reviewed_at) : ''}</span>`;
+    if (status === 'Pending') {
+      actionsHtml = `
+        <div class="flex items-center justify-center gap-2">
+          <button onclick="confirmOvertimeDecision('${r.id}', 'Approved')" class="text-xs px-2.5 py-1 rounded border border-emerald-300 text-emerald-700 hover:bg-emerald-50 font-medium">Approve</button>
+          <button onclick="confirmOvertimeDecision('${r.id}', 'Rejected')" class="text-xs px-2.5 py-1 rounded border border-rose-300 text-rose-700 hover:bg-rose-50 font-medium">Reject</button>
+        </div>
+      `;
+    }
+
+    return `
+      <tr class="hover:bg-slate-100 transition-colors">
+        <td class="px-4 py-3">
+          <div class="font-medium text-slate-900">${escapeHtml(empName)}</div>
+          <div class="text-[11px] text-slate-400 font-mono">ID: ${escapeHtml(emp ? emp.employee_number : 'N/A')}</div>
+        </td>
+        <td class="px-4 py-3 text-slate-800">${escapeHtml(empMeta)}</td>
+        <td class="px-4 py-3 text-slate-800 whitespace-nowrap">${formatDateLabel(r.ot_date)}</td>
+        <td class="px-4 py-3 text-slate-800 whitespace-nowrap">${formatTimeLabel(r.start_time)} – ${formatTimeLabel(r.end_time)}</td>
+        <td class="px-4 py-3 text-right font-mono-tabular font-semibold text-slate-900">${hours.toFixed(2)}</td>
+        <td class="px-4 py-3 text-slate-700 max-w-[220px]"><span class="line-clamp-2">${escapeHtml(r.reason || 'N/A')}</span></td>
+        <td class="px-4 py-3 text-slate-500 text-xs whitespace-nowrap">${formatDateTimeLabel(r.created_at)}</td>
+        <td class="px-4 py-3 text-center">
+          <span class="text-xs px-2 py-0.5 rounded-full border ${statusClass} font-medium">${escapeHtml(status)}</span>
+        </td>
+        <td class="px-4 py-3 text-center">${actionsHtml}</td>
+      </tr>
+    `;
+  }).join('');
+}
+
+function confirmOvertimeDecision(id, decision) {
+  const verb = decision === 'Approved' ? 'approve' : 'reject';
+  openConfirmModal(
+    `${decision} Overtime Request`,
+    `Are you sure you want to ${verb} this overtime request? This will update its status immediately.`,
+    () => decideOvertimeRequest(id, decision)
+  );
+}
+
+async function decideOvertimeRequest(id, decision) {
+  let adminEmail = '';
+  try {
+    const { data: { session } } = await supabaseClient.auth.getSession();
+    adminEmail = session && session.user ? session.user.email : '';
+  } catch (_) { /* non-fatal */ }
+
+  try {
+    const { error } = await supabaseClient
+      .from(OVERTIME_TABLE)
+      .update({
+        status: decision,
+        reviewed_by: adminEmail,
+        reviewed_at: new Date().toISOString()
+      })
+      .eq('id', id);
+    if (error) throw error;
+
+    showToast(`Overtime request ${decision.toLowerCase()}.`, 'success');
+    await fetchOvertimeRequests();
+  } catch (err) {
+    console.error('decideOvertimeRequest error:', err);
+    showToast('Failed to update overtime request. Ensure the "overtime_requests" table has status/reviewed_by/reviewed_at columns.', 'error');
+  }
+}
+
 /* AUTHENTICATION (Supabase Auth) */
 function enterApp(session) {
   document.getElementById('loginScreen').classList.add('hidden');
@@ -1657,6 +1930,25 @@ function registerEventListeners() {
   });
   document.getElementById('confirmModal').addEventListener('click', (evt) => {
     if (evt.target.id === 'confirmModal') closeConfirmModal();
+  });
+
+  // Overtime Approval Center: filters & search
+  document.getElementById('otSearchInput').addEventListener('input', renderOvertimeTable);
+  document.getElementById('otFilterEmployee').addEventListener('change', renderOvertimeTable);
+  document.getElementById('otFilterDept').addEventListener('change', renderOvertimeTable);
+  document.getElementById('otFilterStatus').addEventListener('change', renderOvertimeTable);
+  document.getElementById('otFilterMonth').addEventListener('change', renderOvertimeTable);
+  document.getElementById('otFilterDateFrom').addEventListener('change', renderOvertimeTable);
+  document.getElementById('otFilterDateTo').addEventListener('change', renderOvertimeTable);
+  document.getElementById('otResetFiltersBtn').addEventListener('click', () => {
+    document.getElementById('otSearchInput').value = '';
+    document.getElementById('otFilterEmployee').value = '';
+    document.getElementById('otFilterDept').value = '';
+    document.getElementById('otFilterStatus').value = '';
+    document.getElementById('otFilterMonth').value = '';
+    document.getElementById('otFilterDateFrom').value = '';
+    document.getElementById('otFilterDateTo').value = '';
+    renderOvertimeTable();
   });
 
   // Schedule Management: employee list sub-view
