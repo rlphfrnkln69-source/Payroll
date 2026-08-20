@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -10,6 +11,8 @@
 
 <!-- Supabase JS Client CDN -->
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
 
 <style>
   :root {
@@ -691,12 +694,102 @@
 
       <!-- MODULE: PAYROLL MANAGEMENT -->
       <section id="modulePayroll" class="hidden space-y-6">
-        <div>
-          <h3 class="text-base font-semibold text-slate-900">Centralized Payroll Generation Center</h3>
-          <p class="text-xs text-slate-500 mt-0.5">Automatically retrieves employee salary, statutory details, and attendance.</p>
+        <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
+          <div>
+            <h3 class="text-base font-semibold text-slate-900">Centralized Payroll Generation Center</h3>
+            <p class="text-xs text-slate-500 mt-0.5">Schedule → Attendance → Leave → Overtime → Payroll → Payslip</p>
+          </div>
+          <div class="flex flex-wrap items-center gap-2">
+            <button id="payrollRefreshBtn" class="px-3 py-2 text-xs font-semibold rounded-lg border border-slate-300 bg-white hover:bg-slate-50">Refresh</button>
+            <button id="payrollGenerateBtn" class="px-4 py-2 text-xs font-semibold rounded-lg bg-amber-500 hover:bg-amber-400 text-slate-900">Generate Payroll</button>
+          </div>
         </div>
-        <div class="rounded-xl border border-slate-300 bg-slate-50 p-6 text-sm text-slate-600">
-          Integrated with Employee Management. Salaries and rates pull automatically for payroll cutoffs.
+
+        <!-- PAYROLL PERIOD -->
+        <div class="rounded-xl border border-slate-300 bg-white p-4">
+          <div class="flex flex-wrap items-end gap-3">
+            <div class="min-w-[180px]">
+              <label class="text-[11px] font-semibold uppercase tracking-wide text-slate-500">Payroll Period</label>
+              <select id="payrollPeriodPreset" class="mt-1 w-full bg-white border border-slate-300 rounded-lg px-3 py-2 text-sm">
+                <option value="custom">Custom Date Range</option>
+                <option value="1-15">1st–15th</option>
+                <option value="16-end">16th–End of Month</option>
+                <option value="month">Whole Month</option>
+              </select>
+            </div>
+            <div>
+              <label class="text-[11px] font-semibold uppercase tracking-wide text-slate-500">From</label>
+              <input id="payrollDateFrom" type="date" class="mt-1 bg-white border border-slate-300 rounded-lg px-3 py-2 text-sm" />
+            </div>
+            <div>
+              <label class="text-[11px] font-semibold uppercase tracking-wide text-slate-500">To</label>
+              <input id="payrollDateTo" type="date" class="mt-1 bg-white border border-slate-300 rounded-lg px-3 py-2 text-sm" />
+            </div>
+            <div class="min-w-[150px]">
+              <label class="text-[11px] font-semibold uppercase tracking-wide text-slate-500">Working Days / Month</label>
+              <input id="payrollWorkingDays" type="number" min="1" step="0.01" value="26" class="mt-1 w-full bg-white border border-slate-300 rounded-lg px-3 py-2 text-sm" />
+            </div>
+            <div class="min-w-[140px]">
+              <label class="text-[11px] font-semibold uppercase tracking-wide text-slate-500">Hours / Day</label>
+              <input id="payrollHoursPerDay" type="number" min="1" step="0.25" value="8" class="mt-1 w-full bg-white border border-slate-300 rounded-lg px-3 py-2 text-sm" />
+            </div>
+          </div>
+          <div class="mt-3 text-xs text-slate-500">Statutory deductions are calculated from the employee's monthly basic salary and are split across the cutoff when using semi-monthly payroll. Tax and contribution assumptions remain configurable for HR review.</div>
+        </div>
+
+        <!-- KPIs -->
+        <div class="grid grid-cols-2 md:grid-cols-4 xl:grid-cols-7 gap-3">
+          <div class="rounded-xl border border-slate-300 bg-slate-50 p-3"><p class="text-[11px] text-slate-500">Employees</p><p id="payrollKpiEmployees" class="text-xl font-semibold font-mono-tabular">0</p></div>
+          <div class="rounded-xl border border-slate-300 bg-slate-50 p-3"><p class="text-[11px] text-slate-500">Payroll Period</p><p id="payrollKpiPeriod" class="text-sm font-semibold mt-1">—</p></div>
+          <div class="rounded-xl border border-slate-300 bg-slate-50 p-3"><p class="text-[11px] text-slate-500">Gross Pay</p><p id="payrollKpiGross" class="text-xl font-semibold font-mono-tabular">₱0.00</p></div>
+          <div class="rounded-xl border border-slate-300 bg-slate-50 p-3"><p class="text-[11px] text-slate-500">OT Pay</p><p id="payrollKpiOt" class="text-xl font-semibold font-mono-tabular">₱0.00</p></div>
+          <div class="rounded-xl border border-slate-300 bg-slate-50 p-3"><p class="text-[11px] text-slate-500">Deductions</p><p id="payrollKpiDeductions" class="text-xl font-semibold font-mono-tabular">₱0.00</p></div>
+          <div class="rounded-xl border border-emerald-300 bg-emerald-50 p-3"><p class="text-[11px] text-emerald-700">Net Pay</p><p id="payrollKpiNet" class="text-xl font-semibold text-emerald-700 font-mono-tabular">₱0.00</p></div>
+          <div class="rounded-xl border border-slate-300 bg-slate-50 p-3"><p class="text-[11px] text-slate-500">Status</p><p id="payrollKpiStatus" class="text-sm font-semibold mt-1">No payroll</p></div>
+        </div>
+
+        <!-- EXCEPTIONS -->
+        <div id="payrollExceptionsCard" class="hidden rounded-xl border border-amber-300 bg-amber-50 overflow-hidden">
+          <div class="px-4 py-3 border-b border-amber-200 flex items-center justify-between">
+            <div><h4 class="text-sm font-semibold text-amber-900">⚠ Payroll Exceptions</h4><p class="text-xs text-amber-800 mt-0.5">Resolve source-data issues before finalizing payroll.</p></div>
+            <span id="payrollExceptionCount" class="text-xs font-semibold px-2 py-1 rounded-full bg-amber-200 text-amber-900">0</span>
+          </div>
+          <div id="payrollExceptionsList" class="divide-y divide-amber-200"></div>
+        </div>
+
+        <!-- PAYROLL ACTIONS -->
+        <div class="rounded-xl border border-slate-300 bg-slate-50 p-3 flex flex-wrap items-center justify-between gap-2">
+          <div class="text-xs text-slate-600"><span class="font-semibold">Verification:</span> review employee details before finalizing. Finalized payroll is locked.</div>
+          <div class="flex flex-wrap gap-2">
+            <button id="payrollFinalizeBtn" class="hidden px-3 py-2 text-xs font-semibold rounded-lg bg-emerald-600 text-white hover:bg-emerald-700">Finalize Payroll</button>
+            <button id="payrollReleaseBtn" class="hidden px-3 py-2 text-xs font-semibold rounded-lg bg-sky-600 text-white hover:bg-sky-700">Release Payroll</button>
+            <button id="payrollExcelBtn" class="hidden px-3 py-2 text-xs font-semibold rounded-lg border border-emerald-300 text-emerald-700 bg-white hover:bg-emerald-50">Download Excel</button>
+            <button id="payrollDeleteBtn" class="hidden px-3 py-2 text-xs font-semibold rounded-lg border border-rose-300 text-rose-700 bg-white hover:bg-rose-50">Delete Payroll</button>
+          </div>
+        </div>
+
+        <!-- GENERATED PAYROLL TABLE -->
+        <div class="rounded-xl border border-slate-300 bg-white overflow-hidden">
+          <div class="px-4 py-3 border-b border-slate-200 flex flex-wrap items-center justify-between gap-2">
+            <div><h4 class="text-sm font-semibold text-slate-900">Payroll Verification / Review Center</h4><p class="text-xs text-slate-500">Each line is a payroll snapshot generated from the HRIS source records.</p></div>
+            <input id="payrollEmployeeSearch" type="search" placeholder="Search employee…" class="border border-slate-300 rounded-lg px-3 py-2 text-xs w-56" />
+          </div>
+          <div class="overflow-x-auto">
+            <table class="w-full text-xs min-w-[1500px]">
+              <thead class="bg-slate-100 text-slate-500 uppercase tracking-wide">
+                <tr>
+                  <th class="text-left px-3 py-3">Employee</th><th class="text-right px-3 py-3">Days</th><th class="text-right px-3 py-3">Paid Leave</th><th class="text-right px-3 py-3">Unpaid Leave</th><th class="text-right px-3 py-3">Absences</th><th class="text-right px-3 py-3">Late</th><th class="text-right px-3 py-3">Undertime</th><th class="text-right px-3 py-3">Regular Hrs</th><th class="text-right px-3 py-3">OT Hrs</th><th class="text-right px-3 py-3">OT Pay</th><th class="text-right px-3 py-3">Basic Pay</th><th class="text-right px-3 py-3">Gross</th><th class="text-right px-3 py-3">Deductions</th><th class="text-right px-3 py-3">Net</th><th class="text-center px-3 py-3">Actions</th>
+                </tr>
+              </thead>
+              <tbody id="payrollTableBody" class="divide-y divide-slate-200"><tr><td colspan="15" class="px-4 py-10 text-center text-slate-400">Select a payroll period and generate payroll.</td></tr></tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- GENERATED PAYROLL HISTORY -->
+        <div class="rounded-xl border border-slate-300 bg-white overflow-hidden">
+          <div class="px-4 py-3 border-b border-slate-200"><h4 class="text-sm font-semibold text-slate-900">Generated Payroll History</h4><p class="text-xs text-slate-500">Exact cutoff periods are unique. Regeneration replaces the existing run after confirmation.</p></div>
+          <div class="overflow-x-auto"><table class="w-full text-xs"><thead class="bg-slate-100 text-slate-500 uppercase"><tr><th class="text-left px-4 py-3">Period</th><th class="text-right px-4 py-3">Employees</th><th class="text-right px-4 py-3">Gross</th><th class="text-right px-4 py-3">Deductions</th><th class="text-right px-4 py-3">Net</th><th class="text-center px-4 py-3">Status</th><th class="text-center px-4 py-3">Created</th><th class="text-center px-4 py-3">Action</th></tr></thead><tbody id="payrollHistoryBody" class="divide-y divide-slate-200"><tr><td colspan="8" class="px-4 py-6 text-center text-slate-400">No generated payroll history.</td></tr></tbody></table></div>
         </div>
       </section>
 
@@ -1071,6 +1164,8 @@ function switchModule(targetId) {
     populateEmployeeDropdowns();
     fetchLeaveRequests();
     fetchLeaveBalances();
+  } else if (targetId === 'payroll') {
+    initPayrollModule();
   }
 }
 
@@ -2711,6 +2806,287 @@ function exitToLogin() {
   document.getElementById('loginForm').reset();
 }
 
+/* ===============================
+   PAYROLL MANAGEMENT
+   Consolidates schedules, attendance, leave and approved overtime.
+=============================== */
+const PAYROLL_RUNS_TABLE = 'payroll_runs';
+const PAYROLL_ITEMS_TABLE = 'payroll_items';
+let payrollCurrentRun = null;
+let payrollCurrentItems = [];
+let payrollHistoryCache = [];
+
+function payrollMoney(v) { return Number(v || 0); }
+function payrollRound(v) { return Math.round((Number(v) || 0) * 100) / 100; }
+function payrollDateObj(s) { return new Date((s || '') + 'T00:00:00'); }
+function payrollDaysInclusive(from, to) { return Math.max(1, Math.round((payrollDateObj(to)-payrollDateObj(from))/86400000)+1); }
+function payrollIsSemiMonthly(from, to) {
+  const f=payrollDateObj(from), t=payrollDateObj(to);
+  return f.getDate() === 1 || f.getDate() === 16;
+}
+function payrollPeriodFactor(from, to) {
+  const f=payrollDateObj(from), t=payrollDateObj(to);
+  if (f.getDate()===1 && t.getDate()===15) return 0.5;
+  const end=new Date(f.getFullYear(), f.getMonth()+1, 0).getDate();
+  if (f.getDate()===16 && t.getDate()===end) return 0.5;
+  if (f.getDate()===1 && t.getDate()===end) return 1;
+  return payrollDaysInclusive(from,to)/30;
+}
+function payrollTimeMinutes(t) { if(!t) return null; const p=t.slice(0,5).split(':').map(Number); return p[0]*60+p[1]; }
+function payrollIntervalMinutes(start,end) { let a=payrollTimeMinutes(start),b=payrollTimeMinutes(end); if(a===null||b===null)return 0; if(b<=a)b+=1440; return Math.max(0,b-a); }
+function payrollOverlapMinutes(aStart,aEnd,bStart,bEnd){
+  if(!aStart||!aEnd||!bStart||!bEnd)return 0;
+  let a=payrollTimeMinutes(aStart), b=payrollTimeMinutes(aEnd), c=payrollTimeMinutes(bStart), d=payrollTimeMinutes(bEnd);
+  if(b<=a)b+=1440; if(d<=c)d+=1440; if(c<a)c+=1440; if(d<a)d+=1440;
+  return Math.max(0,Math.min(b,d)-Math.max(a,c));
+}
+function payrollActualHours(log,schedule){
+  if(!log || !log.time_in || !log.time_out)return 0;
+  const raw=payrollIntervalMinutes(log.time_in,log.time_out);
+  const br=payrollOverlapMinutes(log.time_in,log.time_out,schedule?.break_start,schedule?.break_end);
+  return Math.max(0,(raw-br)/60);
+}
+function payrollExpectedHours(s){
+  if(!s || s.is_rest_day || !s.start_time || !s.end_time)return 0;
+  const raw=payrollIntervalMinutes(s.start_time,s.end_time);
+  const br=(s.break_start&&s.break_end)?payrollIntervalMinutes(s.break_start,s.break_end):0;
+  return Math.max(0,(raw-br)/60);
+}
+function payrollLateMinutes(log,s){
+  if(!log?.time_in||!s?.start_time||s.is_rest_day)return 0;
+  let a=payrollTimeMinutes(log.time_in), b=payrollTimeMinutes(s.start_time); if(a<b && payrollIntervalMinutes(s.start_time,s.end_time)>720)a+=1440;
+  return Math.max(0,a-b);
+}
+function payrollUndertimeMinutes(log,s){
+  if(!log?.time_out||!s?.end_time||s.is_rest_day)return 0;
+  const expected=payrollExpectedHours(s), actual=payrollActualHours(log,s);
+  return Math.max(0,Math.round((expected-actual)*60));
+}
+function payrollStatusClass(status){
+  if(status==='Finalized')return 'bg-emerald-50 text-emerald-700 border-emerald-300';
+  if(status==='Released')return 'bg-sky-50 text-sky-700 border-sky-300';
+  if(status==='For Verification')return 'bg-amber-50 text-amber-700 border-amber-300';
+  return 'bg-slate-50 text-slate-600 border-slate-300';
+}
+function payrollGetPeriod(){ return {from:document.getElementById('payrollDateFrom').value,to:document.getElementById('payrollDateTo').value}; }
+function payrollSetDefaultPeriod(){
+  const now=new Date(), y=now.getFullYear(), m=now.getMonth(), d=now.getDate();
+  const pad=n=>String(n).padStart(2,'0');
+  const from=d<=15?`${y}-${pad(m+1)}-01`:`${y}-${pad(m+1)}-16`;
+  const to=d<=15?`${y}-${pad(m+1)}-15`:`${y}-${pad(m+1)}-${pad(new Date(y,m+1,0).getDate())}`;
+  document.getElementById('payrollDateFrom').value=from; document.getElementById('payrollDateTo').value=to;
+  document.getElementById('payrollPeriodPreset').value=d<=15?'1-15':'16-end';
+}
+function payrollApplyPreset(){
+  const p=document.getElementById('payrollPeriodPreset').value; const base=payrollDateObj(document.getElementById('payrollDateFrom').value||new Date().toISOString().slice(0,10));
+  const y=base.getFullYear(),m=base.getMonth(),pad=n=>String(n).padStart(2,'0'),end=new Date(y,m+1,0).getDate();
+  if(p==='month'){document.getElementById('payrollDateFrom').value=`${y}-${pad(m+1)}-01`;document.getElementById('payrollDateTo').value=`${y}-${pad(m+1)}-${pad(end)}`;}
+  if(p==='1-15'){document.getElementById('payrollDateFrom').value=`${y}-${pad(m+1)}-01`;document.getElementById('payrollDateTo').value=`${y}-${pad(m+1)}-15`;}
+  if(p==='16-end'){document.getElementById('payrollDateFrom').value=`${y}-${pad(m+1)}-16`;document.getElementById('payrollDateTo').value=`${y}-${pad(m+1)}-${pad(end)}`;}
+}
+
+async function payrollFetchSources(from,to){
+  const [s,a,l,lb,o,h] = await Promise.all([
+    supabaseClient.from('schedules').select('*').gte('schedule_date',from).lte('schedule_date',to),
+    supabaseClient.from('attendance_logs').select('*').gte('attendance_date',from).lte('attendance_date',to),
+    supabaseClient.from(LEAVE_TABLE).select('*').eq('status','Approved').lte('start_date',to).gte('end_date',from),
+    supabaseClient.from(LEAVE_BALANCE_TABLE).select('*'),
+    supabaseClient.from(OVERTIME_TABLE).select('*').eq('status','Approved').gte('ot_date',from).lte('ot_date',to),
+    supabaseClient.from('holidays').select('*').gte('holiday_date',from).lte('holiday_date',to)
+  ]);
+  for(const x of [s,a,l,lb,o]) if(x.error) throw x.error;
+  const holidays = h.error ? [] : (h.data || []);
+  return {schedules:s.data||[],attendance:a.data||[],leaves:l.data||[],balances:lb.data||[],overtime:o.data||[],holidays};
+}
+function payrollLeaveForDate(leaves,employeeId,date){
+  return leaves.find(l=>l.employee_id===employeeId && (l.start_date||'')<=date && (l.end_date||'')>=date && l.status==='Approved') || null;
+}
+function payrollLeavePaid(leave,balances){
+  if(!leave)return false;
+  if(typeof leave.is_paid==='boolean')return leave.is_paid;
+  if(typeof leave.paid_leave==='boolean')return leave.paid_leave;
+  if(String(leave.pay_status||'').toLowerCase()==='unpaid')return false;
+  if(String(leave.pay_status||'').toLowerCase()==='paid')return true;
+  const type=normalizeLeaveType(leave.leave_type);
+  const b=balances.find(x=>x.employee_id===leave.employee_id&&x.leave_type===type);
+  // If Leave Management exposes an explicit pay flag, honor it. Otherwise, an approved
+  // leave type is treated as paid only when a leave-balance row exists with enough remaining credit.
+  return !!b && Number(b.balance) >= 0;
+}
+function payrollApprovedOtHours(o){ return o.reduce((sum,r)=>sum+otRowHours(r),0); }
+function payrollTaxAnnual(taxableAnnual){
+  const x=Math.max(0,taxableAnnual);
+  if(x<=250000)return 0;
+  if(x<=400000)return (x-250000)*0.15;
+  if(x<=800000)return 22500+(x-400000)*0.20;
+  if(x<=2000000)return 102500+(x-800000)*0.25;
+  if(x<=8000000)return 402500+(x-2000000)*0.30;
+  return 2202500+(x-8000000)*0.35;
+}
+function payrollComputeStatutories(monthlyBasic,periodFactor,grossForTax){
+  const sssMonthly=Math.min(35000,Math.max(5000,monthlyBasic))*0.05;
+  const philBase=Math.min(100000,Math.max(10000,monthlyBasic));
+  const philMonthly=philBase*0.05*0.5;
+  const pagBase=Math.min(10000,Math.max(0,monthlyBasic));
+  const pagRate=monthlyBasic<=1500?0.01:0.02;
+  const pagMonthly=Math.min(200,pagBase*pagRate);
+  const sss=sssMonthly*periodFactor, phil=philMonthly*periodFactor, pag=pagMonthly*periodFactor;
+  const taxablePeriod=Math.max(0,grossForTax-sss-phil-pag);
+  const annualized=periodFactor>0?taxablePeriod/periodFactor*12:0;
+  const tax=payrollTaxAnnual(annualized)/12*periodFactor;
+  return {sss,philhealth:phil,pagibig:pag,tax};
+}
+function payrollBuildItem(emp,src,from,to){
+  const workingDays=Number(document.getElementById('payrollWorkingDays').value)||26;
+  const hoursPerDay=Number(document.getElementById('payrollHoursPerDay').value)||8;
+  const periodFactor=payrollPeriodFactor(from,to);
+  const monthly=payrollMoney(emp.monthly_basic_salary);
+  const daily=monthly/workingDays, hourly=daily/hoursPerDay;
+  const schedules=src.schedules.filter(s=>s.employee_id===emp.id);
+  const attendance=src.attendance.filter(a=>a.employee_id===emp.id);
+  const leaves=src.leaves.filter(l=>l.employee_id===emp.id);
+  const ot=src.overtime.filter(o=>o.employee_id===emp.id);
+  let daysWorked=0,paidLeave=0,unpaidLeave=0,absences=0,restWorked=0,restDayHours=0,regularHours=0,lateMin=0,undertimeMin=0,holidayHours=0,holidayPayAmount=0;
+  const details=[];
+  const scheduleDates=new Set(schedules.map(s=>s.schedule_date));
+  const today=new Date(); today.setHours(0,0,0,0);
+  schedules.forEach(s=>{
+    const log=attendance.find(a=>a.attendance_date===s.schedule_date);
+    const leave=payrollLeaveForDate(src.leaves,emp.id,s.schedule_date);
+    const actual=payrollActualHours(log,s);
+    const expected=payrollExpectedHours(s);
+    const holiday=(src.holidays||[]).find(h=>h.holiday_date===s.schedule_date);
+    if(s.is_rest_day){ if(log?.time_in&&log?.time_out){restWorked++;daysWorked++;restDayHours+=actual;} details.push({date:s.schedule_date,type:log?.time_in&&log?.time_out?'Rest Day Worked':'Rest Day',expected,actual,log}); return; }
+    if(leave && !log?.time_in){ if(payrollLeavePaid(leave,src.balances))paidLeave++;else unpaidLeave++; details.push({date:s.schedule_date,type:payrollLeavePaid(leave,src.balances)?'Paid Leave':'Unpaid Leave',expected,actual:0,leave}); return; }
+    if(log?.time_in&&log?.time_out){
+      daysWorked++;
+      regularHours+=Math.min(actual,expected);
+      lateMin+=payrollLateMinutes(log,s);
+      undertimeMin+=payrollUndertimeMinutes(log,s);
+      if(holiday){
+        const multiplier=Number(holiday.pay_multiplier||1);
+        holidayHours+=Math.min(actual,expected);
+        holidayPayAmount+=Math.min(actual,expected)*hourly*Math.max(0,multiplier-1);
+      }
+      details.push({date:s.schedule_date,type:holiday?`Holiday Worked: ${holiday.holiday_name||'Holiday'}`:(log.source==='Manual/Adjusted'?'Manual/Adjusted':'Attendance'),expected,actual,log,holiday});
+    }
+    else if(!leave && payrollDateObj(s.schedule_date)<today){absences++;details.push({date:s.schedule_date,type:'Absent',expected,actual:0});}
+    else details.push({date:s.schedule_date,type:'Incomplete / Pending',expected,actual,log});
+  });
+  attendance.filter(a=>!scheduleDates.has(a.attendance_date)).forEach(a=>{ if(a.time_in&&a.time_out)details.push({date:a.attendance_date,type:'Attendance without Schedule',expected:0,actual:payrollIntervalMinutes(a.time_in,a.time_out)/60,log:a}); });
+  const paidLeavePay=(String(emp.salary_type||'Monthly').toLowerCase().includes('daily')||String(emp.salary_type||'Monthly').toLowerCase().includes('hourly')) ? paidLeave*daily : 0;
+  const unpaidLeaveDeduction=unpaidLeave*daily, absenceDeduction=absences*daily, lateDeduction=(lateMin/60)*hourly, undertimeDeduction=(undertimeMin/60)*hourly;
+  const monthlyEmployee=String(emp.salary_type||'Monthly').toLowerCase();
+  const isHourlyOrDaily=monthlyEmployee.includes('daily')||monthlyEmployee.includes('hourly');
+  const basicBase=isHourlyOrDaily ? (daysWorked*daily) : (monthly*periodFactor);
+  // Keep earnings and deductions separate. Source deductions are NOT subtracted from basic pay here;
+  // they are applied once in totalDeductions below. This prevents double-deducting absences, late, and undertime.
+  const basicPay=Math.max(0,basicBase);
+  const otHours=payrollApprovedOtHours(ot);
+  const otRate=hourly*1.25;
+  const otPay=otHours*otRate;
+  const holidayPay=holidayPayAmount;
+  const restDayPay=restDayHours*hourly*1.3;
+  const allowances=payrollMoney(emp.allowances||emp.monthly_allowances||0);
+  const otherEarnings=payrollMoney(emp.other_earnings||0);
+  const gross=basicPay+paidLeavePay+otPay+holidayPay+restDayPay+allowances+otherEarnings;
+  const stat=payrollComputeStatutories(monthly,periodFactor,gross);
+  const otherDeductions=payrollMoney(emp.other_deductions||0),loans=payrollMoney(emp.loan_deduction||emp.loan_amortization||0);
+  const totalDeductions=absenceDeduction+unpaidLeaveDeduction+lateDeduction+undertimeDeduction+stat.sss+stat.philhealth+stat.pagibig+stat.tax+loans+otherDeductions;
+  const net=gross-totalDeductions;
+  const exceptions=[];
+  if(!monthly)exceptions.push('Missing basic salary/rate');
+  if(!emp.sss_number)exceptions.push('Missing SSS number');
+  if(!emp.philhealth_number)exceptions.push('Missing PhilHealth number');
+  if(!emp.pagibig_number)exceptions.push('Missing Pag-IBIG number');
+  if(!emp.tin_number)exceptions.push('Missing TIN');
+  if(!schedules.length)exceptions.push('No schedule in payroll period');
+  details.filter(d=>d.type==='Incomplete / Pending').forEach(d=>exceptions.push(`Missing Time In/Out on ${d.date}`));
+  details.filter(d=>d.type==='Attendance without Schedule').forEach(d=>exceptions.push(`Attendance without schedule on ${d.date}`));
+  leaves.forEach(l=>{
+    const type=normalizeLeaveType(l.leave_type);
+    const balanceRow=src.balances.find(b=>b.employee_id===emp.id&&b.leave_type===type);
+    const leaveDays=leaveRowDays(l);
+    if(balanceRow && Number(balanceRow.balance) < 0) exceptions.push(`Insufficient ${type} credits for ${leaveDays} day(s)`);
+  });
+  if(net<0)exceptions.push('Negative net pay');
+  return {employee_id:emp.id,employee_number:emp.employee_number||'',employee_name:`${emp.first_name||''} ${emp.last_name||''}`.trim(),department:emp.department||'',position:emp.position||emp.job_title||'',basic_pay:payrollRound(basicPay),days_worked:daysWorked,paid_leave_days:paidLeave,unpaid_leave_days:unpaidLeave,absence_days:absences,late_minutes:lateMin,undertime_minutes:undertimeMin,regular_hours:payrollRound(regularHours),rest_day_hours:payrollRound(restDayHours),ot_hours:payrollRound(otHours),ot_pay:payrollRound(otPay),holiday_pay:payrollRound(holidayPay),rest_day_pay:payrollRound(restDayPay),allowances:payrollRound(allowances),other_earnings:payrollRound(otherEarnings),gross_pay:payrollRound(gross),sss:payrollRound(stat.sss),philhealth:payrollRound(stat.philhealth),pagibig:payrollRound(stat.pagibig),tax:payrollRound(stat.tax),absence_deduction:payrollRound(absenceDeduction),late_deduction:payrollRound(lateDeduction),undertime_deduction:payrollRound(undertimeDeduction),loans:payrollRound(loans),other_deductions:payrollRound(otherDeductions),total_deductions:payrollRound(totalDeductions),net_pay:payrollRound(net),exceptions:[...new Set(exceptions)],source_snapshot:{details,schedule_count:schedules.length,approved_ot:ot,approved_leave:leaves,holidays:src.holidays||[]}};
+}
+async function payrollGenerate(){
+  const {from,to}=payrollGetPeriod(); if(!from||!to||from>to){showToast('Select a valid payroll period.','warning');return;}
+  const existing=await supabaseClient.from(PAYROLL_RUNS_TABLE).select('*').eq('period_start',from).eq('period_end',to).maybeSingle();
+  if(existing.error && existing.error.code!=='PGRST116')throw existing.error;
+  if(existing.data){
+    if(['Finalized','Released'].includes(existing.data.status)){
+      showToast(`Payroll for ${formatDateLabel(from)}–${formatDateLabel(to)} is ${existing.data.status} and locked. Delete the locked run first if it must be regenerated.`,'warning');
+      return;
+    }
+    const ok=confirm('Payroll already exists for this period. Would you like to overwrite the existing payroll?'); if(!ok)return;
+    const del=await supabaseClient.from(PAYROLL_RUNS_TABLE).delete().eq('id',existing.data.id); if(del.error)throw del.error;
+  }
+  const btn=document.getElementById('payrollGenerateBtn');btn.disabled=true;btn.textContent='Generating…';
+  try{
+    const src=await payrollFetchSources(from,to);
+    const active=employeesCache.filter(e=>!['Inactive','Resigned','Terminated'].includes(e.employment_status));
+    const items=active.map(e=>payrollBuildItem(e,src,from,to));
+    const exceptions=items.reduce((n,i)=>n+i.exceptions.length,0);
+    const runPayload={period_start:from,period_end:to,status:'For Verification',employee_count:items.length,total_gross:payrollRound(items.reduce((s,i)=>s+i.gross_pay,0)),total_ot:payrollRound(items.reduce((s,i)=>s+i.ot_pay,0)),total_deductions:payrollRound(items.reduce((s,i)=>s+i.total_deductions,0)),total_net:payrollRound(items.reduce((s,i)=>s+i.net_pay,0)),exception_count:exceptions,working_days:Number(document.getElementById('payrollWorkingDays').value)||26,hours_per_day:Number(document.getElementById('payrollHoursPerDay').value)||8};
+    const ins=await supabaseClient.from(PAYROLL_RUNS_TABLE).insert([runPayload]).select().single(); if(ins.error)throw ins.error;
+    const run=ins.data;
+    const rows=items.map(i=>({...i,payroll_run_id:run.id}));
+    const det=await supabaseClient.from(PAYROLL_ITEMS_TABLE).insert(rows); if(det.error)throw det.error;
+    payrollCurrentRun=run; payrollCurrentItems=items.map((i,idx)=>({...i,id:rows[idx].id}));
+    renderPayrollCurrent(); await fetchPayrollHistory(); showToast(`Payroll generated for ${formatDateLabel(from)}–${formatDateLabel(to)}.`,'success');
+  }catch(err){console.error('payrollGenerate error',err);showToast('Failed to generate payroll. Check the payroll tables and source records.','error');}
+  finally{btn.disabled=false;btn.textContent='Generate Payroll';}
+}
+async function loadPayrollRun(runId){
+  const r=await supabaseClient.from(PAYROLL_RUNS_TABLE).select('*').eq('id',runId).single(); if(r.error)throw r.error;
+  const i=await supabaseClient.from(PAYROLL_ITEMS_TABLE).select('*').eq('payroll_run_id',runId).order('employee_name'); if(i.error)throw i.error;
+  payrollCurrentRun=r.data; payrollCurrentItems=i.data||[]; document.getElementById('payrollDateFrom').value=r.data.period_start;document.getElementById('payrollDateTo').value=r.data.period_end;renderPayrollCurrent();
+}
+function renderPayrollCurrent(){
+  const r=payrollCurrentRun, items=payrollCurrentItems, q=(document.getElementById('payrollEmployeeSearch').value||'').toLowerCase();
+  const visible=items.filter(i=>!q||i.employee_name.toLowerCase().includes(q)||String(i.employee_number).toLowerCase().includes(q));
+  document.getElementById('payrollKpiEmployees').textContent=r?items.length:0;document.getElementById('payrollKpiPeriod').textContent=r?`${formatDateLabel(r.period_start)}–${formatDateLabel(r.period_end)}`:'—';document.getElementById('payrollKpiGross').textContent=formatCurrency(r?.total_gross||0);document.getElementById('payrollKpiOt').textContent=formatCurrency(r?.total_ot||0);document.getElementById('payrollKpiDeductions').textContent=formatCurrency(r?.total_deductions||0);document.getElementById('payrollKpiNet').textContent=formatCurrency(r?.total_net||0);document.getElementById('payrollKpiStatus').textContent=r?.status||'No payroll';
+  const body=document.getElementById('payrollTableBody');
+  if(!r){body.innerHTML='<tr><td colspan="15" class="px-4 py-10 text-center text-slate-400">Select a payroll period and generate payroll.</td></tr>';document.getElementById('payrollExceptionsCard').classList.add('hidden');['payrollFinalizeBtn','payrollReleaseBtn','payrollExcelBtn','payrollDeleteBtn'].forEach(id=>document.getElementById(id).classList.add('hidden'));return;}
+  body.innerHTML=visible.length?visible.map(i=>`<tr class="hover:bg-slate-50"><td class="px-3 py-3"><div class="font-semibold">${escapeHtml(i.employee_name)}</div><div class="text-[10px] text-slate-400">${escapeHtml(i.employee_number)} • ${escapeHtml(i.department)}</div></td><td class="px-3 py-3 text-right">${i.days_worked}</td><td class="px-3 py-3 text-right">${Number(i.paid_leave_days).toFixed(1)}</td><td class="px-3 py-3 text-right">${Number(i.unpaid_leave_days).toFixed(1)}</td><td class="px-3 py-3 text-right">${Number(i.absence_days).toFixed(1)}</td><td class="px-3 py-3 text-right">${i.late_minutes}m</td><td class="px-3 py-3 text-right">${i.undertime_minutes}m</td><td class="px-3 py-3 text-right">${Number(i.regular_hours).toFixed(2)}</td><td class="px-3 py-3 text-right">${Number(i.ot_hours).toFixed(2)}</td><td class="px-3 py-3 text-right">${formatCurrency(i.ot_pay)}</td><td class="px-3 py-3 text-right">${formatCurrency(i.basic_pay)}</td><td class="px-3 py-3 text-right font-semibold">${formatCurrency(i.gross_pay)}</td><td class="px-3 py-3 text-right">${formatCurrency(i.total_deductions)}</td><td class="px-3 py-3 text-right font-semibold text-emerald-700">${formatCurrency(i.net_pay)}</td><td class="px-3 py-3 text-center whitespace-nowrap"><button onclick="viewPayrollDetails('${i.id}')" class="text-[11px] px-2 py-1 rounded border border-slate-300 hover:bg-slate-100">View Details</button> <button onclick="printPayrollPayslip('${i.id}')" class="text-[11px] px-2 py-1 rounded border border-sky-300 text-sky-700 hover:bg-sky-50">View Payslip</button> <button onclick="downloadPayrollPayslipPdf('${i.id}')" class="text-[11px] px-2 py-1 rounded border border-violet-300 text-violet-700 hover:bg-violet-50">Download PDF</button></td></tr>`).join(''):'<tr><td colspan="15" class="px-4 py-10 text-center text-slate-400">No matching employees.</td></tr>';
+  const ex=[];items.forEach(i=>i.exceptions.forEach(x=>ex.push({employee:i.employee_name,message:x}))); const card=document.getElementById('payrollExceptionsCard');card.classList.toggle('hidden',ex.length===0);document.getElementById('payrollExceptionCount').textContent=ex.length;document.getElementById('payrollExceptionsList').innerHTML=ex.map(x=>`<div class="px-4 py-2 text-xs flex justify-between gap-4"><span class="font-medium text-amber-900">${escapeHtml(x.employee)}</span><span class="text-amber-800">${escapeHtml(x.message)}</span></div>`).join('');
+  const locked=['Finalized','Released'].includes(r.status); document.getElementById('payrollFinalizeBtn').classList.toggle('hidden',locked||r.status!=='For Verification');document.getElementById('payrollReleaseBtn').classList.toggle('hidden',r.status!=='Finalized');document.getElementById('payrollExcelBtn').classList.remove('hidden');document.getElementById('payrollDeleteBtn').classList.toggle('hidden',false);
+}
+function viewPayrollDetails(id){
+  const i=payrollCurrentItems.find(x=>x.id===id);if(!i)return;
+  const details=i.source_snapshot?.details||[];const lines=details.map(d=>`${d.date}: ${d.type} — expected ${Number(d.expected||0).toFixed(2)}h / actual ${Number(d.actual||0).toFixed(2)}h`).join('\n');
+  alert(`${i.employee_name}\n\nEarnings\nBasic: ${formatCurrency(i.basic_pay)}\nOT: ${formatCurrency(i.ot_pay)}\nGross: ${formatCurrency(i.gross_pay)}\n\nDeductions\nSSS: ${formatCurrency(i.sss)}\nPhilHealth: ${formatCurrency(i.philhealth)}\nPag-IBIG: ${formatCurrency(i.pagibig)}\nTax: ${formatCurrency(i.tax)}\nAbsence: ${formatCurrency(i.absence_deduction)}\nLate: ${formatCurrency(i.late_deduction)}\nUndertime: ${formatCurrency(i.undertime_deduction)}\n\nNet: ${formatCurrency(i.net_pay)}\n\nSource records:\n${lines}`);
+}
+async function finalizePayroll(){if(!payrollCurrentRun)return;const exceptions=payrollCurrentItems.reduce((n,i)=>n+i.exceptions.length,0);if(exceptions&&!confirm(`There are ${exceptions} payroll exceptions. Finalize anyway?`))return;if(!confirm('Finalize this payroll? Finalized payroll will be locked.'))return;const {error}=await supabaseClient.from(PAYROLL_RUNS_TABLE).update({status:'Finalized',finalized_at:new Date().toISOString()}).eq('id',payrollCurrentRun.id);if(error){showToast('Unable to finalize payroll.','error');return;}payrollCurrentRun.status='Finalized';renderPayrollCurrent();fetchPayrollHistory();showToast('Payroll finalized and locked.','success');}
+async function releasePayroll(){if(!payrollCurrentRun||payrollCurrentRun.status!=='Finalized')return;if(!confirm('Release this payroll to employees?'))return;const {error}=await supabaseClient.from(PAYROLL_RUNS_TABLE).update({status:'Released',released_at:new Date().toISOString()}).eq('id',payrollCurrentRun.id);if(error){showToast('Unable to release payroll.','error');return;}payrollCurrentRun.status='Released';renderPayrollCurrent();fetchPayrollHistory();showToast('Payroll released.','success');}
+async function deletePayroll(){if(!payrollCurrentRun)return;if(!confirm('Are you sure you want to permanently delete this payroll? This action cannot be undone.'))return;const {error}=await supabaseClient.from(PAYROLL_RUNS_TABLE).delete().eq('id',payrollCurrentRun.id);if(error){showToast('Unable to delete payroll.','error');return;}payrollCurrentRun=null;payrollCurrentItems=[];renderPayrollCurrent();fetchPayrollHistory();showToast('Payroll permanently deleted. Source HR records were not changed.','success');}
+async function fetchPayrollHistory(){try{const {data,error}=await supabaseClient.from(PAYROLL_RUNS_TABLE).select('*').order('period_start',{ascending:false});if(error)throw error;payrollHistoryCache=data||[];document.getElementById('payrollHistoryBody').innerHTML=payrollHistoryCache.length?payrollHistoryCache.map(r=>`<tr class="hover:bg-slate-50"><td class="px-4 py-3 font-medium">${formatDateLabel(r.period_start)} – ${formatDateLabel(r.period_end)}</td><td class="px-4 py-3 text-right">${r.employee_count}</td><td class="px-4 py-3 text-right">${formatCurrency(r.total_gross)}</td><td class="px-4 py-3 text-right">${formatCurrency(r.total_deductions)}</td><td class="px-4 py-3 text-right font-semibold">${formatCurrency(r.total_net)}</td><td class="px-4 py-3 text-center"><span class="text-[11px] px-2 py-1 rounded-full border ${payrollStatusClass(r.status)}">${escapeHtml(r.status)}</span></td><td class="px-4 py-3 text-center">${formatDateTimeLabel(r.created_at)}</td><td class="px-4 py-3 text-center"><button onclick="loadPayrollRun('${r.id}')" class="text-[11px] px-2 py-1 rounded border border-slate-300">Open</button></td></tr>`).join(''):'<tr><td colspan="8" class="px-4 py-6 text-center text-slate-400">No generated payroll history.</td></tr>';}catch(e){console.error(e);}}
+function downloadPayrollExcel(){if(!payrollCurrentRun||!window.XLSX){showToast('Excel export library is unavailable.','error');return;}const rows=payrollCurrentItems.map(i=>({'Employee ID':i.employee_number,'Employee Name':i.employee_name,'Department':i.department,'Position':i.position,'Basic Pay':i.basic_pay,'Days Worked':i.days_worked,'Paid Leave':i.paid_leave_days,'Unpaid Leave':i.unpaid_leave_days,'Absences':i.absence_days,'Late (min)':i.late_minutes,'Undertime (min)':i.undertime_minutes,'Regular Hours':i.regular_hours,'OT Hours':i.ot_hours,'OT Pay':i.ot_pay,'Holiday Pay':i.holiday_pay,'Allowances':i.allowances,'Gross Pay':i.gross_pay,'SSS':i.sss,'PhilHealth':i.philhealth,'Pag-IBIG':i.pagibig,'Tax':i.tax,'Other Deductions':i.other_deductions,'Total Deductions':i.total_deductions,'Net Pay':i.net_pay}));const ws=XLSX.utils.json_to_sheet(rows);ws['!cols']=Object.keys(rows[0]||{}).map(()=>({wch:18}));const wb=XLSX.utils.book_new();XLSX.utils.book_append_sheet(wb,ws,'Payroll');XLSX.writeFile(wb,`Payroll_${payrollCurrentRun.period_start}_${payrollCurrentRun.period_end}.xlsx`);}
+function downloadPayrollPayslipPdf(itemId){
+  const i=payrollCurrentItems.find(x=>x.id===itemId);
+  if(!i||!payrollCurrentRun){showToast('Payslip data is unavailable.','error');return;}
+  if(!window.jspdf?.jsPDF){showToast('PDF library is unavailable. Use the Payslip print option instead.','warning');return;}
+  const {jsPDF}=window.jspdf; const doc=new jsPDF();
+  const left=18; let y=18; const line=(label,value)=>{doc.text(String(label),left,y);doc.text(String(value),190,y,{align:'right'});y+=7;};
+  doc.setFontSize(16);doc.setFont(undefined,'bold');doc.text('PAYSLIP',left,y);y+=8;
+  doc.setFontSize(10);doc.setFont(undefined,'normal');doc.text(`Payroll Period: ${formatDateLabel(payrollCurrentRun.period_start)} – ${formatDateLabel(payrollCurrentRun.period_end)}`,left,y);y+=10;
+  doc.setFont(undefined,'bold');doc.text('Employee Information',left,y);y+=7;doc.setFont(undefined,'normal');
+  line('Employee',i.employee_name);line('Employee ID',i.employee_number);line('Department',i.department);line('Position',i.position);
+  y+=3;doc.setFont(undefined,'bold');doc.text('Earnings',left,y);y+=7;doc.setFont(undefined,'normal');
+  const daily=Number(i.basic_pay||0)/(Number(document.getElementById('payrollWorkingDays').value)||26);
+  line('Basic Pay',formatCurrency(i.basic_pay));line('Paid Leave',formatCurrency(i.paid_leave_days*daily));line('Overtime',formatCurrency(i.ot_pay));line('Holiday Pay',formatCurrency(i.holiday_pay));line('Rest Day Pay',formatCurrency(i.rest_day_pay));line('Allowances',formatCurrency(i.allowances));line('Other Earnings',formatCurrency(i.other_earnings));line('Gross Pay',formatCurrency(i.gross_pay));
+  y+=3;doc.setFont(undefined,'bold');doc.text('Deductions',left,y);y+=7;doc.setFont(undefined,'normal');
+  line('SSS',formatCurrency(i.sss));line('PhilHealth',formatCurrency(i.philhealth));line('Pag-IBIG',formatCurrency(i.pagibig));line('Withholding Tax',formatCurrency(i.tax));line('Absences',formatCurrency(i.absence_deduction));line('Late',formatCurrency(i.late_deduction));line('Undertime',formatCurrency(i.undertime_deduction));line('Loans',formatCurrency(i.loans));line('Other Deductions',formatCurrency(i.other_deductions));line('Total Deductions',formatCurrency(i.total_deductions));
+  y+=5;doc.setFontSize(14);doc.setFont(undefined,'bold');line('NET PAY',formatCurrency(i.net_pay));
+  doc.save(`Payslip_${i.employee_number||'employee'}_${payrollCurrentRun.period_start}_${payrollCurrentRun.period_end}.pdf`);
+}
+function printPayrollPayslip(itemId){const i=payrollCurrentItems.find(x=>x.id===itemId);if(!i||!payrollCurrentRun)return;const html=`<!doctype html><html><head><title>Payslip - ${escapeHtml(i.employee_name)}</title><style>body{font-family:Arial,sans-serif;padding:32px;color:#111}h1{font-size:20px;margin:0 0 4px}h2{font-size:14px;margin:24px 0 8px;border-bottom:1px solid #ddd;padding-bottom:6px}table{width:100%;border-collapse:collapse;font-size:12px}td{padding:7px;border-bottom:1px solid #eee}td:last-child{text-align:right;font-weight:600}.total{font-size:16px;font-weight:700}.meta{color:#666;font-size:12px}</style></head><body><h1>PAYSLIP</h1><div class="meta">Payroll Period: ${formatDateLabel(payrollCurrentRun.period_start)} – ${formatDateLabel(payrollCurrentRun.period_end)}</div><h2>Employee Information</h2><table><tr><td>Employee</td><td>${escapeHtml(i.employee_name)}</td></tr><tr><td>Employee ID</td><td>${escapeHtml(i.employee_number)}</td></tr><tr><td>Department</td><td>${escapeHtml(i.department)}</td></tr><tr><td>Position</td><td>${escapeHtml(i.position)}</td></tr></table><h2>Earnings</h2><table><tr><td>Basic Pay</td><td>${formatCurrency(i.basic_pay)}</td></tr><tr><td>Paid Leave</td><td>${formatCurrency(i.paid_leave_days*(i.basic_pay/(Number(document.getElementById('payrollWorkingDays').value)||26)))}</td></tr><tr><td>Overtime</td><td>${formatCurrency(i.ot_pay)}</td></tr><tr><td>Holiday Pay</td><td>${formatCurrency(i.holiday_pay)}</td></tr><tr><td>Rest Day Pay</td><td>${formatCurrency(i.rest_day_pay)}</td></tr><tr><td>Allowances</td><td>${formatCurrency(i.allowances)}</td></tr><tr class="total"><td>Gross Pay</td><td>${formatCurrency(i.gross_pay)}</td></tr></table><h2>Deductions</h2><table><tr><td>SSS</td><td>${formatCurrency(i.sss)}</td></tr><tr><td>PhilHealth</td><td>${formatCurrency(i.philhealth)}</td></tr><tr><td>Pag-IBIG</td><td>${formatCurrency(i.pagibig)}</td></tr><tr><td>Withholding Tax</td><td>${formatCurrency(i.tax)}</td></tr><tr><td>Absence</td><td>${formatCurrency(i.absence_deduction)}</td></tr><tr><td>Late</td><td>${formatCurrency(i.late_deduction)}</td></tr><tr><td>Undertime</td><td>${formatCurrency(i.undertime_deduction)}</td></tr><tr><td>Loans</td><td>${formatCurrency(i.loans)}</td></tr><tr><td>Other Deductions</td><td>${formatCurrency(i.other_deductions)}</td></tr><tr class="total"><td>Total Deductions</td><td>${formatCurrency(i.total_deductions)}</td></tr></table><h2 class="total">NET PAY: ${formatCurrency(i.net_pay)}</h2><script>window.onload=()=>setTimeout(()=>window.print(),300)<\/script></body></html>`;const w=window.open('','_blank','width=800,height=900');if(!w){showToast('Please allow pop-ups to print the payslip.','warning');return;}w.document.write(html);w.document.close();}
+function initPayrollModule(){ if(!document.getElementById('payrollDateFrom').value || !document.getElementById('payrollDateTo').value) payrollSetDefaultPeriod(); populateEmployeeDropdowns(); fetchPayrollHistory(); }
+
+
 /* EVENT LISTENERS & INITIALIZATION */
 function registerEventListeners() {
   document.querySelectorAll('.nav-btn').forEach(btn => {
@@ -2882,6 +3258,18 @@ function registerEventListeners() {
   document.getElementById('scheduleMonthNextBtn').addEventListener('click', () => navigateScheduleMonth(1));
   document.getElementById('scheduleLockToggleBtn').addEventListener('click', toggleScheduleLock);
   document.getElementById('scheduleSaveAllBtn').addEventListener('click', handleSaveAllSchedule);
+
+  // Payroll Management
+  document.getElementById('payrollPeriodPreset').addEventListener('change', payrollApplyPreset);
+  document.getElementById('payrollGenerateBtn').addEventListener('click', payrollGenerate);
+  document.getElementById('payrollRefreshBtn').addEventListener('click', () => { fetchPayrollHistory(); if (payrollCurrentRun) loadPayrollRun(payrollCurrentRun.id); });
+  document.getElementById('payrollFinalizeBtn').addEventListener('click', finalizePayroll);
+  document.getElementById('payrollReleaseBtn').addEventListener('click', releasePayroll);
+  document.getElementById('payrollDeleteBtn').addEventListener('click', deletePayroll);
+  document.getElementById('payrollExcelBtn').addEventListener('click', downloadPayrollExcel);
+  document.getElementById('payrollEmployeeSearch').addEventListener('input', renderPayrollCurrent);
+  document.getElementById('payrollDateFrom').addEventListener('change', () => document.getElementById('payrollPeriodPreset').value='custom');
+  document.getElementById('payrollDateTo').addEventListener('change', () => document.getElementById('payrollPeriodPreset').value='custom');
 
   // Add/Edit Form submission
   document.getElementById('employeeForm').addEventListener('submit', async (e) => {
