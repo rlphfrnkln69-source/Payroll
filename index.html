@@ -1335,16 +1335,18 @@ function employeeDept(id) {
 
 /* ===============================
    SCHEDULE MANAGEMENT
+   (Employee list -> individual monthly calendar,
+   with per-employee/per-month locking and rest-day toggles)
 =============================== */
 const SHIFT_OPTIONS = ['Regular Shift', 'Morning Shift', 'Afternoon Shift', 'Night Shift', 'Custom Shift'];
 const DEFAULT_SHIFT = { shift_name: 'Regular Shift', start_time: '08:00', end_time: '17:00', break_start: '12:00', break_end: '13:00' };
 
-let scheduleSelectedEmployee = null;
-let scheduleViewYear = null;
-let scheduleViewMonth = null;
-let scheduleMonthRows = [];
-let scheduleMonthLocked = false;
-let scheduleMonthLockId = null;
+let scheduleSelectedEmployee = null;    // the employee currently open in the calendar view
+let scheduleViewYear = null;            // year currently shown
+let scheduleViewMonth = null;          // 0-11, month currently shown
+let scheduleMonthRows = [];             // in-memory rows for every date of the visible month
+let scheduleMonthLocked = false;        // lock state for the visible employee/month
+let scheduleMonthLockId = null;        // id of the schedule_locks row, if it exists
 let scheduleHasUnsavedChanges = false;
 
 function computeExpectedHours(startTime, endTime, breakStart, breakEnd, isRestDay) {
@@ -1357,7 +1359,7 @@ function computeExpectedHours(startTime, endTime, breakStart, breakEnd, isRestDa
 
   let startMin = toMinutes(startTime);
   let endMin = toMinutes(endTime);
-  if (endMin <= startMin) endMin += 24 * 60;
+  if (endMin <= startMin) endMin += 24 * 60; // overnight shift
 
   let totalMin = endMin - startMin;
 
@@ -1372,9 +1374,11 @@ function computeExpectedHours(startTime, endTime, breakStart, breakEnd, isRestDa
 }
 
 function monthKey(year, month) {
+  // month is 0-11 here; stored as YYYY-MM
   return `${year}-${String(month + 1).padStart(2, '0')}`;
 }
 
+/* ---------- SUB-VIEW SWITCHING ---------- */
 function showScheduleListView() {
   document.getElementById('scheduleListView').classList.remove('hidden');
   document.getElementById('scheduleDetailView').classList.add('hidden');
@@ -1386,6 +1390,7 @@ function showScheduleDetailView() {
   document.getElementById('scheduleDetailView').classList.remove('hidden');
 }
 
+/* ---------- EMPLOYEE LIST (for Schedule module) ---------- */
 function renderScheduleEmployeeList() {
   const tbody = document.getElementById('scheduleEmployeeListBody');
   if (!tbody) return;
@@ -1433,6 +1438,7 @@ function renderScheduleEmployeeList() {
   }).join('');
 }
 
+/* ---------- INDIVIDUAL EMPLOYEE MONTHLY CALENDAR ---------- */
 async function openEmployeeSchedule(employeeId) {
   const emp = employeesCache.find(e => e.id === employeeId);
   if (!emp) return;
@@ -1531,6 +1537,8 @@ async function loadMonthSchedule() {
       }
     }
 
+    // lockResult may error benignly if the schedule_locks table doesn't exist yet;
+    // treat that as "unlocked" rather than failing the whole view.
     if (!lockResult.error && lockResult.data) {
       scheduleMonthLocked = !!lockResult.data.is_locked;
       scheduleMonthLockId = lockResult.data.id;
@@ -1616,6 +1624,7 @@ function updateScheduleField(idx, field, value) {
   if (!row) return;
   row[field] = value;
   if (field === 'shift_name' && value) {
+    // convenience: prefill sensible default times when a shift is first chosen and empty
     if (!row.start_time && !row.end_time && value === 'Regular Shift') {
       row.start_time = DEFAULT_SHIFT.start_time;
       row.end_time = DEFAULT_SHIFT.end_time;
@@ -1633,12 +1642,14 @@ function toggleRestDay(idx, checked) {
   if (!row) return;
   row.is_rest_day = checked;
   if (checked) {
+    // clear the work-schedule fields for that date automatically
     row.shift_name = 'Rest Day';
     row.start_time = '';
     row.end_time = '';
     row.break_start = '';
     row.break_end = '';
   } else {
+    // return the date to an editable, blank work schedule
     row.shift_name = '';
   }
   scheduleHasUnsavedChanges = true;
@@ -1656,7 +1667,7 @@ async function handleSaveAllSchedule() {
   const rowsToUpsert = scheduleMonthRows
     .filter(r => r.is_rest_day || r.shift_name || r.start_time || r.end_time || r.notes || !r._isNew)
     .map(r => ({
-      ...(r.id ? { id: r.id } : {}),
+      id: r.id || crypto.randomUUID(), // Generates a unique ID if it's a new row
       employee_id: scheduleSelectedEmployee.id,
       schedule_date: r.schedule_date,
       shift_name: r.is_rest_day ? 'Rest Day' : (r.shift_name || 'Regular Shift'),
@@ -1697,6 +1708,7 @@ async function handleSaveAllSchedule() {
   }
 }
 
+/* ---------- LOCK / UNLOCK ---------- */
 function updateLockUi() {
   const btn = document.getElementById('scheduleLockToggleBtn');
   const icon = document.getElementById('scheduleLockIcon');
@@ -1735,7 +1747,7 @@ async function toggleScheduleLock() {
   try {
     const { data: { session } } = await supabaseClient.auth.getSession();
     adminEmail = session && session.user ? session.user.email : '';
-  } catch (_) {}
+  } catch (_) { /* non-fatal */ }
 
   try {
     const payload = {
@@ -1775,7 +1787,7 @@ function computeOtHours(startTime, endTime) {
   };
   let startMin = toMinutes(startTime);
   let endMin = toMinutes(endTime);
-  if (endMin <= startMin) endMin += 24 * 60;
+  if (endMin <= startMin) endMin += 24 * 60; // overnight OT
   return Math.max(0, (endMin - startMin) / 60);
 }
 
@@ -1831,7 +1843,7 @@ function getOtFilteredRows() {
   const empVal = document.getElementById('otFilterEmployee').value;
   const deptVal = document.getElementById('otFilterDept').value;
   const statusVal = document.getElementById('otFilterStatus').value;
-  const monthVal = document.getElementById('otFilterMonth').value;
+  const monthVal = document.getElementById('otFilterMonth').value; // YYYY-MM
   const dateFrom = document.getElementById('otFilterDateFrom').value;
   const dateTo = document.getElementById('otFilterDateTo').value;
 
@@ -1939,7 +1951,7 @@ async function decideOvertimeRequest(id, decision) {
   try {
     const { data: { session } } = await supabaseClient.auth.getSession();
     adminEmail = session && session.user ? session.user.email : '';
-  } catch (_) {}
+  } catch (_) { /* non-fatal */ }
 
   try {
     const { error } = await supabaseClient
@@ -1968,9 +1980,9 @@ const LEAVE_BALANCE_TABLE = 'leave_balances';
 const LEAVE_TYPES = ['Vacation Leave', 'Sick Leave', 'Other'];
 
 let leaveCache = [];
-let leaveBalanceCache = [];
+let leaveBalanceCache = []; // rows: { employee_id, leave_type, balance }
 let leaveCalYear = null;
-let leaveCalMonth = null;
+let leaveCalMonth = null; // 0-11
 
 function leaveRowDays(row) {
   if (row.leave_days !== null && row.leave_days !== undefined && row.leave_days !== '') {
@@ -1988,6 +2000,7 @@ function normalizeLeaveType(rawType) {
   return LEAVE_TYPES.includes(rawType) ? rawType : 'Other';
 }
 
+/* ---------- FETCHING ---------- */
 async function fetchLeaveRequests() {
   const tbody = document.getElementById('leaveTableBody');
   tbody.innerHTML = `<tr><td colspan="10" class="px-4 py-8 text-center text-slate-400">Loading leave requests...</td></tr>`;
@@ -2033,6 +2046,7 @@ function getLeaveBalance(employeeId, leaveType) {
   return row ? Number(row.balance) || 0 : 0;
 }
 
+/* ---------- KPIs ---------- */
 function renderLeaveKPIs() {
   const total = leaveCache.length;
   const pending = leaveCache.filter(r => (r.status || 'Pending') === 'Pending').length;
@@ -2047,6 +2061,7 @@ function renderLeaveKPIs() {
   document.getElementById('leaveKpiApprovedDays').textContent = approvedDays.toFixed(1);
 }
 
+/* ---------- SUB-TAB SWITCHING ---------- */
 function switchLeaveSubTab(tabId) {
   document.querySelectorAll('.leave-subview').forEach(el => el.classList.add('hidden'));
   document.getElementById(tabId).classList.remove('hidden');
@@ -2069,13 +2084,14 @@ function switchLeaveSubTab(tabId) {
   }
 }
 
+/* ---------- LEAVE REQUESTS TABLE ---------- */
 function getLeaveFilteredRows() {
   const searchVal = (document.getElementById('leaveSearchInput').value || '').toLowerCase();
   const empVal = document.getElementById('leaveFilterEmployee').value;
   const deptVal = document.getElementById('leaveFilterDept').value;
   const typeVal = document.getElementById('leaveFilterType').value;
   const statusVal = document.getElementById('leaveFilterStatus').value;
-  const monthVal = document.getElementById('leaveFilterMonth').value;
+  const monthVal = document.getElementById('leaveFilterMonth').value; // YYYY-MM
   const dateFrom = document.getElementById('leaveFilterDateFrom').value;
   const dateTo = document.getElementById('leaveFilterDateTo').value;
 
@@ -2174,7 +2190,7 @@ async function decideLeaveRequest(id, decision) {
   try {
     const { data: { session } } = await supabaseClient.auth.getSession();
     adminEmail = session && session.user ? session.user.email : '';
-  } catch (_) {}
+  } catch (_) { /* non-fatal */ }
 
   try {
     const { error: updateError } = await supabaseClient
@@ -2187,6 +2203,7 @@ async function decideLeaveRequest(id, decision) {
       .eq('id', id);
     if (updateError) throw updateError;
 
+    // Approving deducts from balance; cancelling an approved request restores it.
     if (decision === 'Approved') {
       await adjustLeaveBalance(row.employee_id, normalizeLeaveType(row.leave_type), -leaveRowDays(row));
     } else if (decision === 'Cancelled' && row.status === 'Approved') {
@@ -2224,6 +2241,7 @@ async function adjustLeaveBalance(employeeId, leaveType, deltaDays) {
   }
 }
 
+/* ---------- LEAVE BALANCES SUB-VIEW ---------- */
 function renderLeaveBalancesTable() {
   const tbody = document.getElementById('leaveBalanceTableBody');
   if (!tbody) return;
@@ -2300,6 +2318,7 @@ async function saveLeaveBalanceRow(employeeId) {
   }
 }
 
+/* ---------- LEAVE CALENDAR SUB-VIEW ---------- */
 function navigateLeaveCalendarMonth(delta) {
   if (leaveCalYear === null) {
     const today = new Date();
@@ -2330,7 +2349,7 @@ function renderLeaveCalendar() {
 
   const firstOfMonth = new Date(leaveCalYear, leaveCalMonth, 1);
   const daysInMonth = new Date(leaveCalYear, leaveCalMonth + 1, 0).getDate();
-  const leadingBlanks = firstOfMonth.getDay();
+  const leadingBlanks = firstOfMonth.getDay(); // 0 = Sunday
 
   const typeColors = {
     'Vacation Leave': 'bg-sky-100 text-sky-800 border-sky-300',
@@ -2369,6 +2388,7 @@ function renderLeaveCalendar() {
   grid.innerHTML = cellsHtml;
 }
 
+/* ---------- PROFILE MODAL: LEAVE TAB ---------- */
 function renderProfileLeaveTab(employeeId) {
   const container = document.getElementById('tabLeave');
   if (!container) return;
@@ -2408,6 +2428,7 @@ function renderProfileLeaveTab(employeeId) {
   `;
 }
 
+/* AUTHENTICATION (Supabase Auth) */
 function enterApp(session) {
   document.getElementById('loginScreen').classList.add('hidden');
   document.getElementById('appShell').classList.remove('hidden');
@@ -2424,6 +2445,7 @@ function exitToLogin() {
   document.getElementById('loginForm').reset();
 }
 
+/* EVENT LISTENERS & INITIALIZATION */
 function registerEventListeners() {
   document.querySelectorAll('.nav-btn').forEach(btn => {
     btn.addEventListener('click', () => switchModule(btn.getAttribute('data-target')));
@@ -2438,6 +2460,8 @@ function registerEventListeners() {
       console.error('sign out error:', err);
       showToast('Unable to sign out.', 'error');
     }
+    // onAuthStateChange (registered in init) also handles this, but we
+    // call exitToLogin() directly too so the UI updates immediately.
     exitToLogin();
   });
 
@@ -2462,6 +2486,8 @@ function registerEventListeners() {
     try {
       const { data, error } = await supabaseClient.auth.signInWithPassword({ email, password });
       if (error) throw error;
+      // onAuthStateChange (registered in init) will call enterApp() once
+      // the session is confirmed, so we don't need to call it here too.
     } catch (err) {
       console.error('login error:', err);
       errorEl.textContent = 'Invalid email or password.';
@@ -2474,6 +2500,7 @@ function registerEventListeners() {
 
   document.getElementById('topRefreshBtn').addEventListener('click', fetchEmployees);
 
+  // Employee Management UI triggers
   document.getElementById('openAddEmployeeModalBtn').addEventListener('click', openAddEmployeeModal);
   document.getElementById('closeEmployeeModalBtn').addEventListener('click', closeEmployeeModal);
   document.getElementById('cancelEmployeeModalBtn').addEventListener('click', closeEmployeeModal);
@@ -2485,6 +2512,7 @@ function registerEventListeners() {
     btn.addEventListener('click', () => switchProfileTab(btn.getAttribute('data-tab')));
   });
 
+  // Search & Filter listeners
   document.getElementById('empSearchInput').addEventListener('input', renderEmployeeDirectory);
   document.getElementById('filterDept').addEventListener('change', renderEmployeeDirectory);
   document.getElementById('filterStatus').addEventListener('change', renderEmployeeDirectory);
@@ -2497,6 +2525,7 @@ function registerEventListeners() {
     renderEmployeeDirectory();
   });
 
+  // Generic confirm modal
   document.getElementById('confirmCancelBtn').addEventListener('click', closeConfirmModal);
   document.getElementById('confirmOkBtn').addEventListener('click', async () => {
     const action = pendingConfirmAction;
@@ -2507,6 +2536,7 @@ function registerEventListeners() {
     if (evt.target.id === 'confirmModal') closeConfirmModal();
   });
 
+  // Overtime Approval Center: filters & search
   document.getElementById('otSearchInput').addEventListener('input', renderOvertimeTable);
   document.getElementById('otFilterEmployee').addEventListener('change', renderOvertimeTable);
   document.getElementById('otFilterDept').addEventListener('change', renderOvertimeTable);
@@ -2525,10 +2555,12 @@ function registerEventListeners() {
     renderOvertimeTable();
   });
 
+  // Leave Approval Center: sub-tabs
   document.querySelectorAll('.leave-subtab').forEach(btn => {
     btn.addEventListener('click', () => switchLeaveSubTab(btn.getAttribute('data-leave-tab')));
   });
 
+  // Leave Approval Center: requests filters & search
   document.getElementById('leaveSearchInput').addEventListener('input', renderLeaveTable);
   document.getElementById('leaveFilterEmployee').addEventListener('change', renderLeaveTable);
   document.getElementById('leaveFilterDept').addEventListener('change', renderLeaveTable);
@@ -2549,14 +2581,18 @@ function registerEventListeners() {
     renderLeaveTable();
   });
 
+  // Leave Approval Center: balances search
   document.getElementById('leaveBalanceSearchInput').addEventListener('input', renderLeaveBalancesTable);
 
+  // Leave Approval Center: calendar navigation
   document.getElementById('leaveCalMonthPrevBtn').addEventListener('click', () => navigateLeaveCalendarMonth(-1));
   document.getElementById('leaveCalMonthNextBtn').addEventListener('click', () => navigateLeaveCalendarMonth(1));
 
+  // Schedule Management: employee list sub-view
   document.getElementById('scheduleEmpSearchInput').addEventListener('input', renderScheduleEmployeeList);
   document.getElementById('scheduleEmpDeptFilter').addEventListener('change', renderScheduleEmployeeList);
 
+  // Schedule Management: individual monthly calendar sub-view
   document.getElementById('scheduleBackToListBtn').addEventListener('click', () => {
     if (scheduleHasUnsavedChanges) {
       const proceed = confirm('You have unsaved changes on this month. Discard them and go back?');
@@ -2569,6 +2605,7 @@ function registerEventListeners() {
   document.getElementById('scheduleLockToggleBtn').addEventListener('click', toggleScheduleLock);
   document.getElementById('scheduleSaveAllBtn').addEventListener('click', handleSaveAllSchedule);
 
+  // Add/Edit Form submission
   document.getElementById('employeeForm').addEventListener('submit', async (e) => {
     e.preventDefault();
     const editId = document.getElementById('editEmployeeId').value;
@@ -2626,11 +2663,15 @@ async function init() {
     return;
   }
 
+  // Restore an existing session on page load/refresh, if any.
   const { data: { session } } = await supabaseClient.auth.getSession();
   if (session) {
     enterApp(session);
   }
 
+  // Keep the UI in sync with sign-in / sign-out events, including from
+  // other tabs, and this is what actually reveals the dashboard after
+  // a successful login form submission above.
   supabaseClient.auth.onAuthStateChange((event, session) => {
     if (event === 'SIGNED_IN' && session) {
       enterApp(session);
