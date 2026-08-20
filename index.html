@@ -209,7 +209,7 @@
         </div>
       </section>
 
-      <!-- MODULE: EMPLOYEE MANAGEMENT -->
+      <!-- MODULE: EMPLOYEE MANAGEMENT (CENTRAL DIRECTORY) -->
       <section id="moduleEmployees" class="hidden space-y-6">
         <div class="flex flex-wrap items-center justify-between gap-4">
           <div>
@@ -227,8 +227,13 @@
             <input id="empSearchInput" type="text" placeholder="Search name or ID..." class="w-full bg-white border border-slate-300 rounded-lg px-3 py-2 text-xs text-slate-900 focus:outline-none focus:ring-2 focus:ring-amber-500/60" />
           </div>
           <div>
-            <select id="filterDept" class="department-select w-full bg-white border border-slate-300 rounded-lg px-3 py-2 text-xs text-slate-900 focus:outline-none focus:ring-2 focus:ring-amber-500/60">
+            <select id="filterDept" class="w-full bg-white border border-slate-300 rounded-lg px-3 py-2 text-xs text-slate-900 focus:outline-none focus:ring-2 focus:ring-amber-500/60">
               <option value="">All Departments</option>
+              <option value="Human Resources">Human Resources</option>
+              <option value="Operations">Operations</option>
+              <option value="Engineering">Engineering</option>
+              <option value="Finance">Finance</option>
+              <option value="Sales">Sales</option>
             </select>
           </div>
           <div>
@@ -295,8 +300,13 @@
             <div class="sm:col-span-2">
               <input id="scheduleEmpSearchInput" type="text" placeholder="Search employee name or ID..." class="w-full bg-white border border-slate-300 rounded-lg px-3 py-2 text-xs text-slate-900 focus:outline-none focus:ring-2 focus:ring-amber-500/60" />
             </div>
-            <select id="scheduleEmpDeptFilter" class="department-select w-full bg-white border border-slate-300 rounded-lg px-3 py-2 text-xs text-slate-900 focus:outline-none focus:ring-2 focus:ring-amber-500/60">
+            <select id="scheduleEmpDeptFilter" class="w-full bg-white border border-slate-300 rounded-lg px-3 py-2 text-xs text-slate-900 focus:outline-none focus:ring-2 focus:ring-amber-500/60">
               <option value="">All Departments</option>
+              <option value="Human Resources">Human Resources</option>
+              <option value="Operations">Operations</option>
+              <option value="Engineering">Engineering</option>
+              <option value="Finance">Finance</option>
+              <option value="Sales">Sales</option>
             </select>
           </div>
 
@@ -394,107 +404,16 @@
 
       <!-- MODULE: ATTENDANCE MANAGEMENT -->
       <section id="moduleAttendance" class="hidden space-y-6">
-        <div class="flex flex-wrap items-center justify-between gap-4">
-          <div>
-            <h3 class="text-base font-semibold text-slate-900">Attendance Monitoring &amp; Logging</h3>
-            <p class="text-xs text-slate-500 mt-0.5">Automated time logs synced from schedules alongside manual admin adjustments.</p>
-          </div>
-          <div class="flex items-center gap-2">
-            <button id="openAttendanceReportModalBtn" class="bg-slate-800 hover:bg-slate-700 text-white font-semibold text-xs px-4 py-2.5 rounded-lg transition-colors shadow-sm flex items-center gap-2">
-              <span>Generate Report</span>
-            </button>
-            <button id="openAddAttendanceModalBtn" class="bg-amber-500 hover:bg-amber-400 text-slate-900 font-semibold text-xs px-4 py-2.5 rounded-lg transition-colors shadow-sm flex items-center gap-2">
-              <span>+ Add Manual Log</span>
-            </button>
-          </div>
+        <div>
+          <h3 class="text-base font-semibold text-slate-900">Attendance Monitoring &amp; Logging</h3>
+          <p class="text-xs text-slate-500 mt-0.5">Active employees automatically appear in attendance records.</p>
         </div>
-
-        <!-- KPI CARDS -->
-        <div class="grid grid-cols-2 md:grid-cols-5 gap-4">
-          <div class="rounded-xl border border-slate-300 bg-slate-50 p-4">
-            <p class="text-xs text-slate-500 mb-1">Total Logs / Records</p>
-            <p id="attKpiTotal" class="text-2xl font-semibold text-slate-900 font-mono-tabular">0</p>
-          </div>
-          <div class="rounded-xl border border-emerald-300 bg-emerald-50 p-4">
-            <p class="text-xs text-emerald-700 mb-1">Present / Worked</p>
-            <p id="attKpiPresent" class="text-2xl font-semibold text-emerald-700 font-mono-tabular">0</p>
-          </div>
-          <div class="rounded-xl border border-amber-300 bg-amber-50 p-4">
-            <p class="text-xs text-amber-700 mb-1">Late Arrivals</p>
-            <p id="attKpiLate" class="text-2xl font-semibold text-amber-700 font-mono-tabular">0</p>
-          </div>
-          <div class="rounded-xl border border-rose-300 bg-rose-50 p-4">
-            <p class="text-xs text-rose-700 mb-1">Absent / Rest Day</p>
-            <p id="attKpiAbsent" class="text-2xl font-semibold text-rose-700 font-mono-tabular">0</p>
-          </div>
-          <div class="rounded-xl border border-slate-300 bg-slate-50 p-4">
-            <p class="text-xs text-slate-500 mb-1">Total Hours Worked</p>
-            <p id="attKpiHours" class="text-2xl font-semibold text-slate-900 font-mono-tabular">0.00</p>
-          </div>
-        </div>
-
-        <!-- Filters & Search Bar -->
-        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-6 gap-3 bg-slate-50 p-4 rounded-xl border border-slate-300">
-          <div class="lg:col-span-2">
-            <input id="attSearchInput" type="text" placeholder="Search employee name or ID..." class="w-full bg-white border border-slate-300 rounded-lg px-3 py-2 text-xs text-slate-900 focus:outline-none focus:ring-2 focus:ring-amber-500/60" />
-          </div>
-          <select id="attFilterEmployee" class="employee-select w-full bg-white border border-slate-300 rounded-lg px-3 py-2 text-xs text-slate-900 focus:outline-none focus:ring-2 focus:ring-amber-500/60" data-placeholder="All Employees"></select>
-          <select id="attFilterDept" class="department-select w-full bg-white border border-slate-300 rounded-lg px-3 py-2 text-xs text-slate-900 focus:outline-none focus:ring-2 focus:ring-amber-500/60">
-            <option value="">All Departments</option>
-          </select>
-          <select id="attFilterStatus" class="w-full bg-white border border-slate-300 rounded-lg px-3 py-2 text-xs text-slate-900 focus:outline-none focus:ring-2 focus:ring-amber-500/60">
-            <option value="">All Statuses / Filters</option>
-            <option value="Present">Present / Worked</option>
-            <option value="Late">Late</option>
-            <option value="Absent">Absent</option>
-            <option value="Rest Day">Rest Day</option>
-            <option value="Manual">Manual / Adjusted</option>
-          </select>
-          <select id="attFilterRangePreset" class="w-full bg-white border border-slate-300 rounded-lg px-3 py-2 text-xs text-slate-900 focus:outline-none focus:ring-2 focus:ring-amber-500/60">
-            <option value="all">All Dates</option>
-            <option value="today">Today</option>
-            <option value="cutoff1">Payroll Cutoff (1st-15th)</option>
-            <option value="cutoff2">Payroll Cutoff (16th-End)</option>
-            <option value="month">This Month</option>
-            <option value="custom">Custom Date Range</option>
-          </select>
-          <div id="attCustomDateContainer" class="hidden lg:col-span-6 flex flex-wrap items-center gap-3 pt-2 border-t border-slate-200">
-            <label class="text-[11px] text-slate-500 font-medium">Custom Range:</label>
-            <input id="attFilterDateFrom" type="date" class="bg-white border border-slate-300 rounded-lg px-3 py-2 text-xs text-slate-900 focus:outline-none focus:ring-2 focus:ring-amber-500/60" />
-            <span class="text-xs text-slate-400">to</span>
-            <input id="attFilterDateTo" type="date" class="bg-white border border-slate-300 rounded-lg px-3 py-2 text-xs text-slate-900 focus:outline-none focus:ring-2 focus:ring-amber-500/60" />
-            <button id="attResetFiltersBtn" class="ml-auto bg-slate-200 hover:bg-slate-300 text-slate-700 font-medium text-xs px-3 py-2 rounded-lg transition-colors">
-              Reset Filters
-            </button>
-          </div>
-        </div>
-
-        <!-- Attendance Table -->
-        <div class="rounded-xl border border-slate-300 bg-slate-50 overflow-hidden">
-          <div class="overflow-x-auto">
-            <table class="w-full text-sm border-collapse min-w-[1300px]">
-              <thead>
-                <tr class="bg-slate-100 text-slate-500 text-xs uppercase tracking-wide">
-                  <th class="text-left px-4 py-3 border-b border-slate-300">Emp ID &amp; Name</th>
-                  <th class="text-left px-4 py-3 border-b border-slate-300">Date</th>
-                  <th class="text-left px-4 py-3 border-b border-slate-300">Scheduled Time</th>
-                  <th class="text-left px-4 py-3 border-b border-slate-300">Actual Time In / Out</th>
-                  <th class="text-right px-4 py-3 border-b border-slate-300">Total Hrs</th>
-                  <th class="text-left px-4 py-3 border-b border-slate-300">Late / Undertime</th>
-                  <th class="text-right px-4 py-3 border-b border-slate-300">OT Hrs</th>
-                  <th class="text-center px-4 py-3 border-b border-slate-300">Status &amp; Source</th>
-                  <th class="text-center px-4 py-3 border-b border-slate-300">Actions</th>
-                </tr>
-              </thead>
-              <tbody id="attendanceTableBody" class="divide-y divide-slate-200">
-                <tr><td colspan="9" class="px-4 py-8 text-center text-slate-400">Loading attendance records...</td></tr>
-              </tbody>
-            </table>
-          </div>
+        <div class="rounded-xl border border-slate-300 bg-slate-50 p-6 text-sm text-slate-600">
+          Integrated with Employee Management. Time logs and attendance tracking sync directly.
         </div>
       </section>
 
-      <!-- MODULE: OVERTIME MANAGEMENT -->
+      <!-- MODULE: OVERTIME MANAGEMENT (APPROVAL CENTER) -->
       <section id="moduleOvertime" class="hidden space-y-6">
         <div>
           <h3 class="text-base font-semibold text-slate-900">Overtime Approval Center</h3>
@@ -531,9 +450,7 @@
             <input id="otSearchInput" type="text" placeholder="Search employee name..." class="w-full bg-white border border-slate-300 rounded-lg px-3 py-2 text-xs text-slate-900 focus:outline-none focus:ring-2 focus:ring-amber-500/60" />
           </div>
           <select id="otFilterEmployee" class="employee-select w-full bg-white border border-slate-300 rounded-lg px-3 py-2 text-xs text-slate-900 focus:outline-none focus:ring-2 focus:ring-amber-500/60" data-placeholder="All Employees"></select>
-          <select id="otFilterDept" class="department-select w-full bg-white border border-slate-300 rounded-lg px-3 py-2 text-xs text-slate-900 focus:outline-none focus:ring-2 focus:ring-amber-500/60">
-            <option value="">All Departments</option>
-          </select>
+          <select id="otFilterDept" class="department-select w-full bg-white border border-slate-300 rounded-lg px-3 py-2 text-xs text-slate-900 focus:outline-none focus:ring-2 focus:ring-amber-500/60"></select>
           <select id="otFilterStatus" class="w-full bg-white border border-slate-300 rounded-lg px-3 py-2 text-xs text-slate-900 focus:outline-none focus:ring-2 focus:ring-amber-500/60">
             <option value="">All Statuses</option>
             <option value="Pending">Pending</option>
@@ -577,7 +494,7 @@
         </div>
       </section>
 
-      <!-- MODULE: LEAVE MANAGEMENT -->
+      <!-- MODULE: LEAVE MANAGEMENT (APPROVAL CENTER) -->
       <section id="moduleLeave" class="hidden space-y-6">
         <div>
           <h3 class="text-base font-semibold text-slate-900">Leave Approval Center</h3>
@@ -608,7 +525,7 @@
           </div>
         </div>
 
-        <!-- SUB-TABS -->
+        <!-- SUB-TABS: Requests / Balances / Calendar -->
         <div class="flex border-b border-slate-200 gap-6 text-xs font-medium text-slate-500">
           <button data-leave-tab="leaveRequestsView" class="leave-subtab pb-2 text-amber-600 border-b-2 border-amber-600">Leave Requests</button>
           <button data-leave-tab="leaveBalancesView" class="leave-subtab pb-2 hover:text-slate-800">Leave Balances</button>
@@ -617,14 +534,13 @@
 
         <!-- SUB-VIEW: LEAVE REQUESTS -->
         <div id="leaveRequestsView" class="leave-subview space-y-6">
+          <!-- Filters & Search Bar -->
           <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-6 gap-3 bg-slate-50 p-4 rounded-xl border border-slate-300">
             <div class="lg:col-span-2">
               <input id="leaveSearchInput" type="text" placeholder="Search employee name..." class="w-full bg-white border border-slate-300 rounded-lg px-3 py-2 text-xs text-slate-900 focus:outline-none focus:ring-2 focus:ring-amber-500/60" />
             </div>
             <select id="leaveFilterEmployee" class="employee-select w-full bg-white border border-slate-300 rounded-lg px-3 py-2 text-xs text-slate-900 focus:outline-none focus:ring-2 focus:ring-amber-500/60" data-placeholder="All Employees"></select>
-            <select id="leaveFilterDept" class="department-select w-full bg-white border border-slate-300 rounded-lg px-3 py-2 text-xs text-slate-900 focus:outline-none focus:ring-2 focus:ring-amber-500/60">
-              <option value="">All Departments</option>
-            </select>
+            <select id="leaveFilterDept" class="department-select w-full bg-white border border-slate-300 rounded-lg px-3 py-2 text-xs text-slate-900 focus:outline-none focus:ring-2 focus:ring-amber-500/60"></select>
             <select id="leaveFilterType" class="w-full bg-white border border-slate-300 rounded-lg px-3 py-2 text-xs text-slate-900 focus:outline-none focus:ring-2 focus:ring-amber-500/60">
               <option value="">All Leave Types</option>
               <option value="Vacation Leave">Vacation Leave</option>
@@ -653,6 +569,7 @@
             </div>
           </div>
 
+          <!-- Leave Requests Table -->
           <div class="rounded-xl border border-slate-300 bg-slate-50 overflow-hidden">
             <div class="overflow-x-auto">
               <table class="w-full text-sm border-collapse min-w-[1300px]">
@@ -681,7 +598,7 @@
         <!-- SUB-VIEW: LEAVE BALANCES -->
         <div id="leaveBalancesView" class="leave-subview hidden space-y-6">
           <div class="flex flex-wrap items-center justify-between gap-4 bg-slate-50 p-4 rounded-xl border border-slate-300">
-            <p class="text-xs text-slate-500">Current available leave balance per employee, in days.</p>
+            <p class="text-xs text-slate-500">Current available leave balance per employee, in days. Approving a leave request deducts automatically; cancelling an approved request restores it.</p>
             <input id="leaveBalanceSearchInput" type="text" placeholder="Search employee name or ID..." class="w-full sm:w-64 bg-white border border-slate-300 rounded-lg px-3 py-2 text-xs text-slate-900 focus:outline-none focus:ring-2 focus:ring-amber-500/60" />
           </div>
           <div class="rounded-xl border border-slate-300 bg-slate-50 overflow-hidden">
@@ -737,7 +654,7 @@
           <p class="text-xs text-slate-500 mt-0.5">Automatically retrieves employee salary, statutory details, and attendance.</p>
         </div>
         <div class="rounded-xl border border-slate-300 bg-slate-50 p-6 text-sm text-slate-600">
-          Integrated with Attendance Management. Days worked, hours worked, lates, and undertime pull automatically for payroll cutoffs.
+          Integrated with Employee Management. Salaries and rates pull automatically for payroll cutoffs.
         </div>
       </section>
 
@@ -780,6 +697,8 @@
 
     <form id="employeeForm" class="flex-1 overflow-y-auto space-y-6 pr-1 text-sm" novalidate>
       <input type="hidden" id="editEmployeeId" />
+
+      <!-- Personal Information -->
       <div class="space-y-3">
         <h4 class="font-semibold text-xs uppercase tracking-wider text-amber-600">Personal Information</h4>
         <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
@@ -818,12 +737,13 @@
         </div>
       </div>
 
+      <!-- Employment Information -->
       <div class="space-y-3 pt-2 border-t border-slate-200">
         <h4 class="font-semibold text-xs uppercase tracking-wider text-amber-600">Employment Information</h4>
         <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
           <div>
             <label class="text-xs font-medium text-slate-500">Department *</label>
-            <select id="modalDepartment" required class="department-select w-full bg-white border border-slate-300 rounded-lg px-3 py-2 text-sm text-slate-900">
+            <select id="modalDepartment" required class="w-full bg-white border border-slate-300 rounded-lg px-3 py-2 text-sm text-slate-900">
               <option value="Human Resources">Human Resources</option>
               <option value="Operations">Operations</option>
               <option value="Engineering">Engineering</option>
@@ -866,6 +786,7 @@
         </div>
       </div>
 
+      <!-- Payroll Information -->
       <div class="space-y-3 pt-2 border-t border-slate-200">
         <h4 class="font-semibold text-xs uppercase tracking-wider text-amber-600">Payroll &amp; Statutory Information</h4>
         <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
@@ -914,131 +835,6 @@
   </div>
 </div>
 
-<!-- ADD / EDIT MANUAL ATTENDANCE LOG MODAL -->
-<div id="attendanceModal" class="hidden fixed inset-0 z-50 items-center justify-center bg-black/60 px-4">
-  <div class="bg-white border border-slate-300 rounded-xl max-w-lg w-full p-6 space-y-4 shadow-2xl">
-    <div class="flex items-center justify-between border-b border-slate-200 pb-3">
-      <h3 id="attendanceModalTitle" class="text-slate-900 font-semibold text-lg">Add Manual Attendance Log</h3>
-      <button id="closeAttendanceModalBtn" class="text-slate-400 hover:text-slate-700 font-bold text-lg">✕</button>
-    </div>
-
-    <form id="attendanceForm" class="space-y-4 text-sm" novalidate>
-      <input type="hidden" id="editAttendanceId" />
-      <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
-        <div class="sm:col-span-2">
-          <label class="text-xs font-medium text-slate-500">Employee *</label>
-          <select id="modalAttEmployee" required class="employee-select w-full bg-white border border-slate-300 rounded-lg px-3 py-2 text-sm text-slate-900" data-placeholder="Select employee..."></select>
-        </div>
-        <div>
-          <label class="text-xs font-medium text-slate-500">Date *</label>
-          <input id="modalAttDate" type="date" required class="w-full bg-white border border-slate-300 rounded-lg px-3 py-2 text-sm text-slate-900" />
-        </div>
-        <div>
-          <label class="text-xs font-medium text-slate-500">Status</label>
-          <select id="modalAttStatus" class="w-full bg-white border border-slate-300 rounded-lg px-3 py-2 text-sm text-slate-900">
-            <option value="Present">Present / Worked</option>
-            <option value="Absent">Absent</option>
-            <option value="Rest Day Work">Rest Day Work</option>
-            <option value="On Leave">On Leave</option>
-          </select>
-        </div>
-        <div>
-          <label class="text-xs font-medium text-slate-500">Time In</label>
-          <input id="modalAttTimeIn" type="time" class="w-full bg-white border border-slate-300 rounded-lg px-3 py-2 text-sm text-slate-900" />
-        </div>
-        <div>
-          <label class="text-xs font-medium text-slate-500">Time Out</label>
-          <input id="modalAttTimeOut" type="time" class="w-full bg-white border border-slate-300 rounded-lg px-3 py-2 text-sm text-slate-900" />
-        </div>
-        <div class="sm:col-span-2">
-          <label class="text-xs font-medium text-slate-500">Reason for Manual Entry / Adjustment *</label>
-          <input id="modalAttReason" type="text" required class="w-full bg-white border border-slate-300 rounded-lg px-3 py-2 text-sm text-slate-900" placeholder="Biometric device offline / Forgot to time out" />
-        </div>
-        <div class="sm:col-span-2">
-          <label class="text-xs font-medium text-slate-500">Remarks</label>
-          <input id="modalAttRemarks" type="text" class="w-full bg-white border border-slate-300 rounded-lg px-3 py-2 text-sm text-slate-900" placeholder="Approved by HR manager" />
-        </div>
-      </div>
-
-      <div class="flex justify-end gap-3 pt-4 border-t border-slate-200">
-        <button type="button" id="cancelAttendanceModalBtn" class="px-4 py-2 text-sm rounded-lg border border-slate-300 text-slate-600 hover:bg-slate-100 transition-colors">Cancel</button>
-        <button type="submit" class="px-5 py-2 text-sm font-semibold rounded-lg bg-amber-500 hover:bg-amber-400 text-slate-900 transition-colors">Save Attendance Log</button>
-      </div>
-    </form>
-  </div>
-</div>
-
-<!-- ATTENDANCE SUMMARY REPORT MODAL -->
-<div id="attendanceReportModal" class="hidden fixed inset-0 z-50 items-center justify-center bg-black/60 px-4 py-8 overflow-y-auto">
-  <div class="bg-white border border-slate-300 rounded-xl max-w-4xl w-full max-h-[90vh] flex flex-col p-6 space-y-4 shadow-2xl">
-    <div class="flex items-center justify-between border-b border-slate-200 pb-3">
-      <div>
-        <h3 class="text-slate-900 font-semibold text-lg">Attendance Summary Report</h3>
-        <p id="attReportSubtitle" class="text-xs text-slate-500 mt-0.5">Aggregated attendance metrics for payroll generation.</p>
-      </div>
-      <button id="closeAttendanceReportModalBtn" class="text-slate-400 hover:text-slate-700 font-bold text-lg">✕</button>
-    </div>
-
-    <div class="grid grid-cols-1 sm:grid-cols-4 gap-3 bg-slate-50 p-3 rounded-lg border border-slate-200 text-xs">
-      <div>
-        <label class="text-slate-500 block mb-1">Period / Range</label>
-        <select id="reportPeriodPreset" class="w-full bg-white border border-slate-300 rounded-md px-2.5 py-1.5 text-xs text-slate-900">
-          <option value="cutoff1">Payroll Cutoff (1st-15th)</option>
-          <option value="cutoff2">Payroll Cutoff (16th-End)</option>
-          <option value="month">This Month</option>
-          <option value="custom">Custom Date Range</option>
-        </select>
-      </div>
-      <div id="reportCustomRangeBox" class="hidden sm:col-span-2 flex items-center gap-2">
-        <div>
-          <label class="text-slate-500 block mb-1">From</label>
-          <input id="reportDateFrom" type="date" class="bg-white border border-slate-300 rounded-md px-2 py-1.5 text-xs" />
-        </div>
-        <div>
-          <label class="text-slate-500 block mb-1">To</label>
-          <input id="reportDateTo" type="date" class="bg-white border border-slate-300 rounded-md px-2 py-1.5 text-xs" />
-        </div>
-      </div>
-      <div>
-        <label class="text-slate-500 block mb-1">Department</label>
-        <select id="reportFilterDept" class="department-select w-full bg-white border border-slate-300 rounded-md px-2.5 py-1.5 text-xs text-slate-900">
-          <option value="">All Departments</option>
-        </select>
-      </div>
-      <div class="flex items-end">
-        <button id="generateReportRunBtn" class="w-full bg-amber-500 hover:bg-amber-400 text-slate-900 font-semibold text-xs px-3 py-2 rounded-md transition-colors">Run Summary</button>
-      </div>
-    </div>
-
-    <div class="flex-1 overflow-y-auto rounded-lg border border-slate-300 bg-slate-50">
-      <div class="overflow-x-auto">
-        <table class="w-full text-sm border-collapse min-w-[900px]">
-          <thead>
-            <tr class="bg-slate-100 text-slate-500 text-xs uppercase tracking-wide">
-              <th class="text-left px-4 py-3 border-b border-slate-300">Employee Name</th>
-              <th class="text-center px-4 py-3 border-b border-slate-300">Days Worked</th>
-              <th class="text-right px-4 py-3 border-b border-slate-300">Total Hours</th>
-              <th class="text-right px-4 py-3 border-b border-slate-300">Late (Mins)</th>
-              <th class="text-right px-4 py-3 border-b border-slate-300">Undertime</th>
-              <th class="text-right px-4 py-3 border-b border-slate-300">Overtime</th>
-              <th class="text-center px-4 py-3 border-b border-slate-300">Absent Days</th>
-              <th class="text-center px-4 py-3 border-b border-slate-300">Rest Days Worked</th>
-            </tr>
-          </thead>
-          <tbody id="attendanceReportTableBody" class="divide-y divide-slate-200">
-            <tr><td colspan="8" class="px-4 py-8 text-center text-slate-400">Click "Run Summary" to generate report.</td></tr>
-          </tbody>
-        </table>
-      </div>
-    </div>
-
-    <div class="flex justify-end gap-2 pt-2 border-t border-slate-200">
-      <button id="closeAttendanceReportBtn" class="px-4 py-2 text-sm rounded-lg border border-slate-300 text-slate-600 hover:bg-slate-100 transition-colors">Close</button>
-      <button onclick="showToast('Attendance report exported successfully to CSV / Payroll module.', 'success')" class="px-4 py-2 text-sm font-semibold rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white transition-colors">Export Report</button>
-    </div>
-  </div>
-</div>
-
 <!-- EMPLOYEE PROFILE VIEW MODAL -->
 <div id="employeeProfileModal" class="hidden fixed inset-0 z-50 items-center justify-center bg-black/60 px-4 overflow-y-auto py-8">
   <div class="bg-white border border-slate-300 rounded-xl max-w-4xl w-full max-h-[90vh] flex flex-col p-6 space-y-4 shadow-2xl overflow-hidden">
@@ -1050,6 +846,7 @@
       <button id="closeProfileModalBtn" class="text-slate-400 hover:text-slate-700 font-bold text-lg">✕</button>
     </div>
 
+    <!-- Profile Tabs -->
     <div class="flex border-b border-slate-200 gap-6 text-xs font-medium text-slate-500 overflow-x-auto">
       <button data-tab="tabPersonal" class="profile-tab pb-2 text-amber-600 border-b-2 border-amber-600">Personal Info</button>
       <button data-tab="tabEmployment" class="profile-tab pb-2 hover:text-slate-800">Employment</button>
@@ -1062,11 +859,12 @@
       <button data-tab="tabDocuments" class="profile-tab pb-2 hover:text-slate-800">Documents</button>
     </div>
 
+    <!-- Tab Contents -->
     <div class="flex-1 overflow-y-auto py-2 text-sm space-y-4">
       <div id="tabPersonal" class="profile-content space-y-3"></div>
       <div id="tabEmployment" class="profile-content hidden space-y-3"></div>
       <div id="tabCompensation" class="profile-content hidden space-y-3"></div>
-      <div id="tabAttendance" class="profile-content hidden space-y-3"></div>
+      <div id="tabAttendance" class="profile-content hidden space-y-3">Attendance records for this employee.</div>
       <div id="tabSchedule" class="profile-content hidden space-y-3">Work schedule and shift assignments.</div>
       <div id="tabLeave" class="profile-content hidden space-y-3">Leave history and balances.</div>
       <div id="tabOvertime" class="profile-content hidden space-y-3">Overtime requests and logs.</div>
@@ -1080,7 +878,7 @@
   </div>
 </div>
 
-<!-- GENERIC CONFIRM MODAL -->
+<!-- GENERIC CONFIRM MODAL (delete actions) -->
 <div id="confirmModal" class="hidden fixed inset-0 z-[60] items-center justify-center bg-black/60 px-4">
   <div class="bg-white border border-slate-300 rounded-xl max-w-sm w-full p-5">
     <h3 id="confirmModalTitle" class="text-slate-900 font-semibold text-base">Confirm Action</h3>
@@ -1099,14 +897,8 @@ const SUPABASE_KEY = 'sb_publishable_VsbbODbWKrv2g9HUKz7EzA_wUh9bXzm';
 
 const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 const EMPLOYEES_TABLE = 'employees';
-const ATTENDANCE_TABLE = 'attendance_logs';
-const SCHEDULES_TABLE = 'schedules';
-const OVERTIME_TABLE = 'overtime_requests';
 
 let employeesCache = [];
-let schedulesCache = [];
-let attendanceCache = [];
-let overtimeCache = [];
 let selectedProfileEmp = null;
 
 /* UTILITY FUNCTIONS */
@@ -1205,9 +997,6 @@ function switchModule(targetId) {
   } else if (targetId === 'schedule') {
     showScheduleListView();
     renderScheduleEmployeeList();
-  } else if (targetId === 'attendance') {
-    populateEmployeeDropdowns();
-    fetchAttendanceData();
   } else if (targetId === 'overtime') {
     populateEmployeeDropdowns();
     fetchOvertimeRequests();
@@ -1218,40 +1007,27 @@ function switchModule(targetId) {
   }
 }
 
-/* DATA FETCHING */
-async function fetchAllData() {
+/* DATA FETCHING & DIRECTORY RENDERING */
+async function fetchEmployees() {
   if (credentialsArePlaceholders()) {
     setConnectionStatus('unconfigured');
     return;
   }
 
   try {
-    const [empRes, schedRes, attRes, otRes] = await Promise.all([
-      supabaseClient.from(EMPLOYEES_TABLE).select('*').order('last_name', { ascending: true }),
-      supabaseClient.from(SCHEDULES_TABLE).select('*'),
-      supabaseClient.from(ATTENDANCE_TABLE).select('*'),
-      supabaseClient.from(OVERTIME_TABLE).select('*')
-    ]);
-
-    if (empRes.error) throw empRes.error;
+    const { data, error } = await supabaseClient.from(EMPLOYEES_TABLE).select('*').order('last_name', { ascending: true });
+    if (error) throw error;
     setConnectionStatus('connected');
 
-    employeesCache = empRes.data || [];
-    schedulesCache = schedRes.data || [];
-    attendanceCache = attRes.data || [];
-    overtimeCache = otRes.data || [];
-
+    employeesCache = data || [];
     updateDashboardOverview();
     renderEmployeeDirectory();
     renderInactiveEmployees();
     populateEmployeeDropdowns();
-    if (!document.getElementById('moduleAttendance').classList.contains('hidden')) {
-      renderAttendanceTable();
-    }
   } catch (err) {
-    console.error('fetchAllData error:', err);
+    console.error('fetchEmployees error:', err);
     setConnectionStatus('error');
-    showToast('Unable to load database records.', 'error');
+    showToast('Unable to load employee records.', 'error');
   }
 }
 
@@ -1259,468 +1035,12 @@ function updateDashboardOverview() {
   const activeCount = employeesCache.filter(e => e.employment_status !== 'Inactive' && e.employment_status !== 'Resigned' && e.employment_status !== 'Terminated').length;
   const inactiveCount = employeesCache.length - activeCount;
 
-  const todayStr = new Date().toISOString().split('T')[0];
-  const todayAtt = attendanceCache.filter(a => a.attendance_date === todayStr && (a.status === 'Present' || a.status === 'Rest Day Work'));
-
   document.getElementById('dashTotalActive').textContent = activeCount;
   document.getElementById('dashTotalInactive').textContent = inactiveCount;
-  document.getElementById('dashPresentToday').textContent = todayAtt.length;
-  document.getElementById('dashAbsentToday').textContent = Math.max(0, activeCount - todayAtt.length);
+  document.getElementById('dashPresentToday').textContent = activeCount;
+  document.getElementById('dashAbsentToday').textContent = 0;
 }
 
-/* ===============================
-   ATTENDANCE MANAGEMENT LOGIC
-=============================== */
-async function fetchAttendanceData() {
-  try {
-    const [attRes, schedRes, otRes] = await Promise.all([
-      supabaseClient.from(ATTENDANCE_TABLE).select('*'),
-      supabaseClient.from(SCHEDULES_TABLE).select('*'),
-      supabaseClient.from(OVERTIME_TABLE).select('*')
-    ]);
-    if (!attRes.error) attendanceCache = attRes.data || [];
-    if (!schedRes.error) schedulesCache = schedRes.data || [];
-    if (!otRes.error) overtimeCache = otRes.data || [];
-
-    renderAttendanceKPIs();
-    renderAttendanceTable();
-  } catch (err) {
-    console.error('fetchAttendanceData error:', err);
-    showToast('Failed to load attendance records.', 'error');
-  }
-}
-
-/* Computes merged attendance items combining automated schedules + manual logs */
-function getCombinedAttendanceRows() {
-  const manualMap = new Map();
-  attendanceCache.forEach(m => {
-    manualMap.set(`${m.employee_id}_${m.attendance_date}`, m);
-  });
-
-  const combinedMap = new Map();
-
-  // 1. Ingest schedules to create automated attendance baseline
-  schedulesCache.forEach(s => {
-    const key = `${s.employee_id}_${s.schedule_date}`;
-    const manual = manualMap.get(key);
-
-    const schedStart = s.start_time ? s.start_time.slice(0, 5) : null;
-    const schedEnd = s.end_time ? s.end_time.slice(0, 5) : null;
-    const isRest = s.is_rest_day;
-
-    let actualIn = manual ? (manual.time_in ? manual.time_in.slice(0, 5) : '') : '';
-    let actualOut = manual ? (manual.time_out ? manual.time_out.slice(0, 5) : '') : '';
-    let status = manual ? (manual.status || (isRest ? 'Rest Day' : 'Present')) : (isRest ? 'Rest Day' : 'Scheduled');
-    let source = manual ? (manual.source || 'Manual/Adjusted') : 'Automated Schedule';
-    let reason = manual ? (manual.reason || '') : '';
-    let remarks = manual ? (manual.remarks || '') : '';
-    let recordId = manual ? manual.id : null;
-
-    // Calculations
-    let totalHrs = 0;
-    let lateMins = 0;
-    let undertimeMins = 0;
-    let otHrs = 0;
-
-    if (actualIn && actualOut && !isRest) {
-      totalHrs = computeHoursWorked(actualIn, actualOut, s.break_start ? s.break_start.slice(0, 5) : '12:00', s.break_end ? s.break_end.slice(0, 5) : '13:00');
-      if (schedStart) {
-        lateMins = computeLateMinutes(schedStart, actualIn);
-      }
-      if (schedEnd) {
-        undertimeMins = computeUndertimeMinutes(schedEnd, actualOut);
-      }
-    } else if (isRest && actualIn && actualOut) {
-      totalHrs = computeHoursWorked(actualIn, actualOut, '12:00', '13:00');
-      status = 'Rest Day Work';
-    }
-
-    // Check approved overtime
-    const approvedOt = overtimeCache.find(o => o.employee_id === s.employee_id && o.ot_date === s.schedule_date && o.status === 'Approved');
-    if (approvedOt) {
-      otHrs = Number(approvedOt.total_hours) || 2.0;
-    }
-
-    combinedMap.set(key, {
-      id: recordId,
-      employee_id: s.employee_id,
-      attendance_date: s.schedule_date,
-      sched_start: schedStart,
-      sched_end: schedEnd,
-      is_rest_day: isRest,
-      time_in: actualIn,
-      time_out: actualOut,
-      total_hours: totalHrs,
-      late_minutes: lateMins,
-      undertime_minutes: undertimeMins,
-      overtime_hours: otHrs,
-      status: status,
-      source: source,
-      reason: reason,
-      remarks: remarks
-    });
-  });
-
-  // 2. Add manual logs that don't have a schedule row
-  attendanceCache.forEach(m => {
-    const key = `${m.employee_id}_${m.attendance_date}`;
-    if (!combinedMap.has(key)) {
-      const actualIn = m.time_in ? m.time_in.slice(0, 5) : '';
-      const actualOut = m.time_out ? m.time_out.slice(0, 5) : '';
-      const totalHrs = actualIn && actualOut ? computeHoursWorked(actualIn, actualOut, '12:00', '13:00') : 0;
-
-      combinedMap.set(key, {
-        id: m.id,
-        employee_id: m.employee_id,
-        attendance_date: m.attendance_date,
-        sched_start: null,
-        sched_end: null,
-        is_rest_day: false,
-        time_in: actualIn,
-        time_out: actualOut,
-        total_hours: totalHrs,
-        late_minutes: 0,
-        undertime_minutes: 0,
-        overtime_hours: 0,
-        status: m.status || 'Present',
-        source: m.source || 'Manual/Adjusted',
-        reason: m.reason || '',
-        remarks: m.remarks || ''
-      });
-    }
-  });
-
-  return Array.from(combinedMap.values());
-}
-
-function computeHoursWorked(inTime, outTime, breakStart, breakEnd) {
-  if (!inTime || !outTime) return 0;
-  const toMin = t => {
-    const [h, m] = t.split(':').map(Number);
-    return h * 60 + m;
-  };
-  let start = toMin(inTime);
-  let end = toMin(outTime);
-  if (end <= start) end += 24 * 60;
-
-  let total = end - start;
-  if (breakStart && breakEnd) {
-    let bs = toMin(breakStart);
-    let be = toMin(breakEnd);
-    if (be <= bs) be += 24 * 60;
-    total -= Math.max(0, be - bs);
-  }
-  return Math.max(0, total / 60);
-}
-
-function computeLateMinutes(schedIn, actualIn) {
-  const toMin = t => {
-    const [h, m] = t.split(':').map(Number);
-    return h * 60 + m;
-  };
-  const s = toMin(schedIn);
-  const a = toMin(actualIn);
-  return Math.max(0, a - s);
-}
-
-function computeUndertimeMinutes(schedOut, actualOut) {
-  const toMin = t => {
-    const [h, m] = t.split(':').map(Number);
-    return h * 60 + m;
-  };
-  const s = toMin(schedOut);
-  const a = toMin(actualOut);
-  return Math.max(0, s - a);
-}
-
-function renderAttendanceKPIs() {
-  const rows = getFilteredAttendanceRows();
-  const total = rows.length;
-  const present = rows.filter(r => r.status === 'Present' || r.status === 'Rest Day Work').length;
-  const late = rows.filter(r => (r.late_minutes || 0) > 0).length;
-  const absentOrRest = rows.filter(r => r.status === 'Absent' || r.is_rest_day).length;
-  const totalHrs = rows.reduce((acc, r) => acc + (r.total_hours || 0), 0);
-
-  document.getElementById('attKpiTotal').textContent = total;
-  document.getElementById('attKpiPresent').textContent = present;
-  document.getElementById('attKpiLate').textContent = late;
-  document.getElementById('attKpiAbsent').textContent = absentOrRest;
-  document.getElementById('attKpiHours').textContent = totalHrs.toFixed(2);
-}
-
-function getFilteredAttendanceRows() {
-  const searchVal = (document.getElementById('attSearchInput').value || '').toLowerCase();
-  const empVal = document.getElementById('attFilterEmployee').value;
-  const deptVal = document.getElementById('attFilterDept').value;
-  const statusVal = document.getElementById('attFilterStatus').value;
-  const presetVal = document.getElementById('attFilterRangePreset').value;
-
-  const todayStr = new Date().toISOString().split('T')[0];
-  let dateFrom = document.getElementById('attFilterDateFrom').value;
-  let dateTo = document.getElementById('attFilterDateTo').value;
-
-  if (presetVal === 'today') {
-    dateFrom = todayStr;
-    dateTo = todayStr;
-  } else if (presetVal === 'cutoff1') {
-    const cur = new Date();
-    const y = cur.getFullYear();
-    const m = String(cur.getMonth() + 1).padStart(2, '0');
-    dateFrom = `${y}-${m}-01`;
-    dateTo = `${y}-${m}-15`;
-  } else if (presetVal === 'cutoff2') {
-    const cur = new Date();
-    const y = cur.getFullYear();
-    const m = String(cur.getMonth() + 1).padStart(2, '0');
-    const lastDay = new Date(y, cur.getMonth() + 1, 0).getDate();
-    dateFrom = `${y}-${m}-16`;
-    dateTo = `${y}-${m}-${lastDay}`;
-  } else if (presetVal === 'month') {
-    const cur = new Date();
-    const y = cur.getFullYear();
-    const m = String(cur.getMonth() + 1).padStart(2, '0');
-    const lastDay = new Date(y, cur.getMonth() + 1, 0).getDate();
-    dateFrom = `${y}-${m}-01`;
-    dateTo = `${y}-${m}-${lastDay}`;
-  }
-
-  const allRows = getCombinedAttendanceRows();
-
-  return allRows.filter(r => {
-    const emp = employeesCache.find(e => e.id === r.employee_id);
-    if (!emp || emp.employment_status === 'Inactive') return false;
-
-    const fullName = `${emp.first_name || ''} ${emp.last_name || ''}`.toLowerCase();
-    const empId = (emp.employee_number || '').toLowerCase();
-
-    if (searchVal && !fullName.includes(searchVal) && !empId.includes(searchVal)) return false;
-    if (empVal && r.employee_id !== empVal) return false;
-    if (deptVal && emp.department !== deptVal) return false;
-
-    if (statusVal === 'Present' && r.status !== 'Present' && r.status !== 'Rest Day Work') return false;
-    if (statusVal === 'Late' && (r.late_minutes || 0) <= 0) return false;
-    if (statusVal === 'Absent' && r.status !== 'Absent') return false;
-    if (statusVal === 'Rest Day' && !r.is_rest_day) return false;
-    if (statusVal === 'Manual' && r.source !== 'Manual/Adjusted') return false;
-
-    if (dateFrom && r.attendance_date < dateFrom) return false;
-    if (dateTo && r.attendance_date > dateTo) return false;
-
-    return true;
-  }).sort((a, b) => (b.attendance_date || '').localeCompare(a.attendance_date || ''));
-}
-
-function renderAttendanceTable() {
-  const tbody = document.getElementById('attendanceTableBody');
-  const filtered = getFilteredAttendanceRows();
-
-  if (filtered.length === 0) {
-    tbody.innerHTML = `<tr><td colspan="9" class="px-4 py-8 text-center text-slate-400">No attendance logs found matching filters.</td></tr>`;
-    return;
-  }
-
-  tbody.innerHTML = filtered.map(r => {
-    const emp = employeesCache.find(e => e.id === r.employee_id);
-    const empName = emp ? `${emp.first_name} ${emp.last_name}` : 'Unknown';
-    const empMeta = emp ? `${emp.department || 'N/A'} • ${emp.position || 'Staff'}` : 'N/A';
-
-    let statusBadge = 'bg-slate-100 text-slate-700 border-slate-300';
-    if (r.status === 'Present') statusBadge = 'bg-emerald-500/15 text-emerald-700 border-emerald-500/30';
-    if (r.status === 'Rest Day' || r.is_rest_day) statusBadge = 'bg-sky-500/15 text-sky-700 border-sky-300';
-    if (r.status === 'Absent') statusBadge = 'bg-rose-500/15 text-rose-700 border-rose-300';
-
-    const sourceBadge = r.source === 'Manual/Adjusted'
-      ? `<span class="ml-1 text-[10px] px-1.5 py-0.5 rounded bg-amber-500/15 text-amber-700 border border-amber-300">Manual/Adjusted</span>`
-      : `<span class="ml-1 text-[10px] px-1.5 py-0.5 rounded bg-slate-100 text-slate-600 border border-slate-200">Scheduled</span>`;
-
-    const schedText = r.is_rest_day ? 'Rest Day' : (r.sched_start ? `${formatTimeLabel(r.sched_start)} – ${formatTimeLabel(r.sched_end)}` : 'No Schedule');
-    const actualText = (r.time_in && r.time_out) ? `${formatTimeLabel(r.time_in)} – ${formatTimeLabel(r.time_out)}` : '<span class="text-slate-400 italic">No log</span>';
-
-    let lateUndertimeText = '—';
-    if (r.late_minutes > 0) lateUndertimeText = `<span class="text-rose-600">Late: ${r.late_minutes}m</span>`;
-    if (r.undertime_minutes > 0) lateUndertimeText += `<br/><span class="text-amber-600">Under: ${r.undertime_minutes}m</span>`;
-
-    return `
-      <tr class="hover:bg-slate-100 transition-colors">
-        <td class="px-4 py-3">
-          <div class="font-medium text-slate-900">${escapeHtml(empName)}</div>
-          <div class="text-[11px] text-slate-400 font-mono">ID: ${escapeHtml(emp ? emp.employee_number : 'N/A')} • ${escapeHtml(empMeta)}</div>
-        </td>
-        <td class="px-4 py-3 text-slate-800 whitespace-nowrap">${formatDateLabel(r.attendance_date)}</td>
-        <td class="px-4 py-3 text-slate-800 whitespace-nowrap text-xs">${schedText}</td>
-        <td class="px-4 py-3 text-slate-800 whitespace-nowrap text-xs">${actualText}</td>
-        <td class="px-4 py-3 text-right font-mono-tabular font-semibold text-slate-900">${(r.total_hours || 0).toFixed(2)}</td>
-        <td class="px-4 py-3 text-xs">${lateUndertimeText}</td>
-        <td class="px-4 py-3 text-right font-mono-tabular text-emerald-700 font-medium">${(r.overtime_hours || 0).toFixed(2)}</td>
-        <td class="px-4 py-3 text-center">
-          <span class="text-xs px-2 py-0.5 rounded-full border ${statusBadge} font-medium">${escapeHtml(r.status)}</span>
-          ${sourceBadge}
-        </td>
-        <td class="px-4 py-3 text-center">
-          <button onclick="openEditAttendanceModal('${r.employee_id}', '${r.attendance_date}')" class="text-xs px-2.5 py-1 rounded border border-slate-300 text-slate-700 hover:bg-slate-100 font-medium">Edit Log</button>
-        </td>
-      </tr>
-    `;
-  }).join('');
-}
-
-function openAddAttendanceModal() {
-  document.getElementById('attendanceModalTitle').textContent = 'Add Manual Attendance Log';
-  document.getElementById('editAttendanceId').value = '';
-  document.getElementById('attendanceForm').reset();
-  document.getElementById('modalAttDate').value = new Date().toISOString().split('T')[0];
-
-  const modal = document.getElementById('attendanceModal');
-  modal.classList.remove('hidden');
-  modal.classList.add('flex');
-}
-
-function openEditAttendanceModal(employeeId, dateStr) {
-  const existing = attendanceCache.find(a => a.employee_id === employeeId && a.attendance_date === dateStr);
-  document.getElementById('attendanceModalTitle').textContent = 'Edit / Adjust Attendance Log';
-
-  document.getElementById('modalAttEmployee').value = employeeId;
-  document.getElementById('modalAttDate').value = dateStr;
-  document.getElementById('modalAttStatus').value = existing ? existing.status : 'Present';
-  document.getElementById('modalAttTimeIn').value = existing && existing.time_in ? existing.time_in.slice(0, 5) : '';
-  document.getElementById('modalAttTimeOut').value = existing && existing.time_out ? existing.time_out.slice(0, 5) : '';
-  document.getElementById('modalAttReason').value = existing ? (existing.reason || '') : '';
-  document.getElementById('modalAttRemarks').value = existing ? (existing.remarks || '') : '';
-
-  const modal = document.getElementById('attendanceModal');
-  modal.classList.remove('hidden');
-  modal.classList.add('flex');
-}
-
-function closeAttendanceModal() {
-  const modal = document.getElementById('attendanceModal');
-  modal.classList.add('hidden');
-  modal.classList.remove('flex');
-}
-
-/* ===============================
-   ATTENDANCE REPORT GENERATION
-=============================== */
-function openAttendanceReportModal() {
-  const modal = document.getElementById('attendanceReportModal');
-  modal.classList.remove('hidden');
-  modal.classList.add('flex');
-  runAttendanceReport();
-}
-
-function closeAttendanceReportModal() {
-  const modal = document.getElementById('attendanceReportModal');
-  modal.classList.add('hidden');
-  modal.classList.remove('flex');
-}
-
-function runAttendanceReport() {
-  const preset = document.getElementById('reportPeriodPreset').value;
-  const dept = document.getElementById('reportFilterDept').value;
-
-  const todayStr = new Date().toISOString().split('T')[0];
-  let dateFrom = '';
-  let dateTo = '';
-
-  const cur = new Date();
-  const y = cur.getFullYear();
-  const m = String(cur.getMonth() + 1).padStart(2, '0');
-  const lastDay = new Date(y, cur.getMonth() + 1, 0).getDate();
-
-  if (preset === 'cutoff1') {
-    dateFrom = `${y}-${m}-01`;
-    dateTo = `${y}-${m}-15`;
-  } else if (preset === 'cutoff2') {
-    dateFrom = `${y}-${m}-16`;
-    dateTo = `${y}-${m}-${lastDay}`;
-  } else if (preset === 'month') {
-    dateFrom = `${y}-${m}-01`;
-    dateTo = `${y}-${m}-${lastDay}`;
-  } else if (preset === 'custom') {
-    dateFrom = document.getElementById('reportDateFrom').value;
-    dateTo = document.getElementById('reportDateTo').value;
-  }
-
-  document.getElementById('attReportSubtitle').textContent = `Summary period: ${dateFrom || 'Start'} to ${dateTo || 'Present'}`;
-
-  const allRows = getCombinedAttendanceRows();
-  const roster = employeesCache.filter(e => {
-    if (e.employment_status === 'Inactive') return false;
-    if (dept && e.department !== dept) return false;
-    return true;
-  });
-
-  const tbody = document.getElementById('attendanceReportTableBody');
-
-  if (roster.length === 0) {
-    tbody.innerHTML = `<tr><td colspan="8" class="px-4 py-8 text-center text-slate-400">No employees found for this department.</td></tr>`;
-    return;
-  }
-
-  tbody.innerHTML = roster.map(emp => {
-    const empRows = allRows.filter(r => {
-      if (r.employee_id !== emp.id) return false;
-      if (dateFrom && r.attendance_date < dateFrom) return false;
-      if (dateTo && r.attendance_date > dateTo) return false;
-      return true;
-    });
-
-    const daysWorked = empRows.filter(r => r.status === 'Present' || r.status === 'Rest Day Work').length;
-    const totalHrs = empRows.reduce((sum, r) => sum + (r.total_hours || 0), 0);
-    const totalLateMins = empRows.reduce((sum, r) => sum + (r.late_minutes || 0), 0);
-    const totalUnderMins = empRows.reduce((sum, r) => sum + (r.undertime_minutes || 0), 0);
-    const totalOt = empRows.reduce((sum, r) => sum + (r.overtime_hours || 0), 0);
-    const absentDays = empRows.filter(r => r.status === 'Absent').length;
-    const restDaysWorked = empRows.filter(r => r.status === 'Rest Day Work').length;
-
-    return `
-      <tr class="hover:bg-slate-100 transition-colors">
-        <td class="px-4 py-3 font-medium text-slate-900">
-          ${escapeHtml(emp.first_name)} ${escapeHtml(emp.last_name)}
-          <span class="block text-[11px] text-slate-400 font-mono">ID: ${escapeHtml(emp.employee_number)} • ${escapeHtml(emp.department)}</span>
-        </td>
-        <td class="px-4 py-3 text-center font-mono-tabular">${daysWorked}</td>
-        <td class="px-4 py-3 text-right font-mono-tabular font-semibold text-slate-900">${totalHrs.toFixed(2)} hrs</td>
-        <td class="px-4 py-3 text-right font-mono-tabular text-rose-600">${totalLateMins}m</td>
-        <td class="px-4 py-3 text-right font-mono-tabular text-amber-600">${totalUnderMins}m</td>
-        <td class="px-4 py-3 text-right font-mono-tabular text-emerald-700 font-medium">${totalOt.toFixed(2)} hrs</td>
-        <td class="px-4 py-3 text-center font-mono-tabular text-rose-700">${absentDays}</td>
-        <td class="px-4 py-3 text-center font-mono-tabular text-sky-700">${restDaysWorked}</td>
-      </tr>
-    `;
-  }).join('');
-}
-
-/* ===============================
-   SHARED DROPDOWNS
-=============================== */
-function populateEmployeeDropdowns() {
-  const assignable = employeesCache
-    .filter(e => e.employment_status !== 'Inactive')
-    .slice()
-    .sort((a, b) => (a.last_name || '').localeCompare(b.last_name || ''));
-
-  const departments = [...new Set(employeesCache.map(e => e.department).filter(Boolean))].sort();
-
-  document.querySelectorAll('.employee-select').forEach(sel => {
-    const current = sel.value;
-    const placeholder = sel.dataset.placeholder || 'All Employees';
-    sel.innerHTML = `<option value="">${escapeHtml(placeholder)}</option>` +
-      assignable.map(e => `<option value="${escapeHtml(e.id)}">${escapeHtml(e.last_name)}, ${escapeHtml(e.first_name)} (#${escapeHtml(e.employee_number || 'N/A')})</option>`).join('');
-    if (assignable.some(e => e.id === current)) sel.value = current;
-  });
-
-  document.querySelectorAll('.department-select').forEach(sel => {
-    const current = sel.value;
-    sel.innerHTML = `<option value="">All Departments</option>` +
-      departments.map(d => `<option value="${escapeHtml(d)}">${escapeHtml(d)}</option>`).join('');
-    if (departments.includes(current)) sel.value = current;
-  });
-}
-
-/* ===============================
-   EMPLOYEE DIRECTORY & PROFILES
-=============================== */
 function renderEmployeeDirectory() {
   const tbody = document.getElementById('employeeDirectoryTableBody');
   const searchVal = (document.getElementById('empSearchInput').value || '').toLowerCase();
@@ -1729,7 +1049,8 @@ function renderEmployeeDirectory() {
   const typeVal = document.getElementById('filterType').value;
 
   const filtered = employeesCache.filter(e => {
-    if (e.employment_status === 'Inactive') return false;
+    if (e.employment_status === 'Inactive') return false; // Inactive in separate module per rule
+
     const fullName = `${e.first_name || ''} ${e.last_name || ''}`.toLowerCase();
     const empId = (e.employee_number || '').toLowerCase();
     if (searchVal && !fullName.includes(searchVal) && !empId.includes(searchVal)) return false;
@@ -1744,33 +1065,45 @@ function renderEmployeeDirectory() {
     return;
   }
 
-  tbody.innerHTML = filtered.map(e => `
-    <tr class="hover:bg-slate-100 transition-colors cursor-pointer" onclick="openEmployeeProfile('${e.id}')">
-      <td class="px-4 py-3">
-        <div class="font-medium text-slate-900">${escapeHtml(e.first_name)} ${escapeHtml(e.last_name)}</div>
-        <div class="text-[11px] text-slate-400 font-mono">ID: ${escapeHtml(e.employee_number || 'N/A')}</div>
-      </td>
-      <td class="px-4 py-3">
-        <div class="text-slate-800">${escapeHtml(e.department || 'N/A')}</div>
-        <div class="text-[11px] text-slate-400">${escapeHtml(e.job_title || e.position || 'N/A')}</div>
-      </td>
-      <td class="px-4 py-3">
-        <span class="text-xs px-2 py-0.5 rounded-full border bg-emerald-500/15 text-emerald-700 border-emerald-500/30 font-medium">${escapeHtml(e.employment_status || 'Active')}</span>
-      </td>
-      <td class="px-4 py-3">
-        <div class="text-slate-800">${escapeHtml(e.employment_type || 'Regular')}</div>
-        <div class="text-[11px] text-slate-400 font-mono">Hired: ${escapeHtml(e.hire_date || 'N/A')}</div>
-      </td>
-      <td class="px-4 py-3 text-right font-mono-tabular font-semibold text-slate-900">${formatCurrency(e.monthly_basic_salary || 0)}</td>
-      <td class="px-4 py-3 text-center"><span class="text-xs px-2 py-0.5 rounded bg-slate-100 text-slate-700 font-mono">Active</span></td>
-      <td class="px-4 py-3 text-center" onclick="event.stopPropagation()">
-        <div class="flex items-center justify-center gap-2">
-          <button onclick="openEditEmployee('${e.id}')" class="text-xs px-2.5 py-1 rounded border border-slate-300 text-slate-700 hover:bg-slate-100">Edit</button>
-          <button onclick="archiveEmployee('${e.id}')" class="text-xs px-2.5 py-1 rounded border border-rose-300 text-rose-700 hover:bg-rose-50">Archive</button>
-        </div>
-      </td>
-    </tr>
-  `).join('');
+  tbody.innerHTML = filtered.map(e => {
+    let statusClass = 'bg-emerald-500/15 text-emerald-700 border-emerald-500/30';
+    if (e.employment_status === 'On Leave') statusClass = 'bg-amber-500/15 text-amber-700 border-amber-500/30';
+    if (e.employment_status === 'Suspended' || e.employment_status === 'Resigned' || e.employment_status === 'Terminated') {
+      statusClass = 'bg-rose-500/15 text-rose-700 border-rose-500/30';
+    }
+
+    return `
+      <tr class="hover:bg-slate-100 transition-colors cursor-pointer" onclick="openEmployeeProfile('${e.id}')">
+        <td class="px-4 py-3">
+          <div class="font-medium text-slate-900">${escapeHtml(e.first_name)} ${escapeHtml(e.last_name)}</div>
+          <div class="text-[11px] text-slate-400 font-mono">ID: ${escapeHtml(e.employee_number || 'N/A')}</div>
+        </td>
+        <td class="px-4 py-3">
+          <div class="text-slate-800">${escapeHtml(e.department || 'N/A')}</div>
+          <div class="text-[11px] text-slate-400">${escapeHtml(e.job_title || e.position || 'N/A')}</div>
+        </td>
+        <td class="px-4 py-3">
+          <span class="text-xs px-2 py-0.5 rounded-full border ${statusClass} font-medium">${escapeHtml(e.employment_status || 'Active')}</span>
+        </td>
+        <td class="px-4 py-3">
+          <div class="text-slate-800">${escapeHtml(e.employment_type || 'Regular')}</div>
+          <div class="text-[11px] text-slate-400 font-mono">Hired: ${escapeHtml(e.hire_date || 'N/A')}</div>
+        </td>
+        <td class="px-4 py-3 text-right font-mono-tabular font-semibold text-slate-900">
+          ${formatCurrency(e.monthly_basic_salary || 0)}
+        </td>
+        <td class="px-4 py-3 text-center">
+          <span class="text-xs px-2 py-0.5 rounded bg-slate-100 text-slate-700 font-mono">Active</span>
+        </td>
+        <td class="px-4 py-3 text-center" onclick="event.stopPropagation()">
+          <div class="flex items-center justify-center gap-2">
+            <button onclick="openEditEmployee('${e.id}')" class="text-xs px-2.5 py-1 rounded border border-slate-300 text-slate-700 hover:bg-slate-100">Edit</button>
+            <button onclick="archiveEmployee('${e.id}')" class="text-xs px-2.5 py-1 rounded border border-rose-300 text-rose-700 hover:bg-rose-50">Archive</button>
+          </div>
+        </td>
+      </tr>
+    `;
+  }).join('');
 }
 
 function renderInactiveEmployees() {
@@ -1794,11 +1127,14 @@ function renderInactiveEmployees() {
   `).join('');
 }
 
+/* EMPLOYEE MODAL (ADD / EDIT) */
 function openAddEmployeeModal() {
   document.getElementById('modalTitle').textContent = 'Add New Employee Record';
   document.getElementById('editEmployeeId').value = '';
   document.getElementById('employeeForm').reset();
-  document.getElementById('modalHireDate').value = new Date().toISOString().split('T')[0];
+  
+  const today = new Date().toISOString().split('T')[0];
+  document.getElementById('modalHireDate').value = today;
 
   const modal = document.getElementById('employeeModal');
   modal.classList.remove('hidden');
@@ -1839,17 +1175,19 @@ function openEditEmployee(id) {
 }
 
 function closeEmployeeModal() {
-  document.getElementById('employeeModal').classList.add('hidden');
-  document.getElementById('employeeModal').classList.remove('flex');
+  const modal = document.getElementById('employeeModal');
+  modal.classList.add('hidden');
+  modal.classList.remove('flex');
 }
 
+/* EMPLOYEE PROFILE VIEW */
 function openEmployeeProfile(id) {
   const emp = employeesCache.find(e => e.id === id);
   if (!emp) return;
   selectedProfileEmp = emp;
 
   document.getElementById('profileModalName').textContent = `${emp.first_name} ${emp.middle_name ? emp.middle_name + ' ' : ''}${emp.last_name}`;
-  document.getElementById('profileModalMeta').textContent = `${emp.department || 'General'} • ${emp.position || 'Staff'} • Status: ${emp.employment_status || 'Active'}`;
+  document.getElementById('profileModalMeta').textContent = `${emp.department || 'General'} • ${emp.position || emp.job_title || 'Staff'} • Status: ${emp.employment_status || 'Active'}`;
 
   document.getElementById('tabPersonal').innerHTML = `
     <div class="grid grid-cols-2 gap-4 bg-slate-50 p-4 rounded-lg border border-slate-200 text-xs">
@@ -1884,29 +1222,19 @@ function openEmployeeProfile(id) {
     </div>
   `;
 
-  // Render profile attendance tab
-  const empAttRows = getCombinedAttendanceRows().filter(r => r.employee_id === emp.id).slice(0, 10);
-  document.getElementById('tabAttendance').innerHTML = `
-    <div class="space-y-2">
-      <p class="text-xs font-semibold text-slate-700">Recent Attendance Logs</p>
-      ${empAttRows.length ? empAttRows.map(r => `
-        <div class="flex items-center justify-between text-xs bg-slate-50 border border-slate-200 p-2 rounded-lg">
-          <span>${formatDateLabel(r.attendance_date)} • In: ${r.time_in ? formatTimeLabel(r.time_in) : '—'} | Out: ${r.time_out ? formatTimeLabel(r.time_out) : '—'}</span>
-          <span class="font-semibold text-emerald-700">${(r.total_hours || 0).toFixed(2)} hrs</span>
-        </div>
-      `).join('') : '<p class="text-xs text-slate-400">No attendance records found.</p>'}
-    </div>
-  `;
+  renderProfileLeaveTab(emp.id);
 
   switchProfileTab('tabPersonal');
+
   const modal = document.getElementById('employeeProfileModal');
   modal.classList.remove('hidden');
   modal.classList.add('flex');
 }
 
 function closeEmployeeProfile() {
-  document.getElementById('employeeProfileModal').classList.add('hidden');
-  document.getElementById('employeeProfileModal').classList.remove('flex');
+  const modal = document.getElementById('employeeProfileModal');
+  modal.classList.add('hidden');
+  modal.classList.remove('flex');
 }
 
 function switchProfileTab(tabId) {
@@ -1923,12 +1251,13 @@ function switchProfileTab(tabId) {
 }
 
 async function archiveEmployee(id) {
-  if (!confirm('Are you sure you want to archive this employee?')) return;
+  if (!confirm('Are you sure you want to archive this employee? They will be moved to Inactive records.')) return;
+
   try {
     const { error } = await supabaseClient.from(EMPLOYEES_TABLE).update({ employment_status: 'Inactive' }).eq('id', id);
     if (error) throw error;
-    showToast('Employee archived.', 'success');
-    await fetchAllData();
+    showToast('Employee archived successfully.', 'success');
+    await fetchEmployees();
   } catch (err) {
     showToast('Failed to archive employee.', 'error');
   }
@@ -1938,26 +1267,118 @@ async function reactivateEmployee(id) {
   try {
     const { error } = await supabaseClient.from(EMPLOYEES_TABLE).update({ employment_status: 'Active' }).eq('id', id);
     if (error) throw error;
-    showToast('Employee reactivated.', 'success');
-    await fetchAllData();
+    showToast('Employee reactivated successfully.', 'success');
+    await fetchEmployees();
   } catch (err) {
     showToast('Failed to reactivate employee.', 'error');
   }
 }
 
 /* ===============================
-   SCHEDULE MODULE
+   GENERIC CONFIRM MODAL
+=============================== */
+let pendingConfirmAction = null;
+
+function openConfirmModal(title, text, onConfirm) {
+  document.getElementById('confirmModalTitle').textContent = title;
+  document.getElementById('confirmModalText').textContent = text;
+  pendingConfirmAction = onConfirm;
+  const modal = document.getElementById('confirmModal');
+  modal.classList.remove('hidden');
+  modal.classList.add('flex');
+}
+
+function closeConfirmModal() {
+  pendingConfirmAction = null;
+  const modal = document.getElementById('confirmModal');
+  modal.classList.add('hidden');
+  modal.classList.remove('flex');
+}
+
+/* ===============================
+   SHARED EMPLOYEE DROPDOWNS
+=============================== */
+function populateEmployeeDropdowns() {
+  const assignable = employeesCache
+    .filter(e => e.employment_status !== 'Inactive')
+    .slice()
+    .sort((a, b) => (a.last_name || '').localeCompare(b.last_name || ''));
+
+  const departments = [...new Set(employeesCache.map(e => e.department).filter(Boolean))].sort();
+
+  document.querySelectorAll('.employee-select').forEach(sel => {
+    const current = sel.value;
+    const placeholder = sel.dataset.placeholder || 'All Employees';
+    sel.innerHTML = `<option value="">${escapeHtml(placeholder)}</option>` +
+      assignable.map(e => `<option value="${escapeHtml(e.id)}">${escapeHtml(e.last_name)}, ${escapeHtml(e.first_name)} (#${escapeHtml(e.employee_number || 'N/A')})</option>`).join('');
+    if (assignable.some(e => e.id === current)) sel.value = current;
+  });
+
+  document.querySelectorAll('.department-select').forEach(sel => {
+    const current = sel.value;
+    sel.innerHTML = `<option value="">All Departments</option>` +
+      departments.map(d => `<option value="${escapeHtml(d)}">${escapeHtml(d)}</option>`).join('');
+    if (departments.includes(current)) sel.value = current;
+  });
+}
+
+function employeeLabel(id) {
+  const emp = employeesCache.find(e => e.id === id);
+  if (!emp) return 'Unknown Employee';
+  return `${emp.first_name} ${emp.last_name}`;
+}
+
+function employeeDept(id) {
+  const emp = employeesCache.find(e => e.id === id);
+  return emp ? emp.department : '';
+}
+
+/* ===============================
+   SCHEDULE MANAGEMENT
+   (Employee list -> individual monthly calendar,
+   with per-employee/per-month locking and rest-day toggles)
 =============================== */
 const SHIFT_OPTIONS = ['Regular Shift', 'Morning Shift', 'Afternoon Shift', 'Night Shift', 'Custom Shift'];
 const DEFAULT_SHIFT = { shift_name: 'Regular Shift', start_time: '08:00', end_time: '17:00', break_start: '12:00', break_end: '13:00' };
 
-let scheduleSelectedEmployee = null;
-let scheduleViewYear = null;
-let scheduleViewMonth = null;
-let scheduleMonthRows = [];
-let scheduleMonthLocked = false;
+let scheduleSelectedEmployee = null;    // the employee currently open in the calendar view
+let scheduleViewYear = null;            // year currently shown
+let scheduleViewMonth = null;          // 0-11, month currently shown
+let scheduleMonthRows = [];             // in-memory rows for every date of the visible month
+let scheduleMonthLocked = false;        // lock state for the visible employee/month
+let scheduleMonthLockId = null;        // id of the schedule_locks row, if it exists
 let scheduleHasUnsavedChanges = false;
 
+function computeExpectedHours(startTime, endTime, breakStart, breakEnd, isRestDay) {
+  if (isRestDay || !startTime || !endTime) return null;
+
+  const toMinutes = (t) => {
+    const [h, m] = t.split(':').map(Number);
+    return h * 60 + m;
+  };
+
+  let startMin = toMinutes(startTime);
+  let endMin = toMinutes(endTime);
+  if (endMin <= startMin) endMin += 24 * 60; // overnight shift
+
+  let totalMin = endMin - startMin;
+
+  if (breakStart && breakEnd) {
+    let bStart = toMinutes(breakStart);
+    let bEnd = toMinutes(breakEnd);
+    if (bEnd <= bStart) bEnd += 24 * 60;
+    totalMin -= Math.max(0, bEnd - bStart);
+  }
+
+  return Math.max(0, totalMin / 60);
+}
+
+function monthKey(year, month) {
+  // month is 0-11 here; stored as YYYY-MM
+  return `${year}-${String(month + 1).padStart(2, '0')}`;
+}
+
+/* ---------- SUB-VIEW SWITCHING ---------- */
 function showScheduleListView() {
   document.getElementById('scheduleListView').classList.remove('hidden');
   document.getElementById('scheduleDetailView').classList.add('hidden');
@@ -1969,6 +1390,7 @@ function showScheduleDetailView() {
   document.getElementById('scheduleDetailView').classList.remove('hidden');
 }
 
+/* ---------- EMPLOYEE LIST (for Schedule module) ---------- */
 function renderScheduleEmployeeList() {
   const tbody = document.getElementById('scheduleEmployeeListBody');
   if (!tbody) return;
@@ -1990,26 +1412,33 @@ function renderScheduleEmployeeList() {
     return;
   }
 
-  tbody.innerHTML = filtered.map(e => `
-    <tr class="hover:bg-slate-100 transition-colors cursor-pointer" onclick="openEmployeeSchedule('${e.id}')">
-      <td class="px-4 py-3">
-        <div class="font-medium text-slate-900">${escapeHtml(e.first_name)} ${escapeHtml(e.last_name)}</div>
-        <div class="text-[11px] text-slate-400 font-mono">ID: ${escapeHtml(e.employee_number || 'N/A')}</div>
-      </td>
-      <td class="px-4 py-3">
-        <div class="text-slate-800">${escapeHtml(e.department || 'N/A')}</div>
-        <div class="text-[11px] text-slate-400">${escapeHtml(e.job_title || 'Staff')}</div>
-      </td>
-      <td class="px-4 py-3">
-        <span class="text-xs px-2 py-0.5 rounded-full border bg-emerald-500/15 text-emerald-700 border-emerald-500/30 font-medium">${escapeHtml(e.employment_status || 'Active')}</span>
-      </td>
-      <td class="px-4 py-3 text-center" onclick="event.stopPropagation()">
-        <button onclick="openEmployeeSchedule('${e.id}')" class="text-xs px-3 py-1.5 rounded border border-slate-300 text-slate-700 hover:bg-slate-100">View Schedule</button>
-      </td>
-    </tr>
-  `).join('');
+  tbody.innerHTML = filtered.map(e => {
+    let statusClass = 'bg-emerald-500/15 text-emerald-700 border-emerald-500/30';
+    if (e.employment_status === 'On Leave') statusClass = 'bg-amber-500/15 text-amber-700 border-amber-500/30';
+    if (e.employment_status === 'Suspended') statusClass = 'bg-rose-500/15 text-rose-700 border-rose-500/30';
+
+    return `
+      <tr class="hover:bg-slate-100 transition-colors cursor-pointer" onclick="openEmployeeSchedule('${e.id}')">
+        <td class="px-4 py-3">
+          <div class="font-medium text-slate-900">${escapeHtml(e.first_name)} ${escapeHtml(e.last_name)}</div>
+          <div class="text-[11px] text-slate-400 font-mono">ID: ${escapeHtml(e.employee_number || 'N/A')}</div>
+        </td>
+        <td class="px-4 py-3">
+          <div class="text-slate-800">${escapeHtml(e.department || 'N/A')}</div>
+          <div class="text-[11px] text-slate-400">${escapeHtml(e.job_title || e.position || 'N/A')}</div>
+        </td>
+        <td class="px-4 py-3">
+          <span class="text-xs px-2 py-0.5 rounded-full border ${statusClass} font-medium">${escapeHtml(e.employment_status || 'Active')}</span>
+        </td>
+        <td class="px-4 py-3 text-center" onclick="event.stopPropagation()">
+          <button onclick="openEmployeeSchedule('${e.id}')" class="text-xs px-3 py-1.5 rounded border border-slate-300 text-slate-700 hover:bg-slate-100">View Schedule</button>
+        </td>
+      </tr>
+    `;
+  }).join('');
 }
 
+/* ---------- INDIVIDUAL EMPLOYEE MONTHLY CALENDAR ---------- */
 async function openEmployeeSchedule(employeeId) {
   const emp = employeesCache.find(e => e.id === employeeId);
   if (!emp) return;
@@ -2020,14 +1449,17 @@ async function openEmployeeSchedule(employeeId) {
   scheduleViewMonth = today.getMonth();
 
   document.getElementById('scheduleDetailEmpName').textContent = `${emp.first_name} ${emp.last_name}`;
-  document.getElementById('scheduleDetailEmpMeta').textContent = `${emp.department || 'General'} • ID: ${emp.employee_number || 'N/A'}`;
+  document.getElementById('scheduleDetailEmpMeta').textContent = `${emp.department || 'General'} • ${emp.position || emp.job_title || 'Staff'} • ID: ${emp.employee_number || 'N/A'}`;
 
   showScheduleDetailView();
   await loadMonthSchedule();
 }
 
 async function navigateScheduleMonth(delta) {
-  if (scheduleHasUnsavedChanges && !confirm('Discard unsaved changes?')) return;
+  if (scheduleHasUnsavedChanges) {
+    const proceed = confirm('You have unsaved changes on this month. Discard them and continue?');
+    if (!proceed) return;
+  }
   scheduleViewMonth += delta;
   if (scheduleViewMonth < 0) { scheduleViewMonth = 11; scheduleViewYear -= 1; }
   if (scheduleViewMonth > 11) { scheduleViewMonth = 0; scheduleViewYear += 1; }
@@ -2040,80 +1472,148 @@ async function loadMonthSchedule() {
   const label = new Date(scheduleViewYear, scheduleViewMonth, 1).toLocaleDateString('en-US', { month: 'long', year: 'numeric' });
   document.getElementById('scheduleMonthLabel').textContent = label;
 
+  const tbody = document.getElementById('scheduleCalendarBody');
+  tbody.innerHTML = `<tr><td colspan="9" class="px-4 py-8 text-center text-slate-400">Loading calendar…</td></tr>`;
+  scheduleHasUnsavedChanges = false;
+  updateUnsavedIndicator();
+
   const daysInMonth = new Date(scheduleViewYear, scheduleViewMonth + 1, 0).getDate();
   const firstDate = `${scheduleViewYear}-${String(scheduleViewMonth + 1).padStart(2, '0')}-01`;
   const lastDate = `${scheduleViewYear}-${String(scheduleViewMonth + 1).padStart(2, '0')}-${String(daysInMonth).padStart(2, '0')}`;
 
-  const existingRows = schedulesCache.filter(s => s.employee_id === scheduleSelectedEmployee.id && s.schedule_date >= firstDate && s.schedule_date <= lastDate);
-  const byDate = {};
-  existingRows.forEach(r => { byDate[r.schedule_date] = r; });
+  try {
+    const [{ data: existingRows, error: schedError }, lockResult] = await Promise.all([
+      supabaseClient
+        .from('schedules')
+        .select('*')
+        .eq('employee_id', scheduleSelectedEmployee.id)
+        .gte('schedule_date', firstDate)
+        .lte('schedule_date', lastDate),
+      supabaseClient
+        .from('schedule_locks')
+        .select('*')
+        .eq('employee_id', scheduleSelectedEmployee.id)
+        .eq('month', monthKey(scheduleViewYear, scheduleViewMonth))
+        .maybeSingle()
+    ]);
 
-  scheduleMonthRows = [];
-  for (let d = 1; d <= daysInMonth; d++) {
-    const dateStr = `${scheduleViewYear}-${String(scheduleViewMonth + 1).padStart(2, '0')}-${String(d).padStart(2, '0')}`;
-    const existing = byDate[dateStr];
-    if (existing) {
-      scheduleMonthRows.push({
-        id: existing.id,
-        schedule_date: dateStr,
-        shift_name: existing.shift_name || DEFAULT_SHIFT.shift_name,
-        start_time: existing.start_time ? existing.start_time.slice(0, 5) : '',
-        end_time: existing.end_time ? existing.end_time.slice(0, 5) : '',
-        break_start: existing.break_start ? existing.break_start.slice(0, 5) : '',
-        break_end: existing.break_end ? existing.break_end.slice(0, 5) : '',
-        is_rest_day: !!existing.is_rest_day,
-        status: existing.status || 'Active',
-        notes: existing.notes || '',
-        _isNew: false
-      });
-    } else {
-      scheduleMonthRows.push({
-        id: null,
-        schedule_date: dateStr,
-        shift_name: '',
-        start_time: '',
-        end_time: '',
-        break_start: '',
-        break_end: '',
-        is_rest_day: false,
-        status: 'Active',
-        notes: '',
-        _isNew: true
-      });
+    if (schedError) throw schedError;
+
+    const byDate = {};
+    (existingRows || []).forEach(r => { byDate[r.schedule_date] = r; });
+
+    scheduleMonthRows = [];
+    for (let d = 1; d <= daysInMonth; d++) {
+      const dateStr = `${scheduleViewYear}-${String(scheduleViewMonth + 1).padStart(2, '0')}-${String(d).padStart(2, '0')}`;
+      const existing = byDate[dateStr];
+      if (existing) {
+        scheduleMonthRows.push({
+          id: existing.id,
+          schedule_date: dateStr,
+          shift_name: existing.shift_name || DEFAULT_SHIFT.shift_name,
+          start_time: existing.start_time ? existing.start_time.slice(0, 5) : '',
+          end_time: existing.end_time ? existing.end_time.slice(0, 5) : '',
+          break_start: existing.break_start ? existing.break_start.slice(0, 5) : '',
+          break_end: existing.break_end ? existing.break_end.slice(0, 5) : '',
+          is_rest_day: !!existing.is_rest_day,
+          status: existing.status || 'Active',
+          notes: existing.notes || '',
+          _isNew: false
+        });
+      } else {
+        scheduleMonthRows.push({
+          id: null,
+          schedule_date: dateStr,
+          shift_name: '',
+          start_time: '',
+          end_time: '',
+          break_start: '',
+          break_end: '',
+          is_rest_day: false,
+          status: 'Active',
+          notes: '',
+          _isNew: true
+        });
+      }
     }
-  }
 
-  scheduleMonthLocked = false;
-  scheduleHasUnsavedChanges = false;
-  renderScheduleCalendar();
-  updateUnsavedIndicator();
-  updateLockUi();
+    // lockResult may error benignly if the schedule_locks table doesn't exist yet;
+    // treat that as "unlocked" rather than failing the whole view.
+    if (!lockResult.error && lockResult.data) {
+      scheduleMonthLocked = !!lockResult.data.is_locked;
+      scheduleMonthLockId = lockResult.data.id;
+    } else {
+      scheduleMonthLocked = false;
+      scheduleMonthLockId = null;
+    }
+
+    renderScheduleCalendar();
+    updateLockUi();
+  } catch (err) {
+    console.error('loadMonthSchedule error:', err);
+    tbody.innerHTML = `<tr><td colspan="9" class="px-4 py-8 text-center text-rose-600">Unable to load the calendar. Check that the "schedules" table exists.</td></tr>`;
+    showToast('Unable to load monthly schedule.', 'error');
+  }
 }
 
 function renderScheduleCalendar() {
   const tbody = document.getElementById('scheduleCalendarBody');
+
   tbody.innerHTML = scheduleMonthRows.map((row, idx) => {
     const dateObj = new Date(row.schedule_date + 'T00:00:00');
     const dayLabel = dateObj.toLocaleDateString('en-US', { weekday: 'short' });
     const dayNum = dateObj.getDate();
-    const hours = computeHoursWorked(row.start_time, row.end_time, row.break_start, row.break_end);
+    const isWeekend = dateObj.getDay() === 0 || dateObj.getDay() === 6;
+    const hours = computeExpectedHours(row.start_time, row.end_time, row.break_start, row.break_end, row.is_rest_day);
+    const disabledAttr = scheduleMonthLocked ? 'disabled' : '';
+    const fieldsDisabled = scheduleMonthLocked || row.is_rest_day;
+
+    let rowStateClass = 'bg-white';
+    if (row.is_rest_day) rowStateClass = 'bg-sky-50';
+    else if (!row.start_time && !row.end_time) rowStateClass = isWeekend ? 'bg-slate-50' : 'bg-white';
 
     return `
-      <tr class="${row.is_rest_day ? 'bg-sky-50' : 'bg-white'}">
-        <td class="px-3 py-2 whitespace-nowrap"><div class="font-medium text-slate-900">${String(dayNum).padStart(2, '0')} <span class="text-slate-400 font-normal">${dayLabel}</span></div></td>
-        <td class="px-3 py-2 text-center"><input type="checkbox" ${row.is_rest_day ? 'checked' : ''} onchange="toggleRestDay(${idx}, this.checked)" class="w-4 h-4 accent-sky-600 cursor-pointer" /></td>
+      <tr class="${rowStateClass} ${scheduleMonthLocked ? 'opacity-70' : ''}">
+        <td class="px-3 py-2 whitespace-nowrap">
+          <div class="font-medium text-slate-900">${String(dayNum).padStart(2, '0')} <span class="text-slate-400 font-normal">${dayLabel}</span></div>
+        </td>
+        <td class="px-3 py-2 text-center">
+          <input type="checkbox" ${row.is_rest_day ? 'checked' : ''} ${disabledAttr}
+            onchange="toggleRestDay(${idx}, this.checked)" class="w-4 h-4 accent-sky-600 cursor-pointer" />
+        </td>
         <td class="px-3 py-2">
-          <select onchange="updateScheduleField(${idx}, 'shift_name', this.value)" class="w-full bg-white border border-slate-300 rounded-md px-2 py-1.5 text-xs text-slate-900">
+          <select ${fieldsDisabled ? 'disabled' : ''} onchange="updateScheduleField(${idx}, 'shift_name', this.value)"
+            class="w-full bg-white border border-slate-300 rounded-md px-2 py-1.5 text-xs text-slate-900 disabled:bg-slate-100 disabled:text-slate-400">
             <option value="">${row.is_rest_day ? 'Rest Day' : 'Select…'}</option>
             ${SHIFT_OPTIONS.map(opt => `<option value="${opt}" ${row.shift_name === opt ? 'selected' : ''}>${opt}</option>`).join('')}
           </select>
         </td>
-        <td class="px-3 py-2"><input type="time" value="${row.start_time}" onchange="updateScheduleField(${idx}, 'start_time', this.value)" class="w-full bg-white border border-slate-300 rounded-md px-2 py-1.5 text-xs text-slate-900" /></td>
-        <td class="px-3 py-2"><input type="time" value="${row.end_time}" onchange="updateScheduleField(${idx}, 'end_time', this.value)" class="w-full bg-white border border-slate-300 rounded-md px-2 py-1.5 text-xs text-slate-900" /></td>
-        <td class="px-3 py-2"><input type="time" value="${row.break_start}" onchange="updateScheduleField(${idx}, 'break_start', this.value)" class="w-full bg-white border border-slate-300 rounded-md px-2 py-1.5 text-xs text-slate-900" /></td>
-        <td class="px-3 py-2"><input type="time" value="${row.break_end}" onchange="updateScheduleField(${idx}, 'break_end', this.value)" class="w-full bg-white border border-slate-300 rounded-md px-2 py-1.5 text-xs text-slate-900" /></td>
-        <td class="px-3 py-2 text-right font-mono-tabular text-slate-700 whitespace-nowrap">${row.is_rest_day ? '—' : hours.toFixed(2)}</td>
-        <td class="px-3 py-2"><input type="text" value="${escapeHtml(row.notes)}" onchange="updateScheduleField(${idx}, 'notes', this.value)" class="w-full bg-white border border-slate-300 rounded-md px-2 py-1.5 text-xs text-slate-900" placeholder="—" /></td>
+        <td class="px-3 py-2">
+          <input type="time" value="${row.start_time}" ${fieldsDisabled ? 'disabled' : ''}
+            onchange="updateScheduleField(${idx}, 'start_time', this.value)"
+            class="w-full bg-white border border-slate-300 rounded-md px-2 py-1.5 text-xs text-slate-900 disabled:bg-slate-100 disabled:text-slate-400" />
+        </td>
+        <td class="px-3 py-2">
+          <input type="time" value="${row.end_time}" ${fieldsDisabled ? 'disabled' : ''}
+            onchange="updateScheduleField(${idx}, 'end_time', this.value)"
+            class="w-full bg-white border border-slate-300 rounded-md px-2 py-1.5 text-xs text-slate-900 disabled:bg-slate-100 disabled:text-slate-400" />
+        </td>
+        <td class="px-3 py-2">
+          <input type="time" value="${row.break_start}" ${fieldsDisabled ? 'disabled' : ''}
+            onchange="updateScheduleField(${idx}, 'break_start', this.value)"
+            class="w-full bg-white border border-slate-300 rounded-md px-2 py-1.5 text-xs text-slate-900 disabled:bg-slate-100 disabled:text-slate-400" />
+        </td>
+        <td class="px-3 py-2">
+          <input type="time" value="${row.break_end}" ${fieldsDisabled ? 'disabled' : ''}
+            onchange="updateScheduleField(${idx}, 'break_end', this.value)"
+            class="w-full bg-white border border-slate-300 rounded-md px-2 py-1.5 text-xs text-slate-900 disabled:bg-slate-100 disabled:text-slate-400" />
+        </td>
+        <td class="px-3 py-2 text-right font-mono-tabular text-slate-700 whitespace-nowrap">${hours === null ? '—' : hours.toFixed(2)}</td>
+        <td class="px-3 py-2">
+          <input type="text" value="${escapeHtml(row.notes)}" ${disabledAttr} placeholder="—"
+            onchange="updateScheduleField(${idx}, 'notes', this.value)"
+            class="w-full bg-white border border-slate-300 rounded-md px-2 py-1.5 text-xs text-slate-900 disabled:bg-slate-100 disabled:text-slate-400" />
+        </td>
       </tr>
     `;
   }).join('');
@@ -2123,11 +1623,14 @@ function updateScheduleField(idx, field, value) {
   const row = scheduleMonthRows[idx];
   if (!row) return;
   row[field] = value;
-  if (field === 'shift_name' && value === 'Regular Shift' && !row.start_time) {
-    row.start_time = DEFAULT_SHIFT.start_time;
-    row.end_time = DEFAULT_SHIFT.end_time;
-    row.break_start = DEFAULT_SHIFT.break_start;
-    row.break_end = DEFAULT_SHIFT.break_end;
+  if (field === 'shift_name' && value) {
+    // convenience: prefill sensible default times when a shift is first chosen and empty
+    if (!row.start_time && !row.end_time && value === 'Regular Shift') {
+      row.start_time = DEFAULT_SHIFT.start_time;
+      row.end_time = DEFAULT_SHIFT.end_time;
+      row.break_start = DEFAULT_SHIFT.break_start;
+      row.break_end = DEFAULT_SHIFT.break_end;
+    }
   }
   scheduleHasUnsavedChanges = true;
   updateUnsavedIndicator();
@@ -2139,9 +1642,15 @@ function toggleRestDay(idx, checked) {
   if (!row) return;
   row.is_rest_day = checked;
   if (checked) {
+    // clear the work-schedule fields for that date automatically
     row.shift_name = 'Rest Day';
     row.start_time = '';
     row.end_time = '';
+    row.break_start = '';
+    row.break_end = '';
+  } else {
+    // return the date to an editable, blank work schedule
+    row.shift_name = '';
   }
   scheduleHasUnsavedChanges = true;
   updateUnsavedIndicator();
@@ -2152,74 +1661,208 @@ function updateUnsavedIndicator() {
   document.getElementById('scheduleUnsavedIndicator').classList.toggle('hidden', !scheduleHasUnsavedChanges);
 }
 
-function updateLockUi() {
-  const btn = document.getElementById('scheduleLockToggleBtn');
-  const label = document.getElementById('scheduleLockLabel');
-  document.getElementById('scheduleLockedBanner').classList.toggle('hidden', !scheduleMonthLocked);
-  document.getElementById('scheduleSaveAllBtn').classList.toggle('hidden', scheduleMonthLocked);
-  label.textContent = scheduleMonthLocked ? 'Unlock Schedule' : 'Lock Schedule';
-}
-
-function toggleScheduleLock() {
-  scheduleMonthLocked = !scheduleMonthLocked;
-  showToast(scheduleMonthLocked ? 'Schedule locked.' : 'Schedule unlocked.', 'success');
-  updateLockUi();
-}
-
 async function handleSaveAllSchedule() {
-  if (!scheduleSelectedEmployee) return;
+  if (!scheduleSelectedEmployee || scheduleMonthLocked) return;
 
-  const rowsToUpsert = scheduleMonthRows.map(r => ({
-    id: r.id || crypto.randomUUID(),
-    employee_id: scheduleSelectedEmployee.id,
-    schedule_date: r.schedule_date,
-    shift_name: r.is_rest_day ? 'Rest Day' : (r.shift_name || 'Regular Shift'),
-    start_time: r.is_rest_day || !r.start_time ? null : (r.start_time.length === 5 ? r.start_time + ':00' : r.start_time),
-    end_time: r.is_rest_day || !r.end_time ? null : (r.end_time.length === 5 ? r.end_time + ':00' : r.end_time),
-    break_start: r.is_rest_day || !r.break_start ? null : (r.break_start.length === 5 ? r.break_start + ':00' : r.break_start),
-    break_end: r.is_rest_day || !r.break_end ? null : (r.break_end.length === 5 ? r.break_end + ':00' : r.break_end),
-    is_rest_day: r.is_rest_day,
-    status: r.status || 'Active',
-    notes: r.notes || null
-  }));
+  const rowsToUpsert = scheduleMonthRows
+    .filter(r => r.is_rest_day || r.shift_name || r.start_time || r.end_time || r.notes || !r._isNew)
+    .map(r => ({
+      id: r.id || crypto.randomUUID(), // Generates a unique ID if it's a new row
+      employee_id: scheduleSelectedEmployee.id,
+      schedule_date: r.schedule_date,
+      shift_name: r.is_rest_day ? 'Rest Day' : (r.shift_name || 'Regular Shift'),
+      start_time: r.is_rest_day || !r.start_time ? null : (r.start_time.length === 5 ? r.start_time + ':00' : r.start_time),
+      end_time: r.is_rest_day || !r.end_time ? null : (r.end_time.length === 5 ? r.end_time + ':00' : r.end_time),
+      break_start: r.is_rest_day || !r.break_start ? null : (r.break_start.length === 5 ? r.break_start + ':00' : r.break_start),
+      break_end: r.is_rest_day || !r.break_end ? null : (r.break_end.length === 5 ? r.break_end + ':00' : r.break_end),
+      is_rest_day: r.is_rest_day,
+      status: r.status || 'Active',
+      notes: r.notes ? r.notes.trim() : null
+    }));
+
+  if (rowsToUpsert.length === 0) {
+    showToast('Nothing to save yet.', 'info');
+    return;
+  }
+
+  const saveBtn = document.getElementById('scheduleSaveAllBtn');
+  saveBtn.disabled = true;
+  saveBtn.textContent = 'Saving…';
 
   try {
-    const { error } = await supabaseClient.from(SCHEDULES_TABLE).upsert(rowsToUpsert, { onConflict: 'employee_id,schedule_date' });
+    const { error } = await supabaseClient
+      .from('schedules')
+      .upsert(rowsToUpsert, { onConflict: 'employee_id,schedule_date' });
     if (error) throw error;
-    showToast('Schedule saved successfully.', 'success');
+
+    showToast('Monthly schedule saved successfully.', 'success');
     scheduleHasUnsavedChanges = false;
     updateUnsavedIndicator();
-    await fetchAllData();
+    await loadMonthSchedule();
   } catch (err) {
-    console.error('Save schedule error:', err);
-    showToast('Failed to save schedule.', 'error');
+    console.error('save monthly schedule error:', err);
+    showToast('Failed to save schedule. Ensure "schedules" has a unique constraint on (employee_id, schedule_date).', 'error');
+  } finally {
+    saveBtn.disabled = false;
+    saveBtn.textContent = "Save Month's Schedule";
+  }
+}
+
+/* ---------- LOCK / UNLOCK ---------- */
+function updateLockUi() {
+  const btn = document.getElementById('scheduleLockToggleBtn');
+  const icon = document.getElementById('scheduleLockIcon');
+  const label = document.getElementById('scheduleLockLabel');
+  const banner = document.getElementById('scheduleLockedBanner');
+  const saveBtn = document.getElementById('scheduleSaveAllBtn');
+
+  banner.classList.toggle('hidden', !scheduleMonthLocked);
+  saveBtn.classList.toggle('hidden', scheduleMonthLocked);
+
+  if (scheduleMonthLocked) {
+    btn.className = 'inline-flex items-center gap-1.5 text-xs font-semibold px-3.5 py-2 rounded-lg border border-rose-300 bg-rose-50 text-rose-700 hover:bg-rose-100 transition-colors';
+    icon.innerHTML = '<path stroke-linecap="round" stroke-linejoin="round" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />';
+    label.textContent = 'Unlock Schedule';
+  } else {
+    btn.className = 'inline-flex items-center gap-1.5 text-xs font-semibold px-3.5 py-2 rounded-lg border border-emerald-300 bg-emerald-50 text-emerald-700 hover:bg-emerald-100 transition-colors';
+    icon.innerHTML = '<path stroke-linecap="round" stroke-linejoin="round" d="M8 11V7a4 4 0 118 0m-9 4h10a2 2 0 012 2v6a2 2 0 01-2 2H7a2 2 0 01-2-2v-6a2 2 0 012-2z" />';
+    label.textContent = 'Lock Schedule';
+  }
+}
+
+async function toggleScheduleLock() {
+  if (!scheduleSelectedEmployee) return;
+
+  const nextLocked = !scheduleMonthLocked;
+
+  if (nextLocked && scheduleHasUnsavedChanges) {
+    const proceed = confirm('You have unsaved changes. Save them before locking?');
+    if (proceed) {
+      await handleSaveAllSchedule();
+    }
+  }
+
+  const label = monthKey(scheduleViewYear, scheduleViewMonth);
+  let adminEmail = '';
+  try {
+    const { data: { session } } = await supabaseClient.auth.getSession();
+    adminEmail = session && session.user ? session.user.email : '';
+  } catch (_) { /* non-fatal */ }
+
+  try {
+    const payload = {
+      employee_id: scheduleSelectedEmployee.id,
+      month: label,
+      is_locked: nextLocked,
+      locked_by: nextLocked ? adminEmail : null,
+      locked_at: nextLocked ? new Date().toISOString() : null
+    };
+
+    const { error } = await supabaseClient
+      .from('schedule_locks')
+      .upsert([payload], { onConflict: 'employee_id,month' });
+    if (error) throw error;
+
+    scheduleMonthLocked = nextLocked;
+    showToast(nextLocked ? 'Schedule locked.' : 'Schedule unlocked.', 'success');
+    renderScheduleCalendar();
+    updateLockUi();
+  } catch (err) {
+    console.error('toggleScheduleLock error:', err);
+    showToast('Failed to update lock state. Ensure the "schedule_locks" table exists.', 'error');
   }
 }
 
 /* ===============================
-   OVERTIME & LEAVE STUBS
+   OVERTIME MANAGEMENT (APPROVAL CENTER)
 =============================== */
+const OVERTIME_TABLE = 'overtime_requests';
+let overtimeCache = [];
+
+function computeOtHours(startTime, endTime) {
+  if (!startTime || !endTime) return null;
+  const toMinutes = (t) => {
+    const [h, m] = t.split(':').map(Number);
+    return h * 60 + m;
+  };
+  let startMin = toMinutes(startTime);
+  let endMin = toMinutes(endTime);
+  if (endMin <= startMin) endMin += 24 * 60; // overnight OT
+  return Math.max(0, (endMin - startMin) / 60);
+}
+
+function otRowHours(row) {
+  if (row.total_hours !== null && row.total_hours !== undefined && row.total_hours !== '') {
+    const n = Number(row.total_hours);
+    if (Number.isFinite(n)) return n;
+  }
+  const computed = computeOtHours(
+    row.start_time ? row.start_time.slice(0, 5) : '',
+    row.end_time ? row.end_time.slice(0, 5) : ''
+  );
+  return computed === null ? 0 : computed;
+}
+
 async function fetchOvertimeRequests() {
-  try {
-    const { data } = await supabaseClient.from(OVERTIME_TABLE).select('*');
-    overtimeCache = data || [];
-    renderOvertimeTable();
-  } catch (e) { console.error(e); }
-}
-
-function renderOvertimeTable() {
   const tbody = document.getElementById('overtimeTableBody');
-  if (!tbody) return;
-  tbody.innerHTML = `<tr><td colspan="9" class="px-4 py-8 text-center text-slate-400">No overtime requests found.</td></tr>`;
+  tbody.innerHTML = `<tr><td colspan="9" class="px-4 py-8 text-center text-slate-400">Loading overtime requests...</td></tr>`;
+
+  try {
+    const { data, error } = await supabaseClient
+      .from(OVERTIME_TABLE)
+      .select('*')
+      .order('created_at', { ascending: false });
+    if (error) throw error;
+
+    overtimeCache = data || [];
+    renderOvertimeKPIs();
+    renderOvertimeTable();
+  } catch (err) {
+    console.error('fetchOvertimeRequests error:', err);
+    tbody.innerHTML = `<tr><td colspan="9" class="px-4 py-8 text-center text-rose-600">Unable to load overtime requests. Check that the "overtime_requests" table exists.</td></tr>`;
+    showToast('Unable to load overtime requests.', 'error');
+  }
 }
 
-async function fetchLeaveRequests() {}
-async function fetchLeaveBalances() {}
-function renderLeaveTable() {}
+function renderOvertimeKPIs() {
+  const total = overtimeCache.length;
+  const pending = overtimeCache.filter(r => (r.status || 'Pending') === 'Pending').length;
+  const approved = overtimeCache.filter(r => r.status === 'Approved');
+  const rejected = overtimeCache.filter(r => r.status === 'Rejected').length;
+  const approvedHours = approved.reduce((sum, r) => sum + otRowHours(r), 0);
 
-/* ===============================
-   FORMATTERS
-=============================== */
+  document.getElementById('otKpiTotal').textContent = total;
+  document.getElementById('otKpiPending').textContent = pending;
+  document.getElementById('otKpiApproved').textContent = approved.length;
+  document.getElementById('otKpiRejected').textContent = rejected;
+  document.getElementById('otKpiApprovedHours').textContent = approvedHours.toFixed(2);
+}
+
+function getOtFilteredRows() {
+  const searchVal = (document.getElementById('otSearchInput').value || '').toLowerCase();
+  const empVal = document.getElementById('otFilterEmployee').value;
+  const deptVal = document.getElementById('otFilterDept').value;
+  const statusVal = document.getElementById('otFilterStatus').value;
+  const monthVal = document.getElementById('otFilterMonth').value; // YYYY-MM
+  const dateFrom = document.getElementById('otFilterDateFrom').value;
+  const dateTo = document.getElementById('otFilterDateTo').value;
+
+  return overtimeCache.filter(r => {
+    const emp = employeesCache.find(e => e.id === r.employee_id);
+    const fullName = emp ? `${emp.first_name || ''} ${emp.last_name || ''}`.toLowerCase() : '';
+    const dept = emp ? emp.department : '';
+
+    if (searchVal && !fullName.includes(searchVal)) return false;
+    if (empVal && r.employee_id !== empVal) return false;
+    if (deptVal && dept !== deptVal) return false;
+    if (statusVal && (r.status || 'Pending') !== statusVal) return false;
+    if (monthVal && !(r.ot_date || '').startsWith(monthVal)) return false;
+    if (dateFrom && (r.ot_date || '') < dateFrom) return false;
+    if (dateTo && (r.ot_date || '') > dateTo) return false;
+    return true;
+  }).sort((a, b) => (b.ot_date || '').localeCompare(a.ot_date || ''));
+}
+
 function formatTimeLabel(t) {
   if (!t) return 'N/A';
   const [h, m] = t.slice(0, 5).split(':').map(Number);
@@ -2231,24 +1874,637 @@ function formatTimeLabel(t) {
 function formatDateLabel(dateStr) {
   if (!dateStr) return 'N/A';
   const d = new Date(dateStr + 'T00:00:00');
-  return isNaN(d.getTime()) ? dateStr : d.toLocaleDateString('en-US', { month: 'short', day: '2-digit', year: 'numeric' });
+  if (isNaN(d.getTime())) return dateStr;
+  return d.toLocaleDateString('en-US', { month: 'short', day: '2-digit', year: 'numeric' });
+}
+
+function formatDateTimeLabel(isoStr) {
+  if (!isoStr) return 'N/A';
+  const d = new Date(isoStr);
+  if (isNaN(d.getTime())) return isoStr;
+  return d.toLocaleDateString('en-US', { month: 'short', day: '2-digit', year: 'numeric' }) +
+    ' ' + d.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' });
+}
+
+function renderOvertimeTable() {
+  const tbody = document.getElementById('overtimeTableBody');
+  const filtered = getOtFilteredRows();
+
+  if (filtered.length === 0) {
+    tbody.innerHTML = `<tr><td colspan="9" class="px-4 py-8 text-center text-slate-400">No matching overtime requests found.</td></tr>`;
+    return;
+  }
+
+  tbody.innerHTML = filtered.map(r => {
+    const emp = employeesCache.find(e => e.id === r.employee_id);
+    const empName = emp ? `${emp.first_name} ${emp.last_name}` : 'Unknown Employee';
+    const empMeta = emp ? `${emp.department || 'N/A'} • ${emp.position || emp.job_title || 'N/A'}` : 'N/A';
+    const status = r.status || 'Pending';
+    const hours = otRowHours(r);
+
+    let statusClass = 'bg-amber-500/15 text-amber-700 border-amber-500/30';
+    if (status === 'Approved') statusClass = 'bg-emerald-500/15 text-emerald-700 border-emerald-500/30';
+    if (status === 'Rejected') statusClass = 'bg-rose-500/15 text-rose-700 border-rose-500/30';
+
+    let actionsHtml = `<span class="text-[11px] text-slate-400">${escapeHtml(r.reviewed_by || '')}${r.reviewed_at ? ' • ' + formatDateTimeLabel(r.reviewed_at) : ''}</span>`;
+    if (status === 'Pending') {
+      actionsHtml = `
+        <div class="flex items-center justify-center gap-2">
+          <button onclick="confirmOvertimeDecision('${r.id}', 'Approved')" class="text-xs px-2.5 py-1 rounded border border-emerald-300 text-emerald-700 hover:bg-emerald-50 font-medium">Approve</button>
+          <button onclick="confirmOvertimeDecision('${r.id}', 'Rejected')" class="text-xs px-2.5 py-1 rounded border border-rose-300 text-rose-700 hover:bg-rose-50 font-medium">Reject</button>
+        </div>
+      `;
+    }
+
+    return `
+      <tr class="hover:bg-slate-100 transition-colors">
+        <td class="px-4 py-3">
+          <div class="font-medium text-slate-900">${escapeHtml(empName)}</div>
+          <div class="text-[11px] text-slate-400 font-mono">ID: ${escapeHtml(emp ? emp.employee_number : 'N/A')}</div>
+        </td>
+        <td class="px-4 py-3 text-slate-800">${escapeHtml(empMeta)}</td>
+        <td class="px-4 py-3 text-slate-800 whitespace-nowrap">${formatDateLabel(r.ot_date)}</td>
+        <td class="px-4 py-3 text-slate-800 whitespace-nowrap">${formatTimeLabel(r.start_time)} – ${formatTimeLabel(r.end_time)}</td>
+        <td class="px-4 py-3 text-right font-mono-tabular font-semibold text-slate-900">${hours.toFixed(2)}</td>
+        <td class="px-4 py-3 text-slate-700 max-w-[220px]"><span class="line-clamp-2">${escapeHtml(r.reason || 'N/A')}</span></td>
+        <td class="px-4 py-3 text-slate-500 text-xs whitespace-nowrap">${formatDateTimeLabel(r.created_at)}</td>
+        <td class="px-4 py-3 text-center">
+          <span class="text-xs px-2 py-0.5 rounded-full border ${statusClass} font-medium">${escapeHtml(status)}</span>
+        </td>
+        <td class="px-4 py-3 text-center">${actionsHtml}</td>
+      </tr>
+    `;
+  }).join('');
+}
+
+function confirmOvertimeDecision(id, decision) {
+  const verb = decision === 'Approved' ? 'approve' : 'reject';
+  openConfirmModal(
+    `${decision} Overtime Request`,
+    `Are you sure you want to ${verb} this overtime request? This will update its status immediately.`,
+    () => decideOvertimeRequest(id, decision)
+  );
+}
+
+async function decideOvertimeRequest(id, decision) {
+  let adminEmail = '';
+  try {
+    const { data: { session } } = await supabaseClient.auth.getSession();
+    adminEmail = session && session.user ? session.user.email : '';
+  } catch (_) { /* non-fatal */ }
+
+  try {
+    const { error } = await supabaseClient
+      .from(OVERTIME_TABLE)
+      .update({
+        status: decision,
+        reviewed_by: adminEmail,
+        reviewed_at: new Date().toISOString()
+      })
+      .eq('id', id);
+    if (error) throw error;
+
+    showToast(`Overtime request ${decision.toLowerCase()}.`, 'success');
+    await fetchOvertimeRequests();
+  } catch (err) {
+    console.error('decideOvertimeRequest error:', err);
+    showToast('Failed to update overtime request. Ensure the "overtime_requests" table has status/reviewed_by/reviewed_at columns.', 'error');
+  }
 }
 
 /* ===============================
-   EVENT LISTENERS & INIT
+   LEAVE MANAGEMENT (APPROVAL CENTER)
 =============================== */
+const LEAVE_TABLE = 'leave_requests';
+const LEAVE_BALANCE_TABLE = 'leave_balances';
+const LEAVE_TYPES = ['Vacation Leave', 'Sick Leave', 'Other'];
+
+let leaveCache = [];
+let leaveBalanceCache = []; // rows: { employee_id, leave_type, balance }
+let leaveCalYear = null;
+let leaveCalMonth = null; // 0-11
+
+function leaveRowDays(row) {
+  if (row.leave_days !== null && row.leave_days !== undefined && row.leave_days !== '') {
+    const n = Number(row.leave_days);
+    if (Number.isFinite(n)) return n;
+  }
+  if (!row.start_date || !row.end_date) return 0;
+  const start = new Date(row.start_date + 'T00:00:00');
+  const end = new Date(row.end_date + 'T00:00:00');
+  const diffDays = Math.round((end - start) / (1000 * 60 * 60 * 24)) + 1;
+  return Math.max(0, diffDays);
+}
+
+function normalizeLeaveType(rawType) {
+  return LEAVE_TYPES.includes(rawType) ? rawType : 'Other';
+}
+
+/* ---------- FETCHING ---------- */
+async function fetchLeaveRequests() {
+  const tbody = document.getElementById('leaveTableBody');
+  tbody.innerHTML = `<tr><td colspan="10" class="px-4 py-8 text-center text-slate-400">Loading leave requests...</td></tr>`;
+
+  try {
+    const { data, error } = await supabaseClient
+      .from(LEAVE_TABLE)
+      .select('*')
+      .order('created_at', { ascending: false });
+    if (error) throw error;
+
+    leaveCache = data || [];
+    renderLeaveKPIs();
+    renderLeaveTable();
+    renderLeaveCalendar();
+  } catch (err) {
+    console.error('fetchLeaveRequests error:', err);
+    tbody.innerHTML = `<tr><td colspan="10" class="px-4 py-8 text-center text-rose-600">Unable to load leave requests. Check that the "leave_requests" table exists.</td></tr>`;
+    showToast('Unable to load leave requests.', 'error');
+  }
+}
+
+async function fetchLeaveBalances() {
+  const tbody = document.getElementById('leaveBalanceTableBody');
+
+  try {
+    const { data, error } = await supabaseClient
+      .from(LEAVE_BALANCE_TABLE)
+      .select('*');
+    if (error) throw error;
+
+    leaveBalanceCache = data || [];
+    renderLeaveBalancesTable();
+  } catch (err) {
+    console.error('fetchLeaveBalances error:', err);
+    if (tbody) tbody.innerHTML = `<tr><td colspan="6" class="px-4 py-8 text-center text-rose-600">Unable to load leave balances. Check that the "leave_balances" table exists.</td></tr>`;
+    showToast('Unable to load leave balances.', 'error');
+  }
+}
+
+function getLeaveBalance(employeeId, leaveType) {
+  const row = leaveBalanceCache.find(b => b.employee_id === employeeId && b.leave_type === leaveType);
+  return row ? Number(row.balance) || 0 : 0;
+}
+
+/* ---------- KPIs ---------- */
+function renderLeaveKPIs() {
+  const total = leaveCache.length;
+  const pending = leaveCache.filter(r => (r.status || 'Pending') === 'Pending').length;
+  const approved = leaveCache.filter(r => r.status === 'Approved');
+  const rejected = leaveCache.filter(r => r.status === 'Rejected').length;
+  const approvedDays = approved.reduce((sum, r) => sum + leaveRowDays(r), 0);
+
+  document.getElementById('leaveKpiTotal').textContent = total;
+  document.getElementById('leaveKpiPending').textContent = pending;
+  document.getElementById('leaveKpiApproved').textContent = approved.length;
+  document.getElementById('leaveKpiRejected').textContent = rejected;
+  document.getElementById('leaveKpiApprovedDays').textContent = approvedDays.toFixed(1);
+}
+
+/* ---------- SUB-TAB SWITCHING ---------- */
+function switchLeaveSubTab(tabId) {
+  document.querySelectorAll('.leave-subview').forEach(el => el.classList.add('hidden'));
+  document.getElementById(tabId).classList.remove('hidden');
+
+  document.querySelectorAll('.leave-subtab').forEach(btn => {
+    const isTarget = btn.getAttribute('data-leave-tab') === tabId;
+    btn.classList.toggle('text-amber-600', isTarget);
+    btn.classList.toggle('border-b-2', isTarget);
+    btn.classList.toggle('border-amber-600', isTarget);
+    btn.classList.toggle('hover:text-slate-800', !isTarget);
+  });
+
+  if (tabId === 'leaveCalendarView') {
+    if (leaveCalYear === null) {
+      const today = new Date();
+      leaveCalYear = today.getFullYear();
+      leaveCalMonth = today.getMonth();
+    }
+    renderLeaveCalendar();
+  }
+}
+
+/* ---------- LEAVE REQUESTS TABLE ---------- */
+function getLeaveFilteredRows() {
+  const searchVal = (document.getElementById('leaveSearchInput').value || '').toLowerCase();
+  const empVal = document.getElementById('leaveFilterEmployee').value;
+  const deptVal = document.getElementById('leaveFilterDept').value;
+  const typeVal = document.getElementById('leaveFilterType').value;
+  const statusVal = document.getElementById('leaveFilterStatus').value;
+  const monthVal = document.getElementById('leaveFilterMonth').value; // YYYY-MM
+  const dateFrom = document.getElementById('leaveFilterDateFrom').value;
+  const dateTo = document.getElementById('leaveFilterDateTo').value;
+
+  return leaveCache.filter(r => {
+    const emp = employeesCache.find(e => e.id === r.employee_id);
+    const fullName = emp ? `${emp.first_name || ''} ${emp.last_name || ''}`.toLowerCase() : '';
+    const dept = emp ? emp.department : '';
+
+    if (searchVal && !fullName.includes(searchVal)) return false;
+    if (empVal && r.employee_id !== empVal) return false;
+    if (deptVal && dept !== deptVal) return false;
+    if (typeVal && normalizeLeaveType(r.leave_type) !== typeVal) return false;
+    if (statusVal && (r.status || 'Pending') !== statusVal) return false;
+    if (monthVal && !(r.start_date || '').startsWith(monthVal) && !(r.end_date || '').startsWith(monthVal)) return false;
+    if (dateFrom && (r.end_date || r.start_date || '') < dateFrom) return false;
+    if (dateTo && (r.start_date || r.end_date || '') > dateTo) return false;
+    return true;
+  }).sort((a, b) => (b.start_date || '').localeCompare(a.start_date || ''));
+}
+
+function renderLeaveTable() {
+  const tbody = document.getElementById('leaveTableBody');
+  const filtered = getLeaveFilteredRows();
+
+  if (filtered.length === 0) {
+    tbody.innerHTML = `<tr><td colspan="10" class="px-4 py-8 text-center text-slate-400">No matching leave requests found.</td></tr>`;
+    return;
+  }
+
+  tbody.innerHTML = filtered.map(r => {
+    const emp = employeesCache.find(e => e.id === r.employee_id);
+    const empName = emp ? `${emp.first_name} ${emp.last_name}` : 'Unknown Employee';
+    const empMeta = emp ? `${emp.department || 'N/A'} • ${emp.position || emp.job_title || 'N/A'}` : 'N/A';
+    const status = r.status || 'Pending';
+    const days = leaveRowDays(r);
+
+    let statusClass = 'bg-amber-500/15 text-amber-700 border-amber-500/30';
+    if (status === 'Approved') statusClass = 'bg-emerald-500/15 text-emerald-700 border-emerald-500/30';
+    if (status === 'Rejected') statusClass = 'bg-rose-500/15 text-rose-700 border-rose-500/30';
+    if (status === 'Cancelled') statusClass = 'bg-slate-500/15 text-slate-600 border-slate-400/40';
+
+    let actionsHtml = `<span class="text-[11px] text-slate-400">${escapeHtml(r.reviewed_by || '')}${r.reviewed_at ? ' • ' + formatDateTimeLabel(r.reviewed_at) : ''}</span>`;
+    if (status === 'Pending') {
+      actionsHtml = `
+        <div class="flex items-center justify-center gap-2">
+          <button onclick="confirmLeaveDecision('${r.id}', 'Approved')" class="text-xs px-2.5 py-1 rounded border border-emerald-300 text-emerald-700 hover:bg-emerald-50 font-medium">Approve</button>
+          <button onclick="confirmLeaveDecision('${r.id}', 'Rejected')" class="text-xs px-2.5 py-1 rounded border border-rose-300 text-rose-700 hover:bg-rose-50 font-medium">Reject</button>
+        </div>
+      `;
+    } else if (status === 'Approved') {
+      actionsHtml = `
+        <div class="flex flex-col items-center gap-1">
+          <button onclick="confirmLeaveDecision('${r.id}', 'Cancelled')" class="text-xs px-2.5 py-1 rounded border border-slate-300 text-slate-600 hover:bg-slate-100 font-medium">Cancel</button>
+          <span class="text-[10px] text-slate-400">${escapeHtml(r.reviewed_by || '')}</span>
+        </div>
+      `;
+    }
+
+    return `
+      <tr class="hover:bg-slate-100 transition-colors">
+        <td class="px-4 py-3">
+          <div class="font-medium text-slate-900">${escapeHtml(empName)}</div>
+          <div class="text-[11px] text-slate-400 font-mono">ID: ${escapeHtml(emp ? emp.employee_number : 'N/A')}</div>
+        </td>
+        <td class="px-4 py-3 text-slate-800">${escapeHtml(empMeta)}</td>
+        <td class="px-4 py-3 text-slate-800 whitespace-nowrap">${escapeHtml(normalizeLeaveType(r.leave_type))}</td>
+        <td class="px-4 py-3 text-slate-800 whitespace-nowrap">${formatDateLabel(r.start_date)}</td>
+        <td class="px-4 py-3 text-slate-800 whitespace-nowrap">${formatDateLabel(r.end_date)}</td>
+        <td class="px-4 py-3 text-right font-mono-tabular font-semibold text-slate-900">${days.toFixed(1)}</td>
+        <td class="px-4 py-3 text-slate-700 max-w-[220px]"><span class="line-clamp-2">${escapeHtml(r.reason || 'N/A')}</span></td>
+        <td class="px-4 py-3 text-slate-500 text-xs whitespace-nowrap">${formatDateTimeLabel(r.created_at)}</td>
+        <td class="px-4 py-3 text-center">
+          <span class="text-xs px-2 py-0.5 rounded-full border ${statusClass} font-medium">${escapeHtml(status)}</span>
+        </td>
+        <td class="px-4 py-3 text-center">${actionsHtml}</td>
+      </tr>
+    `;
+  }).join('');
+}
+
+function confirmLeaveDecision(id, decision) {
+  const verbs = { Approved: 'approve', Rejected: 'reject', Cancelled: 'cancel' };
+  const verb = verbs[decision] || 'update';
+  let text = `Are you sure you want to ${verb} this leave request?`;
+  if (decision === 'Approved') text += ' This will deduct the corresponding days from the employee\u2019s leave balance.';
+  if (decision === 'Cancelled') text += ' This will restore the previously deducted leave balance.';
+
+  openConfirmModal(`${decision} Leave Request`, text, () => decideLeaveRequest(id, decision));
+}
+
+async function decideLeaveRequest(id, decision) {
+  const row = leaveCache.find(r => r.id === id);
+  if (!row) return;
+
+  let adminEmail = '';
+  try {
+    const { data: { session } } = await supabaseClient.auth.getSession();
+    adminEmail = session && session.user ? session.user.email : '';
+  } catch (_) { /* non-fatal */ }
+
+  try {
+    const { error: updateError } = await supabaseClient
+      .from(LEAVE_TABLE)
+      .update({
+        status: decision,
+        reviewed_by: adminEmail,
+        reviewed_at: new Date().toISOString()
+      })
+      .eq('id', id);
+    if (updateError) throw updateError;
+
+    // Approving deducts from balance; cancelling an approved request restores it.
+    if (decision === 'Approved') {
+      await adjustLeaveBalance(row.employee_id, normalizeLeaveType(row.leave_type), -leaveRowDays(row));
+    } else if (decision === 'Cancelled' && row.status === 'Approved') {
+      await adjustLeaveBalance(row.employee_id, normalizeLeaveType(row.leave_type), leaveRowDays(row));
+    }
+
+    showToast(`Leave request ${decision.toLowerCase()}.`, 'success');
+    await Promise.all([fetchLeaveRequests(), fetchLeaveBalances()]);
+  } catch (err) {
+    console.error('decideLeaveRequest error:', err);
+    showToast('Failed to update leave request. Ensure the "leave_requests" table has status/reviewed_by/reviewed_at columns.', 'error');
+  }
+}
+
+async function adjustLeaveBalance(employeeId, leaveType, deltaDays) {
+  try {
+    const { data: existing, error: fetchError } = await supabaseClient
+      .from(LEAVE_BALANCE_TABLE)
+      .select('*')
+      .eq('employee_id', employeeId)
+      .eq('leave_type', leaveType)
+      .maybeSingle();
+    if (fetchError) throw fetchError;
+
+    const currentBalance = existing ? (Number(existing.balance) || 0) : 0;
+    const newBalance = currentBalance + deltaDays;
+
+    const { error: upsertError } = await supabaseClient
+      .from(LEAVE_BALANCE_TABLE)
+      .upsert([{ employee_id: employeeId, leave_type: leaveType, balance: newBalance }], { onConflict: 'employee_id,leave_type' });
+    if (upsertError) throw upsertError;
+  } catch (err) {
+    console.error('adjustLeaveBalance error:', err);
+    showToast('Leave status updated, but the leave balance could not be adjusted. Ensure the "leave_balances" table exists with a unique constraint on (employee_id, leave_type).', 'warning');
+  }
+}
+
+/* ---------- LEAVE BALANCES SUB-VIEW ---------- */
+function renderLeaveBalancesTable() {
+  const tbody = document.getElementById('leaveBalanceTableBody');
+  if (!tbody) return;
+
+  const searchVal = (document.getElementById('leaveBalanceSearchInput').value || '').toLowerCase();
+
+  const roster = employeesCache
+    .filter(e => e.employment_status !== 'Inactive')
+    .filter(e => {
+      const fullName = `${e.first_name || ''} ${e.last_name || ''}`.toLowerCase();
+      const empId = (e.employee_number || '').toLowerCase();
+      return !searchVal || fullName.includes(searchVal) || empId.includes(searchVal);
+    })
+    .sort((a, b) => (a.last_name || '').localeCompare(b.last_name || ''));
+
+  if (roster.length === 0) {
+    tbody.innerHTML = `<tr><td colspan="6" class="px-4 py-8 text-center text-slate-400">No matching employees found.</td></tr>`;
+    return;
+  }
+
+  tbody.innerHTML = roster.map(e => {
+    const vl = getLeaveBalance(e.id, 'Vacation Leave');
+    const sl = getLeaveBalance(e.id, 'Sick Leave');
+    const ot = getLeaveBalance(e.id, 'Other');
+
+    return `
+      <tr class="hover:bg-slate-100 transition-colors" data-emp-balance-row="${e.id}">
+        <td class="px-4 py-3">
+          <div class="font-medium text-slate-900">${escapeHtml(e.first_name)} ${escapeHtml(e.last_name)}</div>
+          <div class="text-[11px] text-slate-400 font-mono">ID: ${escapeHtml(e.employee_number || 'N/A')}</div>
+        </td>
+        <td class="px-4 py-3 text-slate-800">${escapeHtml(e.department || 'N/A')}</td>
+        <td class="px-4 py-3 text-right">
+          <input type="number" step="0.5" value="${vl}" data-balance-input="Vacation Leave"
+            class="w-20 text-right bg-white border border-slate-300 rounded-md px-2 py-1.5 text-xs text-slate-900 font-mono-tabular" />
+        </td>
+        <td class="px-4 py-3 text-right">
+          <input type="number" step="0.5" value="${sl}" data-balance-input="Sick Leave"
+            class="w-20 text-right bg-white border border-slate-300 rounded-md px-2 py-1.5 text-xs text-slate-900 font-mono-tabular" />
+        </td>
+        <td class="px-4 py-3 text-right">
+          <input type="number" step="0.5" value="${ot}" data-balance-input="Other"
+            class="w-20 text-right bg-white border border-slate-300 rounded-md px-2 py-1.5 text-xs text-slate-900 font-mono-tabular" />
+        </td>
+        <td class="px-4 py-3 text-center">
+          <button onclick="saveLeaveBalanceRow('${e.id}')" class="text-xs px-3 py-1.5 rounded border border-amber-300 bg-amber-50 text-amber-700 hover:bg-amber-100 font-medium">Save</button>
+        </td>
+      </tr>
+    `;
+  }).join('');
+}
+
+async function saveLeaveBalanceRow(employeeId) {
+  const row = document.querySelector(`tr[data-emp-balance-row="${employeeId}"]`);
+  if (!row) return;
+
+  const payload = LEAVE_TYPES.map(type => {
+    const input = row.querySelector(`[data-balance-input="${type}"]`);
+    const value = input ? parseFloat(input.value) : 0;
+    return { employee_id: employeeId, leave_type: type, balance: Number.isFinite(value) ? value : 0 };
+  });
+
+  try {
+    const { error } = await supabaseClient
+      .from(LEAVE_BALANCE_TABLE)
+      .upsert(payload, { onConflict: 'employee_id,leave_type' });
+    if (error) throw error;
+
+    showToast('Leave balance updated.', 'success');
+    await fetchLeaveBalances();
+  } catch (err) {
+    console.error('saveLeaveBalanceRow error:', err);
+    showToast('Failed to save leave balance. Ensure the "leave_balances" table exists with a unique constraint on (employee_id, leave_type).', 'error');
+  }
+}
+
+/* ---------- LEAVE CALENDAR SUB-VIEW ---------- */
+function navigateLeaveCalendarMonth(delta) {
+  if (leaveCalYear === null) {
+    const today = new Date();
+    leaveCalYear = today.getFullYear();
+    leaveCalMonth = today.getMonth();
+  }
+  leaveCalMonth += delta;
+  if (leaveCalMonth < 0) { leaveCalMonth = 11; leaveCalYear -= 1; }
+  if (leaveCalMonth > 11) { leaveCalMonth = 0; leaveCalYear += 1; }
+  renderLeaveCalendar();
+}
+
+function renderLeaveCalendar() {
+  const grid = document.getElementById('leaveCalendarGrid');
+  if (!grid) return;
+
+  if (leaveCalYear === null) {
+    const today = new Date();
+    leaveCalYear = today.getFullYear();
+    leaveCalMonth = today.getMonth();
+  }
+
+  const label = new Date(leaveCalYear, leaveCalMonth, 1).toLocaleDateString('en-US', { month: 'long', year: 'numeric' });
+  const labelEl = document.getElementById('leaveCalMonthLabel');
+  if (labelEl) labelEl.textContent = label;
+
+  const approvedLeaves = leaveCache.filter(r => r.status === 'Approved');
+
+  const firstOfMonth = new Date(leaveCalYear, leaveCalMonth, 1);
+  const daysInMonth = new Date(leaveCalYear, leaveCalMonth + 1, 0).getDate();
+  const leadingBlanks = firstOfMonth.getDay(); // 0 = Sunday
+
+  const typeColors = {
+    'Vacation Leave': 'bg-sky-100 text-sky-800 border-sky-300',
+    'Sick Leave': 'bg-rose-100 text-rose-800 border-rose-300',
+    'Other': 'bg-slate-200 text-slate-700 border-slate-300'
+  };
+
+  let cellsHtml = '';
+  for (let i = 0; i < leadingBlanks; i++) {
+    cellsHtml += `<div class="min-h-[100px] rounded-lg bg-white border border-slate-100"></div>`;
+  }
+
+  for (let d = 1; d <= daysInMonth; d++) {
+    const dateStr = `${leaveCalYear}-${String(leaveCalMonth + 1).padStart(2, '0')}-${String(d).padStart(2, '0')}`;
+    const onLeaveToday = approvedLeaves.filter(r => (r.start_date || '') <= dateStr && dateStr <= (r.end_date || r.start_date || ''));
+
+    const badges = onLeaveToday.slice(0, 3).map(r => {
+      const emp = employeesCache.find(e => e.id === r.employee_id);
+      const shortName = emp ? `${emp.first_name} ${(emp.last_name || '').charAt(0)}.` : 'Unknown';
+      const type = normalizeLeaveType(r.leave_type);
+      const colorClass = typeColors[type] || typeColors['Other'];
+      return `<div class="text-[10px] px-1.5 py-0.5 rounded border ${colorClass} truncate" title="${escapeHtml(emp ? `${emp.first_name} ${emp.last_name}` : 'Unknown')} — ${escapeHtml(type)}">${escapeHtml(shortName)}</div>`;
+    }).join('');
+    const moreLabel = onLeaveToday.length > 3 ? `<div class="text-[10px] text-slate-400">+${onLeaveToday.length - 3} more</div>` : '';
+
+    const isToday = dateStr === new Date().toISOString().split('T')[0];
+
+    cellsHtml += `
+      <div class="min-h-[100px] rounded-lg bg-white border ${isToday ? 'border-amber-400' : 'border-slate-200'} p-1.5 flex flex-col gap-1">
+        <div class="text-[11px] font-semibold ${isToday ? 'text-amber-600' : 'text-slate-500'}">${d}</div>
+        <div class="flex-1 flex flex-col gap-1 overflow-hidden">${badges}${moreLabel}</div>
+      </div>
+    `;
+  }
+
+  grid.innerHTML = cellsHtml;
+}
+
+/* ---------- PROFILE MODAL: LEAVE TAB ---------- */
+function renderProfileLeaveTab(employeeId) {
+  const container = document.getElementById('tabLeave');
+  if (!container) return;
+
+  const vl = getLeaveBalance(employeeId, 'Vacation Leave');
+  const sl = getLeaveBalance(employeeId, 'Sick Leave');
+  const ot = getLeaveBalance(employeeId, 'Other');
+
+  const history = leaveCache
+    .filter(r => r.employee_id === employeeId)
+    .sort((a, b) => (b.start_date || '').localeCompare(a.start_date || ''))
+    .slice(0, 8);
+
+  const historyRows = history.length
+    ? history.map(r => {
+        let statusClass = 'text-amber-700';
+        if (r.status === 'Approved') statusClass = 'text-emerald-700';
+        if (r.status === 'Rejected') statusClass = 'text-rose-700';
+        if (r.status === 'Cancelled') statusClass = 'text-slate-500';
+        return `<div class="flex items-center justify-between text-xs border-b border-slate-100 py-1.5">
+          <span>${escapeHtml(normalizeLeaveType(r.leave_type))} • ${formatDateLabel(r.start_date)}–${formatDateLabel(r.end_date)}</span>
+          <span class="font-medium ${statusClass}">${escapeHtml(r.status || 'Pending')}</span>
+        </div>`;
+      }).join('')
+    : `<p class="text-xs text-slate-400">No leave requests on file.</p>`;
+
+  container.innerHTML = `
+    <div class="grid grid-cols-3 gap-4 bg-slate-50 p-4 rounded-lg border border-slate-200 text-xs">
+      <div><span class="text-slate-400 block">Vacation Leave</span><strong class="text-sm">${vl.toFixed(1)} days</strong></div>
+      <div><span class="text-slate-400 block">Sick Leave</span><strong class="text-sm">${sl.toFixed(1)} days</strong></div>
+      <div><span class="text-slate-400 block">Other</span><strong class="text-sm">${ot.toFixed(1)} days</strong></div>
+    </div>
+    <div class="bg-slate-50 p-4 rounded-lg border border-slate-200">
+      <p class="text-xs font-semibold text-slate-600 mb-1">Recent Leave Requests</p>
+      ${historyRows}
+    </div>
+  `;
+}
+
+/* AUTHENTICATION (Supabase Auth) */
+function enterApp(session) {
+  document.getElementById('loginScreen').classList.add('hidden');
+  document.getElementById('appShell').classList.remove('hidden');
+  if (session && session.user) {
+    document.getElementById('sidebarAdminEmail').textContent = session.user.email || '';
+  }
+  switchModule('dashboard');
+  fetchEmployees();
+}
+
+function exitToLogin() {
+  document.getElementById('appShell').classList.add('hidden');
+  document.getElementById('loginScreen').classList.remove('hidden');
+  document.getElementById('loginForm').reset();
+}
+
+/* EVENT LISTENERS & INITIALIZATION */
 function registerEventListeners() {
   document.querySelectorAll('.nav-btn').forEach(btn => {
     btn.addEventListener('click', () => switchModule(btn.getAttribute('data-target')));
   });
 
-  document.getElementById('sidebarLogoutBtn').addEventListener('click', () => exitToLogin());
-  document.getElementById('topRefreshBtn').addEventListener('click', fetchAllData);
+  document.getElementById('sidebarLogoutBtn').addEventListener('click', async () => {
+    try {
+      const { error } = await supabaseClient.auth.signOut();
+      if (error) throw error;
+      showToast('Signed out.', 'info');
+    } catch (err) {
+      console.error('sign out error:', err);
+      showToast('Unable to sign out.', 'error');
+    }
+    // onAuthStateChange (registered in init) also handles this, but we
+    // call exitToLogin() directly too so the UI updates immediately.
+    exitToLogin();
+  });
 
-  // Employee modal triggers
+  document.getElementById('loginForm').addEventListener('submit', async (e) => {
+    e.preventDefault();
+
+    if (credentialsArePlaceholders()) {
+      showToast('Supabase is not configured yet.', 'warning');
+      return;
+    }
+
+    const email = document.getElementById('loginEmail').value.trim();
+    const password = document.getElementById('loginPassword').value;
+    const errorEl = document.getElementById('loginError');
+    const btn = document.getElementById('loginBtn');
+    const btnLabel = document.getElementById('loginBtnLabel');
+
+    errorEl.classList.add('hidden');
+    btn.disabled = true;
+    btnLabel.textContent = 'Signing in…';
+
+    try {
+      const { data, error } = await supabaseClient.auth.signInWithPassword({ email, password });
+      if (error) throw error;
+      // onAuthStateChange (registered in init) will call enterApp() once
+      // the session is confirmed, so we don't need to call it here too.
+    } catch (err) {
+      console.error('login error:', err);
+      errorEl.textContent = 'Invalid email or password.';
+      errorEl.classList.remove('hidden');
+    } finally {
+      btn.disabled = false;
+      btnLabel.textContent = 'Sign In';
+    }
+  });
+
+  document.getElementById('topRefreshBtn').addEventListener('click', fetchEmployees);
+
+  // Employee Management UI triggers
   document.getElementById('openAddEmployeeModalBtn').addEventListener('click', openAddEmployeeModal);
   document.getElementById('closeEmployeeModalBtn').addEventListener('click', closeEmployeeModal);
   document.getElementById('cancelEmployeeModalBtn').addEventListener('click', closeEmployeeModal);
+
   document.getElementById('closeProfileModalBtn').addEventListener('click', closeEmployeeProfile);
   document.getElementById('closeProfileBtn').addEventListener('click', closeEmployeeProfile);
 
@@ -2256,85 +2512,104 @@ function registerEventListeners() {
     btn.addEventListener('click', () => switchProfileTab(btn.getAttribute('data-tab')));
   });
 
-  // Attendance module UI triggers
-  document.getElementById('openAddAttendanceModalBtn').addEventListener('click', openAddAttendanceModal);
-  document.getElementById('closeAttendanceModalBtn').addEventListener('click', closeAttendanceModal);
-  document.getElementById('cancelAttendanceModalBtn').addEventListener('click', closeAttendanceModal);
-  document.getElementById('openAttendanceReportModalBtn').addEventListener('click', openAttendanceReportModal);
-  document.getElementById('closeAttendanceReportModalBtn').addEventListener('click', closeAttendanceReportModal);
-  document.getElementById('closeAttendanceReportBtn').addEventListener('click', closeAttendanceReportModal);
-  document.getElementById('generateReportRunBtn').addEventListener('click', runAttendanceReport);
-
-  // Attendance filters
-  document.getElementById('attSearchInput').addEventListener('input', renderAttendanceTable);
-  document.getElementById('attFilterEmployee').addEventListener('change', renderAttendanceTable);
-  document.getElementById('attFilterDept').addEventListener('change', renderAttendanceTable);
-  document.getElementById('attFilterStatus').addEventListener('change', renderAttendanceTable);
-  document.getElementById('attFilterRangePreset').addEventListener('change', (e) => {
-    const isCustom = e.target.value === 'custom';
-    document.getElementById('attCustomDateContainer').classList.toggle('hidden', !isCustom);
-    renderAttendanceTable();
-  });
-  document.getElementById('attFilterDateFrom').addEventListener('change', renderAttendanceTable);
-  document.getElementById('attFilterDateTo').addEventListener('change', renderAttendanceTable);
-  document.getElementById('attResetFiltersBtn').addEventListener('click', () => {
-    document.getElementById('attSearchInput').value = '';
-    document.getElementById('attFilterEmployee').value = '';
-    document.getElementById('attFilterDept').value = '';
-    document.getElementById('attFilterStatus').value = '';
-    document.getElementById('attFilterRangePreset').value = 'all';
-    document.getElementById('attCustomDateContainer').classList.add('hidden');
-    renderAttendanceTable();
+  // Search & Filter listeners
+  document.getElementById('empSearchInput').addEventListener('input', renderEmployeeDirectory);
+  document.getElementById('filterDept').addEventListener('change', renderEmployeeDirectory);
+  document.getElementById('filterStatus').addEventListener('change', renderEmployeeDirectory);
+  document.getElementById('filterType').addEventListener('change', renderEmployeeDirectory);
+  document.getElementById('resetEmpFiltersBtn').addEventListener('click', () => {
+    document.getElementById('empSearchInput').value = '';
+    document.getElementById('filterDept').value = '';
+    document.getElementById('filterStatus').value = '';
+    document.getElementById('filterType').value = '';
+    renderEmployeeDirectory();
   });
 
-  // Manual attendance form submit
-  document.getElementById('attendanceForm').addEventListener('submit', async (e) => {
-    e.preventDefault();
-    const payload = {
-      employee_id: document.getElementById('modalAttEmployee').value,
-      attendance_date: document.getElementById('modalAttDate').value,
-      status: document.getElementById('modalAttStatus').value,
-      time_in: document.getElementById('modalAttTimeIn').value || null,
-      time_out: document.getElementById('modalAttTimeOut').value || null,
-      reason: document.getElementById('modalAttReason').value.trim(),
-      remarks: document.getElementById('modalAttRemarks').value.trim(),
-      source: 'Manual/Adjusted'
-    };
+  // Generic confirm modal
+  document.getElementById('confirmCancelBtn').addEventListener('click', closeConfirmModal);
+  document.getElementById('confirmOkBtn').addEventListener('click', async () => {
+    const action = pendingConfirmAction;
+    closeConfirmModal();
+    if (action) await action();
+  });
+  document.getElementById('confirmModal').addEventListener('click', (evt) => {
+    if (evt.target.id === 'confirmModal') closeConfirmModal();
+  });
 
-    try {
-      const { error } = await supabaseClient.from(ATTENDANCE_TABLE).upsert([payload], { onConflict: 'employee_id,attendance_date' });
-      if (error) throw error;
-      showToast('Attendance log saved successfully.', 'success');
-      closeAttendanceModal();
-      await fetchAllData();
-    } catch (err) {
-      console.error('Attendance save error:', err);
-      showToast('Failed to save attendance log.', 'error');
+  // Overtime Approval Center: filters & search
+  document.getElementById('otSearchInput').addEventListener('input', renderOvertimeTable);
+  document.getElementById('otFilterEmployee').addEventListener('change', renderOvertimeTable);
+  document.getElementById('otFilterDept').addEventListener('change', renderOvertimeTable);
+  document.getElementById('otFilterStatus').addEventListener('change', renderOvertimeTable);
+  document.getElementById('otFilterMonth').addEventListener('change', renderOvertimeTable);
+  document.getElementById('otFilterDateFrom').addEventListener('change', renderOvertimeTable);
+  document.getElementById('otFilterDateTo').addEventListener('change', renderOvertimeTable);
+  document.getElementById('otResetFiltersBtn').addEventListener('click', () => {
+    document.getElementById('otSearchInput').value = '';
+    document.getElementById('otFilterEmployee').value = '';
+    document.getElementById('otFilterDept').value = '';
+    document.getElementById('otFilterStatus').value = '';
+    document.getElementById('otFilterMonth').value = '';
+    document.getElementById('otFilterDateFrom').value = '';
+    document.getElementById('otFilterDateTo').value = '';
+    renderOvertimeTable();
+  });
+
+  // Leave Approval Center: sub-tabs
+  document.querySelectorAll('.leave-subtab').forEach(btn => {
+    btn.addEventListener('click', () => switchLeaveSubTab(btn.getAttribute('data-leave-tab')));
+  });
+
+  // Leave Approval Center: requests filters & search
+  document.getElementById('leaveSearchInput').addEventListener('input', renderLeaveTable);
+  document.getElementById('leaveFilterEmployee').addEventListener('change', renderLeaveTable);
+  document.getElementById('leaveFilterDept').addEventListener('change', renderLeaveTable);
+  document.getElementById('leaveFilterType').addEventListener('change', renderLeaveTable);
+  document.getElementById('leaveFilterStatus').addEventListener('change', renderLeaveTable);
+  document.getElementById('leaveFilterMonth').addEventListener('change', renderLeaveTable);
+  document.getElementById('leaveFilterDateFrom').addEventListener('change', renderLeaveTable);
+  document.getElementById('leaveFilterDateTo').addEventListener('change', renderLeaveTable);
+  document.getElementById('leaveResetFiltersBtn').addEventListener('click', () => {
+    document.getElementById('leaveSearchInput').value = '';
+    document.getElementById('leaveFilterEmployee').value = '';
+    document.getElementById('leaveFilterDept').value = '';
+    document.getElementById('leaveFilterType').value = '';
+    document.getElementById('leaveFilterStatus').value = '';
+    document.getElementById('leaveFilterMonth').value = '';
+    document.getElementById('leaveFilterDateFrom').value = '';
+    document.getElementById('leaveFilterDateTo').value = '';
+    renderLeaveTable();
+  });
+
+  // Leave Approval Center: balances search
+  document.getElementById('leaveBalanceSearchInput').addEventListener('input', renderLeaveBalancesTable);
+
+  // Leave Approval Center: calendar navigation
+  document.getElementById('leaveCalMonthPrevBtn').addEventListener('click', () => navigateLeaveCalendarMonth(-1));
+  document.getElementById('leaveCalMonthNextBtn').addEventListener('click', () => navigateLeaveCalendarMonth(1));
+
+  // Schedule Management: employee list sub-view
+  document.getElementById('scheduleEmpSearchInput').addEventListener('input', renderScheduleEmployeeList);
+  document.getElementById('scheduleEmpDeptFilter').addEventListener('change', renderScheduleEmployeeList);
+
+  // Schedule Management: individual monthly calendar sub-view
+  document.getElementById('scheduleBackToListBtn').addEventListener('click', () => {
+    if (scheduleHasUnsavedChanges) {
+      const proceed = confirm('You have unsaved changes on this month. Discard them and go back?');
+      if (!proceed) return;
     }
+    showScheduleListView();
   });
+  document.getElementById('scheduleMonthPrevBtn').addEventListener('click', () => navigateScheduleMonth(-1));
+  document.getElementById('scheduleMonthNextBtn').addEventListener('click', () => navigateScheduleMonth(1));
+  document.getElementById('scheduleLockToggleBtn').addEventListener('click', toggleScheduleLock);
+  document.getElementById('scheduleSaveAllBtn').addEventListener('click', handleSaveAllSchedule);
 
-  // Login form
-  document.getElementById('loginForm').addEventListener('submit', async (e) => {
-    e.preventDefault();
-    if (credentialsArePlaceholders()) {
-      showToast('Supabase not configured.', 'warning');
-      return;
-    }
-    const email = document.getElementById('loginEmail').value.trim();
-    const password = document.getElementById('loginPassword').value;
-    try {
-      const { data, error } = await supabaseClient.auth.signInWithPassword({ email, password });
-      if (error) throw error;
-    } catch (err) {
-      document.getElementById('loginError').textContent = 'Invalid credentials.';
-      document.getElementById('loginError').classList.remove('hidden');
-    }
-  });
-
-  // Employee form save
+  // Add/Edit Form submission
   document.getElementById('employeeForm').addEventListener('submit', async (e) => {
     e.preventDefault();
     const editId = document.getElementById('editEmployeeId').value;
+
     const payload = {
       employee_number: document.getElementById('modalEmpId').value.trim(),
       first_name: document.getElementById('modalFirstName').value.trim(),
@@ -2364,47 +2639,45 @@ function registerEventListeners() {
       if (editId) {
         const { error } = await supabaseClient.from(EMPLOYEES_TABLE).update(payload).eq('id', editId);
         if (error) throw error;
-        showToast('Employee updated.', 'success');
+        showToast('Employee updated successfully.', 'success');
       } else {
         const { error } = await supabaseClient.from(EMPLOYEES_TABLE).insert([payload]);
         if (error) throw error;
-        showToast('Employee added.', 'success');
+        showToast('New employee added successfully.', 'success');
       }
+
       closeEmployeeModal();
-      await fetchAllData();
+      await fetchEmployees();
     } catch (err) {
-      showToast('Failed to save employee.', 'error');
+      console.error('Save employee error:', err);
+      showToast('Failed to save employee record.', 'error');
     }
   });
 }
 
-function enterApp(session) {
-  document.getElementById('loginScreen').classList.add('hidden');
-  document.getElementById('appShell').classList.remove('hidden');
-  if (session && session.user) {
-    document.getElementById('sidebarAdminEmail').textContent = session.user.email || '';
-  }
-  switchModule('dashboard');
-  fetchAllData();
-}
-
-function exitToLogin() {
-  document.getElementById('appShell').classList.add('hidden');
-  document.getElementById('loginScreen').classList.remove('hidden');
-}
-
 async function init() {
   registerEventListeners();
+
   if (credentialsArePlaceholders()) {
     setConnectionStatus('unconfigured');
     return;
   }
-  const { data: { session } } = await supabaseClient.auth.getSession();
-  if (session) enterApp(session);
 
+  // Restore an existing session on page load/refresh, if any.
+  const { data: { session } } = await supabaseClient.auth.getSession();
+  if (session) {
+    enterApp(session);
+  }
+
+  // Keep the UI in sync with sign-in / sign-out events, including from
+  // other tabs, and this is what actually reveals the dashboard after
+  // a successful login form submission above.
   supabaseClient.auth.onAuthStateChange((event, session) => {
-    if (event === 'SIGNED_IN' && session) enterApp(session);
-    else if (event === 'SIGNED_OUT') exitToLogin();
+    if (event === 'SIGNED_IN' && session) {
+      enterApp(session);
+    } else if (event === 'SIGNED_OUT') {
+      exitToLogin();
+    }
   });
 }
 
