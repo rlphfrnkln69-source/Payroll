@@ -3408,11 +3408,19 @@ function payrollBuildItem(emp,src,from,to){
   const restDayPay=restDayHours*hourly*1.3;
   const allowances=payrollMoney(emp.allowances||emp.monthly_allowances||0);
   const otherEarnings=payrollMoney(emp.other_earnings||0);
-  const gross=basicPay+paidLeavePay+otPay+holidayPay+restDayPay+allowances+otherEarnings;
-  const stat=payrollComputeStatutories(monthly,periodFactor,gross);
-  const otherDeductions=payrollMoney(emp.other_deductions||0),loans=payrollMoney(emp.loan_deduction||emp.loan_amortization||0);
-  const totalDeductions=absenceDeduction+unpaidLeaveDeduction+lateDeduction+undertimeDeduction+stat.sss+stat.philhealth+stat.pagibig+stat.tax+loans+otherDeductions;
-  const net=gross-totalDeductions;
+  // Full-cutoff absence: allow the employee to pass through payroll as NO PAY instead of
+  // blocking the entire payroll because recurring deductions would make the net negative.
+  const fullCutoffAbsence = schedules.length > 0 && daysWorked === 0 && paidLeave === 0 && regularHours === 0 && otHours === 0 && holidayPay === 0 && restDayPay === 0;
+  const effectiveAllowances = fullCutoffAbsence ? 0 : allowances;
+  const effectiveOtherEarnings = fullCutoffAbsence ? 0 : otherEarnings;
+  const gross=basicPay+paidLeavePay+otPay+holidayPay+restDayPay+effectiveAllowances+effectiveOtherEarnings;
+  const computedStat=payrollComputeStatutories(monthly,periodFactor,gross);
+  const stat=fullCutoffAbsence ? {sss:0,philhealth:0,pagibig:0,tax:0} : computedStat;
+  const configuredOtherDeductions=payrollMoney(emp.other_deductions||0),configuredLoans=payrollMoney(emp.loan_deduction||emp.loan_amortization||0);
+  const otherDeductions=fullCutoffAbsence ? 0 : configuredOtherDeductions;
+  const loans=fullCutoffAbsence ? 0 : configuredLoans;
+  const totalDeductions=fullCutoffAbsence ? 0 : absenceDeduction+unpaidLeaveDeduction+lateDeduction+undertimeDeduction+stat.sss+stat.philhealth+stat.pagibig+stat.tax+loans+otherDeductions;
+  const net=fullCutoffAbsence ? 0 : gross-totalDeductions;
   const exceptions=[];
   if(!monthly)exceptions.push('Missing basic salary/rate');
   if(!emp.sss_number)exceptions.push('Missing SSS number');
@@ -3428,8 +3436,9 @@ function payrollBuildItem(emp,src,from,to){
     const leaveDays=leaveRowDays(l);
     if(balanceRow && Number(balanceRow.balance) < 0) exceptions.push(`Insufficient ${type} credits for ${leaveDays} day(s)`);
   });
-  if(net<0)exceptions.push('Negative net pay');
-  return {employee_id:emp.id,employee_number:emp.employee_number||'',employee_name:`${emp.first_name||''} ${emp.last_name||''}`.trim(),department:emp.department||'',position:emp.position||emp.job_title||'',basic_pay:payrollRound(basicPay),days_worked:daysWorked,paid_leave_days:paidLeave,unpaid_leave_days:unpaidLeave,absence_days:absences,late_minutes:lateMin,undertime_minutes:undertimeMin,regular_hours:payrollRound(regularHours),rest_day_hours:payrollRound(restDayHours),ot_hours:payrollRound(otHours),ot_pay:payrollRound(otPay),holiday_pay:payrollRound(holidayPay),rest_day_pay:payrollRound(restDayPay),allowances:payrollRound(allowances),other_earnings:payrollRound(otherEarnings),gross_pay:payrollRound(gross),sss:payrollRound(stat.sss),philhealth:payrollRound(stat.philhealth),pagibig:payrollRound(stat.pagibig),tax:payrollRound(stat.tax),absence_deduction:payrollRound(absenceDeduction),late_deduction:payrollRound(lateDeduction),undertime_deduction:payrollRound(undertimeDeduction),loans:payrollRound(loans),other_deductions:payrollRound(otherDeductions),total_deductions:payrollRound(totalDeductions),net_pay:payrollRound(net),exceptions:[...new Set(exceptions)],source_snapshot:{details,schedule_count:schedules.length,approved_ot:ot,approved_leave:leaves,holidays:src.holidays||[]}};
+  if(fullCutoffAbsence)exceptions.push('No Pay - Full-cutoff absence');
+  if(net<0&&!fullCutoffAbsence)exceptions.push('Negative net pay');
+  return {employee_id:emp.id,employee_number:emp.employee_number||'',employee_name:`${emp.first_name||''} ${emp.last_name||''}`.trim(),department:emp.department||'',position:emp.position||emp.job_title||'',basic_pay:payrollRound(basicPay),days_worked:daysWorked,paid_leave_days:paidLeave,unpaid_leave_days:unpaidLeave,absence_days:absences,late_minutes:lateMin,undertime_minutes:undertimeMin,regular_hours:payrollRound(regularHours),rest_day_hours:payrollRound(restDayHours),ot_hours:payrollRound(otHours),ot_pay:payrollRound(otPay),holiday_pay:payrollRound(holidayPay),rest_day_pay:payrollRound(restDayPay),allowances:payrollRound(effectiveAllowances),other_earnings:payrollRound(effectiveOtherEarnings),gross_pay:payrollRound(gross),sss:payrollRound(stat.sss),philhealth:payrollRound(stat.philhealth),pagibig:payrollRound(stat.pagibig),tax:payrollRound(stat.tax),absence_deduction:payrollRound(fullCutoffAbsence?0:absenceDeduction),late_deduction:payrollRound(fullCutoffAbsence?0:lateDeduction),undertime_deduction:payrollRound(fullCutoffAbsence?0:undertimeDeduction),loans:payrollRound(loans),other_deductions:payrollRound(otherDeductions),total_deductions:payrollRound(totalDeductions),net_pay:payrollRound(net),payroll_status:fullCutoffAbsence?'No Pay':'Ready',exceptions:[...new Set(exceptions)],source_snapshot:{details,schedule_count:schedules.length,approved_ot:ot,approved_leave:leaves,holidays:src.holidays||[],full_cutoff_absence:fullCutoffAbsence}};
 }
 let payrollValidationResult=null;
 function payrollValidationIssue(level,message){return {level,message};}
@@ -3447,8 +3456,9 @@ function payrollValidateEmployee(emp,src,from,to){
   if(!emp.tin_number)warnings.push(payrollValidationIssue('warning','Missing TIN.'));
   let preview=null;
   try{preview=payrollBuildItem(emp,src,from,to);(preview.exceptions||[]).forEach(msg=>{
+    const noPay=msg==='No Pay - Full-cutoff absence';
     const blocking=['Negative net pay','Missing basic salary/rate'].includes(msg)||String(msg).startsWith('No schedule');
-    (blocking?errors:warnings).push(payrollValidationIssue(blocking?'error':'warning',msg));
+    (blocking?errors:warnings).push(payrollValidationIssue(blocking?'error':(noPay?'info':'warning'),msg));
   });}catch(err){console.error('Payroll preview failed',emp.id,err);errors.push(payrollValidationIssue('error','Unable to calculate payroll preview for this employee.'));}
   const unique=a=>a.filter((v,i,self)=>i===self.findIndex(x=>x.level===v.level&&x.message===v.message));
   return {employee:emp,employee_name:`${emp.first_name||''} ${emp.last_name||''}`.trim()||emp.employee_number||'Unnamed employee',employee_number:emp.employee_number||'',errors:unique(errors),warnings:unique(warnings),preview};
@@ -3465,7 +3475,7 @@ function payrollRenderValidation(){
   else{status.textContent='Ready to Generate';status.className='text-xs font-semibold px-3 py-1 rounded-full bg-emerald-100 text-emerald-700';}
   let html='';
   if(r.existingMessage)html+=`<div class="px-4 py-3 ${r.existingMessage.level==='error'?'bg-rose-50':'bg-amber-50'}"><div class="text-xs font-semibold ${r.existingMessage.level==='error'?'text-rose-800':'text-amber-800'}">${r.existingMessage.level==='error'?'BLOCKING ERROR':'WARNING'}</div><div class="text-sm mt-1 ${r.existingMessage.level==='error'?'text-rose-700':'text-amber-700'}">${escapeHtml(r.existingMessage.message)}</div></div>`;
-  html+=r.employees.map(e=>{const issues=[...e.errors,...e.warnings];const blocked=e.errors.length;const warn=!blocked&&e.warnings.length;const label=blocked?'BLOCKED':warn?'WARNING':'READY';const cls=blocked?'bg-rose-100 text-rose-700':warn?'bg-amber-100 text-amber-700':'bg-emerald-100 text-emerald-700';return `<div class="px-4 py-3"><div class="flex flex-wrap items-center justify-between gap-2"><div><div class="text-sm font-semibold text-slate-900">${escapeHtml(e.employee_name)}</div><div class="text-[11px] text-slate-500">${escapeHtml(e.employee_number)}</div></div><span class="text-[10px] font-bold px-2 py-1 rounded-full ${cls}">${label}</span></div>${issues.length?`<div class="mt-2 space-y-1">${issues.map(i=>`<div class="text-xs ${i.level==='error'?'text-rose-700':'text-amber-700'}">• ${escapeHtml(i.message)}</div>`).join('')}</div>`:'<div class="mt-1 text-xs text-emerald-600">Payroll data is ready.</div>'}</div>`;}).join('');
+  html+=r.employees.map(e=>{const issues=[...e.errors,...e.warnings];const blocked=e.errors.length;const noPay=e.preview&&e.preview.payroll_status==='No Pay';const warn=!blocked&&!noPay&&e.warnings.some(i=>i.level==='warning');const label=blocked?'BLOCKED':noPay?'NO PAY':warn?'WARNING':'READY';const cls=blocked?'bg-rose-100 text-rose-700':noPay?'bg-violet-100 text-violet-700':warn?'bg-amber-100 text-amber-700':'bg-emerald-100 text-emerald-700';return `<div class="px-4 py-3"><div class="flex flex-wrap items-center justify-between gap-2"><div><div class="text-sm font-semibold text-slate-900">${escapeHtml(e.employee_name)}</div><div class="text-[11px] text-slate-500">${escapeHtml(e.employee_number)}</div></div><span class="text-[10px] font-bold px-2 py-1 rounded-full ${cls}">${label}</span></div>${issues.length?`<div class="mt-2 space-y-1">${issues.map(i=>`<div class="text-xs ${i.level==='error'?'text-rose-700':i.level==='info'?'text-violet-700':'text-amber-700'}">• ${escapeHtml(i.message)}</div>`).join('')}</div>`:'<div class="mt-1 text-xs text-emerald-600">Payroll data is ready.</div>'}</div>`;}).join('');
   document.getElementById('payrollValidationResults').innerHTML=html;
   const footer=document.getElementById('payrollValidationFooter');footer.classList.remove('hidden');
   document.getElementById('payrollValidationMessage').textContent=r.totalErrors?`${r.totalErrors} blocking issue(s) must be resolved before payroll can be generated.`:r.totalWarnings?`Payroll is ready. ${r.totalWarnings} warning(s) should be reviewed before generation.`:'All payroll data passed validation. You can now generate the draft payroll.';
