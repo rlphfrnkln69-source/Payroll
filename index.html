@@ -2285,12 +2285,6 @@ function buildAttendanceRow(employeeId,date,schedule,log,approvedOt) {
   return {employee_id:employeeId,schedule_date:date,_schedule:schedule,_log:log,id:log?.id||null,employee:emp,scheduled_in:expectedIn,scheduled_out:expectedOut,actual_in:actualIn,actual_out:actualOut,worked_hours:worked/60,late_minutes:late,undertime_minutes:undertime,overtime_hours:Number(approvedOt||0),status,source,reason:log?.reason||'',remarks:log?.remarks||''};
 }
 
-function getAttendanceFilteredRows() {
-  const empVal=document.getElementById('attendanceEmployeeFilter').value, deptVal=document.getElementById('attendanceDeptFilter').value;
-  const pos=(document.getElementById('attendancePositionFilter').value||'').trim().toLowerCase(), status=document.getElementById('attendanceStatusFilter').value;
-  return attendanceCache.filter(r=>{const e=r.employee; if(empVal&&r.employee_id!==empVal)return false; if(deptVal&&(e?.department||'')!==deptVal)return false; if(pos&&!((e?.position||e?.job_title||'').toLowerCase().includes(pos)))return false; if(status&&r.status!==status)return false; return true;}).sort((a,b)=>a.schedule_date.localeCompare(b.schedule_date)||((a.employee?.last_name||'').localeCompare(b.employee?.last_name||'')));
-}
-
 function renderAttendanceKPIs(rows) {
   document.getElementById('attKpiRecords').textContent=rows.length;
   document.getElementById('attKpiWorked').textContent=rows.filter(r=>r.actual_in&&r.actual_out&&!r.status.includes('Rest Day')).length;
