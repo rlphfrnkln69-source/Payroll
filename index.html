@@ -859,6 +859,7 @@
             <button id="payrollAdjustmentsBtn" class="hidden px-3 py-2 text-xs font-semibold rounded-lg bg-violet-600 text-white hover:bg-violet-700">Payroll Adjustments</button>
             <button id="payrollFinalizeBtn" class="hidden px-3 py-2 text-xs font-semibold rounded-lg bg-emerald-600 text-white hover:bg-emerald-700">Finalize Payroll</button>
             <button id="payrollReleaseBtn" class="hidden px-3 py-2 text-xs font-semibold rounded-lg bg-sky-600 text-white hover:bg-sky-700">Release Payroll</button>
+            <button id="payrollPayslipCenterBtn" class="hidden px-3 py-2 text-xs font-semibold rounded-lg border border-sky-300 text-sky-700 bg-white hover:bg-sky-50">Payslip Center</button>
             <button id="payrollExcelBtn" class="hidden px-3 py-2 text-xs font-semibold rounded-lg border border-emerald-300 text-emerald-700 bg-white hover:bg-emerald-50">Download Excel</button>
             <button id="payrollDeleteBtn" class="hidden px-3 py-2 text-xs font-semibold rounded-lg border border-rose-300 text-rose-700 bg-white hover:bg-rose-50">Delete Payroll</button>
           </div>
@@ -958,6 +959,45 @@
               <div class="px-5 py-4 border-t border-slate-200 bg-slate-50 flex justify-end gap-2">
                 <button type="button" onclick="closePayrollFinalizeModal()" class="px-3 py-2 text-xs font-semibold rounded-lg border border-slate-300 bg-white hover:bg-slate-50">Cancel</button>
                 <button id="payrollConfirmFinalizeBtn" type="button" class="px-4 py-2 text-xs font-semibold rounded-lg bg-emerald-600 text-white hover:bg-emerald-700 disabled:opacity-50" disabled>Finalize & Lock</button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- PAYSLIP & RELEASE CENTER -->
+        <div id="payrollPayslipCenterModal" class="hidden fixed inset-0 z-[90] bg-slate-900/50 p-4 overflow-y-auto">
+          <div class="min-h-full flex items-center justify-center">
+            <div class="w-full max-w-5xl bg-white rounded-2xl shadow-2xl overflow-hidden">
+              <div class="px-5 py-4 border-b border-slate-200 flex items-start justify-between gap-4">
+                <div>
+                  <h3 class="text-lg font-semibold text-slate-900">Payslip & Release Center</h3>
+                  <p id="payrollPayslipCenterSubtitle" class="text-xs text-slate-500 mt-1"></p>
+                </div>
+                <button type="button" onclick="closePayrollPayslipCenter()" class="px-3 py-2 text-xs rounded-lg border border-slate-300 hover:bg-slate-50">Close</button>
+              </div>
+
+              <div class="p-5 space-y-4">
+                <div id="payrollReleaseStatusBanner" class="rounded-xl border p-4"></div>
+
+                <div class="grid grid-cols-2 md:grid-cols-4 gap-3">
+                  <div class="rounded-xl border border-slate-200 bg-slate-50 p-3"><p class="text-[10px] uppercase tracking-wide text-slate-500">Employees</p><p id="payslipCenterEmployees" class="text-lg font-semibold mt-1">0</p></div>
+                  <div class="rounded-xl border border-emerald-200 bg-emerald-50 p-3"><p class="text-[10px] uppercase tracking-wide text-emerald-700">Total Net Pay</p><p id="payslipCenterNet" class="text-lg font-semibold text-emerald-700 mt-1">₱0.00</p></div>
+                  <div class="rounded-xl border border-slate-200 bg-slate-50 p-3"><p class="text-[10px] uppercase tracking-wide text-slate-500">Status</p><p id="payslipCenterStatus" class="text-lg font-semibold mt-1">—</p></div>
+                  <div class="rounded-xl border border-slate-200 bg-slate-50 p-3"><p class="text-[10px] uppercase tracking-wide text-slate-500">Released</p><p id="payslipCenterReleasedAt" class="text-xs font-semibold mt-2">Not yet</p></div>
+                </div>
+
+                <div class="rounded-xl border border-slate-200 overflow-hidden">
+                  <div class="px-4 py-3 border-b border-slate-200 flex flex-wrap items-center justify-between gap-3">
+                    <div><h4 class="text-sm font-semibold text-slate-900">Employee Payslips</h4><p class="text-xs text-slate-500 mt-0.5">Generate an individual PDF or open a print-ready payslip.</p></div>
+                    <button type="button" onclick="downloadAllPayrollPayslipsPdf()" class="px-3 py-2 text-xs font-semibold rounded-lg border border-violet-300 text-violet-700 bg-white hover:bg-violet-50">Download All PDF</button>
+                  </div>
+                  <div id="payrollPayslipCenterList" class="divide-y divide-slate-200 max-h-[52vh] overflow-y-auto"></div>
+                </div>
+              </div>
+
+              <div class="px-5 py-4 border-t border-slate-200 bg-slate-50 flex flex-wrap justify-end gap-2">
+                <button id="payrollCenterReleaseBtn" type="button" class="hidden px-4 py-2 text-xs font-semibold rounded-lg bg-sky-600 text-white hover:bg-sky-700">Release Payroll</button>
+                <button type="button" onclick="closePayrollPayslipCenter()" class="px-4 py-2 text-xs font-semibold rounded-lg border border-slate-300 bg-white hover:bg-slate-50">Done</button>
               </div>
             </div>
           </div>
@@ -3662,7 +3702,7 @@ function renderPayrollCurrent(){
   const visible=items.filter(i=>!q||i.employee_name.toLowerCase().includes(q)||String(i.employee_number).toLowerCase().includes(q));
   document.getElementById('payrollKpiEmployees').textContent=r?items.length:0;document.getElementById('payrollKpiPeriod').textContent=r?`${formatDateLabel(r.period_start)}–${formatDateLabel(r.period_end)}`:'—';document.getElementById('payrollKpiGross').textContent=formatCurrency(r?.total_gross||0);document.getElementById('payrollKpiOt').textContent=formatCurrency(r?.total_ot||0);document.getElementById('payrollKpiDeductions').textContent=formatCurrency(r?.total_deductions||0);document.getElementById('payrollKpiNet').textContent=formatCurrency(r?.total_net||0);document.getElementById('payrollKpiStatus').textContent=r?.status||'No payroll';
   const body=document.getElementById('payrollTableBody');
-  if(!r){body.innerHTML='<tr><td colspan="15" class="px-4 py-10 text-center text-slate-400">Select a payroll period and generate payroll.</td></tr>';document.getElementById('payrollExceptionsCard').classList.add('hidden');['payrollFinalizeBtn','payrollReleaseBtn','payrollExcelBtn','payrollDeleteBtn','payrollAdjustmentsBtn'].forEach(id=>document.getElementById(id).classList.add('hidden'));renderPayrollReviewSummary();return;}
+  if(!r){body.innerHTML='<tr><td colspan="15" class="px-4 py-10 text-center text-slate-400">Select a payroll period and generate payroll.</td></tr>';document.getElementById('payrollExceptionsCard').classList.add('hidden');['payrollFinalizeBtn','payrollReleaseBtn','payrollPayslipCenterBtn','payrollExcelBtn','payrollDeleteBtn','payrollAdjustmentsBtn'].forEach(id=>document.getElementById(id).classList.add('hidden'));renderPayrollReviewSummary();return;}
   const reviewed=getPayrollReviewedIds();
   body.innerHTML=visible.length?visible.map(i=>`<tr class="hover:bg-slate-50"><td class="px-3 py-3"><div class="flex items-center gap-2"><div class="font-semibold">${escapeHtml(i.employee_name)}</div>${reviewed.has(i.id)?'<span class="text-[9px] font-bold px-1.5 py-0.5 rounded bg-emerald-100 text-emerald-700">REVIEWED</span>':''}</div><div class="text-[10px] text-slate-400">${escapeHtml(i.employee_number)} • ${escapeHtml(i.department)}</div></td><td class="px-3 py-3 text-right">${i.days_worked}</td><td class="px-3 py-3 text-right">${Number(i.paid_leave_days).toFixed(1)}</td><td class="px-3 py-3 text-right">${Number(i.unpaid_leave_days).toFixed(1)}</td><td class="px-3 py-3 text-right">${Number(i.absence_days).toFixed(1)}</td><td class="px-3 py-3 text-right">${i.late_minutes}m</td><td class="px-3 py-3 text-right">${i.undertime_minutes}m</td><td class="px-3 py-3 text-right">${Number(i.regular_hours).toFixed(2)}</td><td class="px-3 py-3 text-right">${Number(i.ot_hours).toFixed(2)}</td><td class="px-3 py-3 text-right">${formatCurrency(i.ot_pay)}</td><td class="px-3 py-3 text-right">${formatCurrency(i.basic_pay)}</td><td class="px-3 py-3 text-right font-semibold">${formatCurrency(i.gross_pay)}</td><td class="px-3 py-3 text-right">${formatCurrency(i.total_deductions)}</td><td class="px-3 py-3 text-right font-semibold text-emerald-700">${formatCurrency(i.net_pay)}</td><td class="px-3 py-3 text-center whitespace-nowrap"><button onclick="viewPayrollDetails('${i.id}')" class="text-[11px] px-2 py-1 rounded border border-slate-300 hover:bg-slate-100">Review</button> ${r.status==='For Verification'?`<button onclick="openPayrollAdjustmentForEmployee('${i.employee_id}')" class="text-[11px] px-2 py-1 rounded border border-violet-300 text-violet-700 hover:bg-violet-50">Adjust</button>`:''} <button onclick="printPayrollPayslip('${i.id}')" class="text-[11px] px-2 py-1 rounded border border-sky-300 text-sky-700 hover:bg-sky-50">View Payslip</button> <button onclick="downloadPayrollPayslipPdf('${i.id}')" class="text-[11px] px-2 py-1 rounded border border-violet-300 text-violet-700 hover:bg-violet-50">PDF</button></td></tr>`).join(''):'<tr><td colspan="15" class="px-4 py-10 text-center text-slate-400">No matching employees.</td></tr>';
   const ex=[];items.forEach(i=>(i.exceptions||[]).forEach(x=>ex.push({employee:i.employee_name,message:x})));
@@ -3683,7 +3723,7 @@ function renderPayrollCurrent(){
 
     document.getElementById('payrollExceptionsList').innerHTML=ex.map(x=>`<div class="px-4 py-2 text-xs flex justify-between gap-4"><span class="font-medium text-amber-900">${escapeHtml(x.employee)}</span><span class="text-amber-800 text-right">${escapeHtml(x.message)}</span></div>`).join('');
   }
-  const locked=['Finalized','Released'].includes(r.status);document.getElementById('payrollFinalizeBtn').classList.toggle('hidden',locked||r.status!=='For Verification');document.getElementById('payrollReleaseBtn').classList.toggle('hidden',r.status!=='Finalized');document.getElementById('payrollExcelBtn').classList.remove('hidden');document.getElementById('payrollDeleteBtn').classList.toggle('hidden',locked);document.getElementById('payrollAdjustmentsBtn').classList.toggle('hidden',locked||r.status!=='For Verification');renderPayrollReviewSummary();renderPayrollAdjustments();
+  const locked=['Finalized','Released'].includes(r.status);document.getElementById('payrollFinalizeBtn').classList.toggle('hidden',locked||r.status!=='For Verification');document.getElementById('payrollReleaseBtn').classList.toggle('hidden',r.status!=='Finalized');document.getElementById('payrollPayslipCenterBtn').classList.toggle('hidden',!['Finalized','Released'].includes(r.status));document.getElementById('payrollExcelBtn').classList.remove('hidden');document.getElementById('payrollDeleteBtn').classList.toggle('hidden',locked);document.getElementById('payrollAdjustmentsBtn').classList.toggle('hidden',locked||r.status!=='For Verification');renderPayrollReviewSummary();renderPayrollAdjustments();
 }
 function togglePayrollExceptions(){
   const body=document.getElementById('payrollExceptionsBody');
@@ -3724,7 +3764,97 @@ async function confirmFinalizePayroll(){
   if(!payrollCurrentRun||!document.getElementById('payrollFinalizeConfirm').checked)return;const btn=document.getElementById('payrollConfirmFinalizeBtn');btn.disabled=true;btn.textContent='Finalizing…';
   try{const {error}=await supabaseClient.from(PAYROLL_RUNS_TABLE).update({status:'Finalized',finalized_at:new Date().toISOString()}).eq('id',payrollCurrentRun.id).eq('status','For Verification');if(error)throw error;payrollCurrentRun.status='Finalized';closePayrollFinalizeModal();renderPayrollCurrent();await fetchPayrollHistory();showToast('Payroll finalized and locked.','success');}catch(err){console.error('finalizePayroll',err);showToast(err?.message||'Unable to finalize payroll.','error');}finally{btn.disabled=false;btn.textContent='Finalize & Lock';}
 }
-async function releasePayroll(){if(!payrollCurrentRun||payrollCurrentRun.status!=='Finalized')return;if(!confirm(`Release payroll for ${formatDateLabel(payrollCurrentRun.period_start)} – ${formatDateLabel(payrollCurrentRun.period_end)}? Once released, the payroll remains locked.`))return;const {error}=await supabaseClient.from(PAYROLL_RUNS_TABLE).update({status:'Released',released_at:new Date().toISOString()}).eq('id',payrollCurrentRun.id).eq('status','Finalized');if(error){showToast(error.message||'Unable to release payroll.','error');return;}payrollCurrentRun.status='Released';renderPayrollCurrent();await fetchPayrollHistory();showToast('Payroll released and remains locked.','success');}
+function openPayrollPayslipCenter(){
+  if(!payrollCurrentRun){showToast('Open a payroll run first.','warning');return;}
+  const r=payrollCurrentRun, items=payrollCurrentItems||[];
+  document.getElementById('payrollPayslipCenterSubtitle').textContent=`${formatDateLabel(r.period_start)} – ${formatDateLabel(r.period_end)}`;
+  document.getElementById('payslipCenterEmployees').textContent=items.length;
+  document.getElementById('payslipCenterNet').textContent=formatCurrency(r.total_net);
+  document.getElementById('payslipCenterStatus').textContent=r.status||'—';
+  document.getElementById('payslipCenterReleasedAt').textContent=r.released_at?formatDateTimeLabel(r.released_at):'Not yet';
+
+  const released=r.status==='Released';
+  const finalized=r.status==='Finalized';
+  const banner=document.getElementById('payrollReleaseStatusBanner');
+  banner.className=`rounded-xl border p-4 ${released?'border-sky-200 bg-sky-50 text-sky-900':finalized?'border-emerald-200 bg-emerald-50 text-emerald-900':'border-amber-200 bg-amber-50 text-amber-900'}`;
+  banner.innerHTML=released
+    ? `<div class="font-semibold text-sm">✓ Payroll Released</div><div class="text-xs mt-1">Payslips are ready for distribution. This payroll remains locked.</div>`
+    : finalized
+      ? `<div class="font-semibold text-sm">Payroll Finalized — Ready to Release</div><div class="text-xs mt-1">Review the payslips, then release this locked payroll when ready.</div>`
+      : `<div class="font-semibold text-sm">Payslip Preview Mode</div><div class="text-xs mt-1">This payroll is not finalized yet. Finalize it before official release.</div>`;
+
+  document.getElementById('payrollPayslipCenterList').innerHTML=items.length?items.map(i=>`
+    <div class="px-4 py-3 flex flex-wrap items-center justify-between gap-3">
+      <div class="min-w-0">
+        <div class="text-sm font-semibold text-slate-900">${escapeHtml(i.employee_name)}</div>
+        <div class="text-[11px] text-slate-500">${escapeHtml(i.employee_number||'N/A')} • ${escapeHtml(i.department||'General')} • Net Pay: <strong>${formatCurrency(i.net_pay)}</strong></div>
+      </div>
+      <div class="flex gap-2">
+        <button type="button" onclick="printPayrollPayslip('${i.id}')" class="px-3 py-1.5 text-[11px] font-semibold rounded-lg border border-sky-300 text-sky-700 bg-white hover:bg-sky-50">View / Print</button>
+        <button type="button" onclick="downloadPayrollPayslipPdf('${i.id}')" class="px-3 py-1.5 text-[11px] font-semibold rounded-lg border border-violet-300 text-violet-700 bg-white hover:bg-violet-50">PDF</button>
+      </div>
+    </div>`).join(''):`<div class="px-4 py-10 text-center text-sm text-slate-400">No payroll items found.</div>`;
+
+  document.getElementById('payrollCenterReleaseBtn').classList.toggle('hidden',!finalized);
+  document.getElementById('payrollPayslipCenterModal').classList.remove('hidden');
+}
+function closePayrollPayslipCenter(){document.getElementById('payrollPayslipCenterModal').classList.add('hidden');}
+
+async function releasePayroll(){
+  if(!payrollCurrentRun||payrollCurrentRun.status!=='Finalized')return;
+  const period=`${formatDateLabel(payrollCurrentRun.period_start)} – ${formatDateLabel(payrollCurrentRun.period_end)}`;
+  const total=formatCurrency(payrollCurrentRun.total_net);
+  if(!confirm(`Release this payroll?\n\nPeriod: ${period}\nEmployees: ${payrollCurrentItems.length}\nTotal Net Pay: ${total}\n\nAfter release, the payroll and its payslips remain locked.`))return;
+
+  const {error}=await supabaseClient.from(PAYROLL_RUNS_TABLE)
+    .update({status:'Released',released_at:new Date().toISOString()})
+    .eq('id',payrollCurrentRun.id).eq('status','Finalized');
+
+  if(error){showToast(error.message||'Unable to release payroll.','error');return;}
+
+  // Reload the exact run so released_at and server state stay in sync.
+  const {data:updatedRun,error:reloadError}=await supabaseClient.from(PAYROLL_RUNS_TABLE).select('*').eq('id',payrollCurrentRun.id).single();
+  if(!reloadError&&updatedRun) payrollCurrentRun=updatedRun;
+  else payrollCurrentRun.status='Released';
+
+  renderPayrollCurrent();
+  if(!document.getElementById('payrollPayslipCenterModal').classList.contains('hidden')) openPayrollPayslipCenter();
+  await fetchPayrollHistory();
+  showToast('Payroll released. Payslips are ready for distribution.','success');
+}
+
+function downloadAllPayrollPayslipsPdf(){
+  if(!payrollCurrentRun||!payrollCurrentItems.length){showToast('No payroll payslips are available.','warning');return;}
+  if(!window.jspdf?.jsPDF){showToast('PDF library is unavailable.','warning');return;}
+  const {jsPDF}=window.jspdf, doc=new jsPDF();
+  const workingDays=Number(document.getElementById('payrollWorkingDays')?.value)||26;
+
+  payrollCurrentItems.forEach((i,index)=>{
+    if(index>0) doc.addPage();
+    let y=18;
+    const left=18, right=192;
+    const row=(label,value,bold=false)=>{
+      doc.setFont(undefined,bold?'bold':'normal');
+      doc.setFontSize(bold?11:9);
+      doc.text(String(label),left,y);
+      doc.text(String(value),right,y,{align:'right'});
+      y+=6;
+    };
+    doc.setFont(undefined,'bold');doc.setFontSize(16);doc.text('PAYSLIP',left,y);y+=8;
+    doc.setFont(undefined,'normal');doc.setFontSize(9);doc.text(`Payroll Period: ${formatDateLabel(payrollCurrentRun.period_start)} – ${formatDateLabel(payrollCurrentRun.period_end)}`,left,y);y+=8;
+    row('Employee',i.employee_name,true);row('Employee ID',i.employee_number);row('Department',i.department||'—');row('Position',i.position||'—');
+    y+=3;doc.setFont(undefined,'bold');doc.setFontSize(11);doc.text('EARNINGS',left,y);y+=6;
+    const paidLeave=Number(i.paid_leave_days||0)*(Number(i.basic_pay||0)/workingDays);
+    [['Basic Pay',i.basic_pay],['Paid Leave',paidLeave],['Overtime',i.ot_pay],['Holiday Pay',i.holiday_pay],['Rest Day Pay',i.rest_day_pay],['Allowances',i.allowances],['Other Earnings',i.other_earnings],['Gross Pay',i.gross_pay]].forEach(([l,v])=>row(l,formatCurrency(v),l==='Gross Pay'));
+    y+=3;doc.setFont(undefined,'bold');doc.setFontSize(11);doc.text('DEDUCTIONS',left,y);y+=6;
+    [['SSS',i.sss],['PhilHealth',i.philhealth],['Pag-IBIG',i.pagibig],['Withholding Tax',i.tax],['Absence',i.absence_deduction],['Late',i.late_deduction],['Undertime',i.undertime_deduction],['Loans',i.loans],['Other Deductions',i.other_deductions],['Total Deductions',i.total_deductions]].forEach(([l,v])=>row(l,formatCurrency(v),l==='Total Deductions'));
+    y+=5;row('NET PAY',formatCurrency(i.net_pay),true);
+    doc.setFontSize(8);doc.setFont(undefined,'normal');doc.text(`Payroll Status: ${payrollCurrentRun.status}`,left,280);
+  });
+
+  doc.save(`Payslips_${payrollCurrentRun.period_start}_${payrollCurrentRun.period_end}.pdf`);
+}
+
 async function deletePayroll(){if(!payrollCurrentRun)return;if(!confirm('Are you sure you want to permanently delete this payroll? This action cannot be undone.'))return;const {error}=await supabaseClient.from(PAYROLL_RUNS_TABLE).delete().eq('id',payrollCurrentRun.id);if(error){showToast('Unable to delete payroll.','error');return;}payrollCurrentRun=null;payrollCurrentItems=[];renderPayrollCurrent();fetchPayrollHistory();showToast('Payroll permanently deleted. Source HR records were not changed.','success');}
 async function fetchPayrollHistory(){try{const {data,error}=await supabaseClient.from(PAYROLL_RUNS_TABLE).select('*').order('period_start',{ascending:false});if(error)throw error;payrollHistoryCache=data||[];document.getElementById('payrollHistoryBody').innerHTML=payrollHistoryCache.length?payrollHistoryCache.map(r=>`<tr class="hover:bg-slate-50"><td class="px-4 py-3 font-medium">${formatDateLabel(r.period_start)} – ${formatDateLabel(r.period_end)}</td><td class="px-4 py-3 text-right">${r.employee_count}</td><td class="px-4 py-3 text-right">${formatCurrency(r.total_gross)}</td><td class="px-4 py-3 text-right">${formatCurrency(r.total_deductions)}</td><td class="px-4 py-3 text-right font-semibold">${formatCurrency(r.total_net)}</td><td class="px-4 py-3 text-center"><span class="text-[11px] px-2 py-1 rounded-full border ${payrollStatusClass(r.status)}">${escapeHtml(r.status)}</span></td><td class="px-4 py-3 text-center">${formatDateTimeLabel(r.created_at)}</td><td class="px-4 py-3 text-center"><button onclick="loadPayrollRun('${r.id}')" class="text-[11px] px-2 py-1 rounded border border-slate-300">Open</button></td></tr>`).join(''):'<tr><td colspan="8" class="px-4 py-6 text-center text-slate-400">No generated payroll history.</td></tr>';}catch(e){console.error(e);}}
 function downloadPayrollExcel(){if(!payrollCurrentRun||!window.XLSX){showToast('Excel export library is unavailable.','error');return;}const rows=payrollCurrentItems.map(i=>({'Employee ID':i.employee_number,'Employee Name':i.employee_name,'Department':i.department,'Position':i.position,'Basic Pay':i.basic_pay,'Days Worked':i.days_worked,'Paid Leave':i.paid_leave_days,'Unpaid Leave':i.unpaid_leave_days,'Absences':i.absence_days,'Late (min)':i.late_minutes,'Undertime (min)':i.undertime_minutes,'Regular Hours':i.regular_hours,'OT Hours':i.ot_hours,'OT Pay':i.ot_pay,'Holiday Pay':i.holiday_pay,'Allowances':i.allowances,'Gross Pay':i.gross_pay,'SSS':i.sss,'PhilHealth':i.philhealth,'Pag-IBIG':i.pagibig,'Tax':i.tax,'Other Deductions':i.other_deductions,'Total Deductions':i.total_deductions,'Net Pay':i.net_pay}));const ws=XLSX.utils.json_to_sheet(rows);ws['!cols']=Object.keys(rows[0]||{}).map(()=>({wch:18}));const wb=XLSX.utils.book_new();XLSX.utils.book_append_sheet(wb,ws,'Payroll');XLSX.writeFile(wb,`Payroll_${payrollCurrentRun.period_start}_${payrollCurrentRun.period_end}.xlsx`);}
@@ -3951,6 +4081,8 @@ function registerEventListeners() {
   document.getElementById('payrollFinalizeConfirm').addEventListener('change', (e) => { document.getElementById('payrollConfirmFinalizeBtn').disabled=!e.target.checked; });
   document.getElementById('payrollConfirmFinalizeBtn').addEventListener('click', confirmFinalizePayroll);
   document.getElementById('payrollReleaseBtn').addEventListener('click', releasePayroll);
+  document.getElementById('payrollPayslipCenterBtn').addEventListener('click', openPayrollPayslipCenter);
+  document.getElementById('payrollCenterReleaseBtn').addEventListener('click', releasePayroll);
   document.getElementById('payrollDeleteBtn').addEventListener('click', deletePayroll);
   document.getElementById('payrollExcelBtn').addEventListener('click', downloadPayrollExcel);
   document.getElementById('payrollEmployeeSearch').addEventListener('input', renderPayrollCurrent);
