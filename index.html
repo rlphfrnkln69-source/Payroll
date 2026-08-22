@@ -1119,8 +1119,105 @@ function credentialsArePlaceholders() {
 
 /* NAVIGATION & MODULE SWITCHING */
 const MODULES = ['dashboard', 'employees', 'schedule', 'attendance', 'overtime', 'leave', 'payroll', 'inactive'];
+const HRIS_STATE_KEY = 'hris_ui_state_v1';
+let currentModule = 'dashboard';
+let isRestoringAppState = false;
+
+function getPersistableControlIds() {
+  return [
+    // Attendance
+    'attendancePeriodType', 'attendanceDate', 'attendanceDateFrom', 'attendanceDateTo',
+    'attendanceMonth', 'attendanceCutoff', 'attendanceEmployeeFilter', 'attendanceDeptFilter',
+    'attendancePositionFilter', 'attendanceStatusFilter',
+    // Employee Directory
+    'empSearchInput', 'filterDept', 'filterStatus', 'filterType',
+    // Schedule
+    'scheduleEmpSearchInput', 'scheduleEmpDeptFilter',
+    // Overtime
+    'otSearchInput', 'otFilterEmployee', 'otFilterDept', 'otFilterStatus',
+    'otFilterMonth', 'otFilterDateFrom', 'otFilterDateTo',
+    // Leave
+    'leaveSearchInput', 'leaveFilterEmployee', 'leaveFilterDept', 'leaveFilterType',
+    'leaveFilterStatus', 'leaveFilterMonth', 'leaveFilterDateFrom', 'leaveFilterDateTo',
+    'leaveBalanceSearchInput'
+  ];
+}
+
+function saveAppState() {
+  if (isRestoringAppState) return;
+
+  try {
+    const controls = {};
+    getPersistableControlIds().forEach(id => {
+      const el = document.getElementById(id);
+      if (!el) return;
+      controls[id] = el.type === 'checkbox' ? el.checked : el.value;
+    });
+
+    const mainScroller = document.querySelector('#appShell > div.flex-1.overflow-y-auto');
+
+    const state = {
+      module: currentModule,
+      controls,
+      scrollTop: mainScroller ? mainScroller.scrollTop : 0,
+      schedule: {
+        employeeId: scheduleSelectedEmployee ? scheduleSelectedEmployee.id : null,
+        year: scheduleViewYear,
+        month: scheduleViewMonth,
+        detailView: !!scheduleSelectedEmployee
+      }
+    };
+
+    localStorage.setItem(HRIS_STATE_KEY, JSON.stringify(state));
+  } catch (err) {
+    console.warn('Unable to save HRIS UI state:', err);
+  }
+}
+
+function loadAppState() {
+  try {
+    const raw = localStorage.getItem(HRIS_STATE_KEY);
+    if (!raw) return null;
+    const state = JSON.parse(raw);
+    if (!state || !MODULES.includes(state.module)) return null;
+    return state;
+  } catch (err) {
+    console.warn('Unable to load HRIS UI state:', err);
+    return null;
+  }
+}
+
+function restoreAppState() {
+  const state = loadAppState();
+  if (!state) return null;
+
+  isRestoringAppState = true;
+  try {
+    Object.entries(state.controls || {}).forEach(([id, value]) => {
+      const el = document.getElementById(id);
+      if (!el) return;
+      if (el.type === 'checkbox') el.checked = !!value;
+      else el.value = value ?? '';
+    });
+
+    // Re-apply visibility for controls such as the attendance date/range fields.
+    if (document.getElementById('attendancePeriodType')) {
+      updateAttendancePeriodControls();
+    }
+
+    currentModule = state.module;
+  } finally {
+    isRestoringAppState = false;
+  }
+
+  return state;
+}
 
 function switchModule(targetId) {
+  if (!MODULES.includes(targetId)) targetId = 'dashboard';
+
+  currentModule = targetId;
+
   MODULES.forEach(mod => {
     const el = document.getElementById('module' + mod.charAt(0).toUpperCase() + mod.slice(1));
     if (el) el.classList.toggle('hidden', mod !== targetId);
@@ -1144,6 +1241,7 @@ function switchModule(targetId) {
     inactive: 'Inactive & Archived Employee Records'
   };
   document.getElementById('pageTitle').textContent = titles[targetId] || 'HRIS Platform';
+  saveAppState();
 
   if (targetId === 'employees') {
     renderEmployeeDirectory();
@@ -2790,20 +2888,38 @@ function renderProfileLeaveTab(employeeId) {
 }
 
 /* AUTHENTICATION (Supabase Auth) */
-function enterApp(session) {
+async function enterApp(session) {
   document.getElementById('loginScreen').classList.add('hidden');
   document.getElementById('appShell').classList.remove('hidden');
   if (session && session.user) {
     document.getElementById('sidebarAdminEmail').textContent = session.user.email || '';
   }
-  switchModule('dashboard');
-  fetchEmployees();
+
+  // Do not force the user back to Dashboard when the existing Supabase
+  // session is restored or refreshed. Load employee data first so filters
+  // such as the Attendance employee dropdown can be restored correctly.
+  const savedState = loadAppState();
+  await fetchEmployees();
+  restoreAppState();
+  switchModule(savedState && MODULES.includes(savedState.module) ? savedState.module : 'dashboard');
+
+  const stateAfterRestore = savedState || loadAppState();
+  const mainScroller = document.querySelector('#appShell > div.flex-1.overflow-y-auto');
+  if (mainScroller && stateAfterRestore && Number.isFinite(Number(stateAfterRestore.scrollTop))) {
+    requestAnimationFrame(() => {
+      mainScroller.scrollTop = Number(stateAfterRestore.scrollTop) || 0;
+    });
+  }
 }
 
-function exitToLogin() {
+function exitToLogin(clearSavedState = false) {
   document.getElementById('appShell').classList.add('hidden');
   document.getElementById('loginScreen').classList.remove('hidden');
   document.getElementById('loginForm').reset();
+  if (clearSavedState) {
+    try { localStorage.removeItem(HRIS_STATE_KEY); } catch (_) {}
+    currentModule = 'dashboard';
+  }
 }
 
 /* ===============================
@@ -3093,6 +3209,20 @@ function registerEventListeners() {
     btn.addEventListener('click', () => switchModule(btn.getAttribute('data-target')));
   });
 
+  // Persist navigation/filter state continuously so changing tabs, windows,
+  // or applications never resets the HRIS back to Dashboard.
+  getPersistableControlIds().forEach(id => {
+    const el = document.getElementById(id);
+    if (!el) return;
+    el.addEventListener('input', saveAppState);
+    el.addEventListener('change', saveAppState);
+  });
+
+  const mainScroller = document.querySelector('#appShell > div.flex-1.overflow-y-auto');
+  if (mainScroller) mainScroller.addEventListener('scroll', saveAppState, { passive: true });
+
+  window.addEventListener('pagehide', saveAppState);
+
   document.getElementById('sidebarLogoutBtn').addEventListener('click', async () => {
     try {
       const { error } = await supabaseClient.auth.signOut();
@@ -3104,7 +3234,7 @@ function registerEventListeners() {
     }
     // onAuthStateChange (registered in init) also handles this, but we
     // call exitToLogin() directly too so the UI updates immediately.
-    exitToLogin();
+    exitToLogin(true);
   });
 
   document.getElementById('loginForm').addEventListener('submit', async (e) => {
@@ -3146,7 +3276,7 @@ function registerEventListeners() {
   document.getElementById('attendancePeriodType').addEventListener('change', () => { updateAttendancePeriodControls(); fetchAttendance(); });
   ['attendanceDate','attendanceDateFrom','attendanceDateTo','attendanceMonth','attendanceCutoff','attendanceEmployeeFilter','attendanceDeptFilter','attendancePositionFilter','attendanceStatusFilter'].forEach(id => document.getElementById(id).addEventListener('change', fetchAttendance));
   document.getElementById('attendancePositionFilter').addEventListener('input', renderAttendanceTable);
-  document.getElementById('attendanceResetFiltersBtn').addEventListener('click', () => { document.getElementById('attendanceEmployeeFilter').value=''; document.getElementById('attendanceDeptFilter').value=''; document.getElementById('attendancePositionFilter').value=''; document.getElementById('attendanceStatusFilter').value=''; initAttendancePeriodDefaults(); fetchAttendance(); });
+  document.getElementById('attendanceResetFiltersBtn').addEventListener('click', () => { document.getElementById('attendanceEmployeeFilter').value=''; document.getElementById('attendanceDeptFilter').value=''; document.getElementById('attendancePositionFilter').value=''; document.getElementById('attendanceStatusFilter').value=''; initAttendancePeriodDefaults(); saveAppState(); fetchAttendance(); });
   document.getElementById('openManualAttendanceModalBtn').addEventListener('click', openManualAttendanceModal);
   document.getElementById('closeManualAttendanceModalBtn').addEventListener('click', closeManualAttendanceModal);
   document.getElementById('cancelManualAttendanceBtn').addEventListener('click', closeManualAttendanceModal);
