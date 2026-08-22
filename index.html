@@ -482,6 +482,27 @@
             <div id="attendancePeriodLabel" class="text-[11px] text-slate-500 font-medium"></div>
           </div>
 
+          <!-- ATTENDANCE SUMMARY -->
+          <div class="rounded-xl border border-slate-300 bg-white p-4 space-y-3">
+            <div class="flex flex-wrap items-center justify-between gap-2">
+              <div>
+                <h4 class="text-sm font-semibold text-slate-800">Attendance Summary</h4>
+                <p class="text-xs text-slate-500 mt-0.5">Summary based on the currently selected date period and attendance status filter.</p>
+              </div>
+              <span id="attendanceSummaryPeriod" class="text-[11px] font-medium text-slate-500"></span>
+            </div>
+            <div class="grid grid-cols-2 md:grid-cols-4 xl:grid-cols-8 gap-3">
+              <div class="rounded-xl border border-slate-200 bg-slate-50 p-3"><p class="text-[11px] text-slate-500 mb-1">Scheduled Days</p><p id="attSummaryScheduled" class="text-xl font-semibold font-mono-tabular text-slate-800">0</p></div>
+              <div class="rounded-xl border border-emerald-200 bg-emerald-50 p-3"><p class="text-[11px] text-emerald-700 mb-1">Days Worked</p><p id="attSummaryWorked" class="text-xl font-semibold font-mono-tabular text-emerald-700">0</p></div>
+              <div class="rounded-xl border border-rose-200 bg-rose-50 p-3"><p class="text-[11px] text-rose-700 mb-1">Absent</p><p id="attSummaryAbsent" class="text-xl font-semibold font-mono-tabular text-rose-700">0</p></div>
+              <div class="rounded-xl border border-sky-200 bg-sky-50 p-3"><p class="text-[11px] text-sky-700 mb-1">Rest Days</p><p id="attSummaryRest" class="text-xl font-semibold font-mono-tabular text-sky-700">0</p></div>
+              <div class="rounded-xl border border-amber-200 bg-amber-50 p-3"><p class="text-[11px] text-amber-700 mb-1">Late</p><p id="attSummaryLate" class="text-xl font-semibold font-mono-tabular text-amber-700">0</p><p id="attSummaryLateMinutes" class="text-[10px] text-amber-600 mt-0.5">0 min</p></div>
+              <div class="rounded-xl border border-orange-200 bg-orange-50 p-3"><p class="text-[11px] text-orange-700 mb-1">Undertime</p><p id="attSummaryUndertime" class="text-xl font-semibold font-mono-tabular text-orange-700">0</p><p id="attSummaryUndertimeMinutes" class="text-[10px] text-orange-600 mt-0.5">0 min</p></div>
+              <div class="rounded-xl border border-violet-200 bg-violet-50 p-3"><p class="text-[11px] text-violet-700 mb-1">Overtime</p><p id="attSummaryOt" class="text-xl font-semibold font-mono-tabular text-violet-700">0.00 h</p></div>
+              <div class="rounded-xl border border-indigo-200 bg-indigo-50 p-3"><p class="text-[11px] text-indigo-700 mb-1">Rest Day Worked</p><p id="attSummaryRestWorked" class="text-xl font-semibold font-mono-tabular text-indigo-700">0</p></div>
+            </div>
+          </div>
+
           <div class="rounded-xl border border-slate-300 bg-slate-50 overflow-hidden">
             <div class="overflow-x-auto">
               <table class="w-full text-sm border-collapse min-w-[1700px]">
@@ -2356,12 +2377,37 @@ function buildAttendanceRow(employeeId,date,schedule,log,approvedOt) {
 }
 
 function renderAttendanceKPIs(rows) {
+  const workedRows=rows.filter(r=>r.actual_in&&r.actual_out&&!r.status.includes('Rest Day'));
+  const absentRows=rows.filter(r=>r.status==='Absent');
+  const lateRows=rows.filter(r=>r.late_minutes>0);
+  const undertimeRows=rows.filter(r=>r.undertime_minutes>0);
+  const restRows=rows.filter(r=>r.status==='Rest Day'||r.status==='Rest Day Worked');
+  const restWorkedRows=rows.filter(r=>r.status==='Rest Day Worked');
+  const scheduledRows=rows.filter(r=>r.status!=='Rest Day'&&r.status!=='Rest Day Worked');
+  const totalLate=lateRows.reduce((a,r)=>a+r.late_minutes,0);
+  const totalUndertime=undertimeRows.reduce((a,r)=>a+r.undertime_minutes,0);
+  const totalOt=rows.reduce((a,r)=>a+r.overtime_hours,0);
+
   document.getElementById('attKpiRecords').textContent=rows.length;
-  document.getElementById('attKpiWorked').textContent=rows.filter(r=>r.actual_in&&r.actual_out&&!r.status.includes('Rest Day')).length;
-  document.getElementById('attKpiAbsent').textContent=rows.filter(r=>r.status==='Absent').length;
-  document.getElementById('attKpiLate').textContent=rows.filter(r=>r.late_minutes>0).length;
-  document.getElementById('attKpiOt').textContent=rows.reduce((a,r)=>a+r.overtime_hours,0).toFixed(2);
-  document.getElementById('attKpiRestWorked').textContent=rows.filter(r=>r.status==='Rest Day Worked').length;
+  document.getElementById('attKpiWorked').textContent=workedRows.length;
+  document.getElementById('attKpiAbsent').textContent=absentRows.length;
+  document.getElementById('attKpiLate').textContent=lateRows.length;
+  document.getElementById('attKpiOt').textContent=totalOt.toFixed(2);
+  document.getElementById('attKpiRestWorked').textContent=restWorkedRows.length;
+
+  document.getElementById('attSummaryScheduled').textContent=scheduledRows.length;
+  document.getElementById('attSummaryWorked').textContent=workedRows.length;
+  document.getElementById('attSummaryAbsent').textContent=absentRows.length;
+  document.getElementById('attSummaryRest').textContent=restRows.length;
+  document.getElementById('attSummaryLate').textContent=lateRows.length;
+  document.getElementById('attSummaryLateMinutes').textContent=`${formatDuration(totalLate)}`;
+  document.getElementById('attSummaryUndertime').textContent=undertimeRows.length;
+  document.getElementById('attSummaryUndertimeMinutes').textContent=`${formatDuration(totalUndertime)}`;
+  document.getElementById('attSummaryOt').textContent=`${totalOt.toFixed(2)} h`;
+  document.getElementById('attSummaryRestWorked').textContent=restWorkedRows.length;
+  const p=attendancePeriod();
+  const status=document.getElementById('attendanceStatusFilter')?.value;
+  document.getElementById('attendanceSummaryPeriod').textContent=`${formatDateLabel(p.from)} – ${formatDateLabel(p.to)}${status ? ` • ${status}` : ''}`;
 }
 
 function renderAttendanceTable() {
