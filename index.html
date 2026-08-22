@@ -823,13 +823,33 @@
           <div class="rounded-xl border border-slate-300 bg-slate-50 p-3"><p class="text-[11px] text-slate-500">Status</p><p id="payrollKpiStatus" class="text-sm font-semibold mt-1">No payroll</p></div>
         </div>
 
-        <!-- EXCEPTIONS -->
+        <!-- EXCEPTIONS: COMPACT / CLICK TO EXPAND -->
         <div id="payrollExceptionsCard" class="hidden rounded-xl border border-amber-300 bg-amber-50 overflow-hidden">
-          <div class="px-4 py-3 border-b border-amber-200 flex items-center justify-between">
-            <div><h4 class="text-sm font-semibold text-amber-900">⚠ Payroll Exceptions</h4><p class="text-xs text-amber-800 mt-0.5">Resolve source-data issues before finalizing payroll.</p></div>
-            <span id="payrollExceptionCount" class="text-xs font-semibold px-2 py-1 rounded-full bg-amber-200 text-amber-900">0</span>
+          <button id="payrollExceptionsToggle" type="button"
+            onclick="togglePayrollExceptions()"
+            class="w-full px-4 py-3 flex items-center justify-between gap-3 text-left hover:bg-amber-100/60 transition-colors">
+            <div class="min-w-0">
+              <h4 class="text-sm font-semibold text-amber-900">⚠ Payroll Exceptions</h4>
+              <p id="payrollExceptionsSummary" class="text-xs text-amber-800 mt-0.5">
+                Click to view payroll exceptions before finalizing.
+              </p>
+            </div>
+
+            <div class="flex items-center gap-2 shrink-0">
+              <span id="payrollExceptionCount"
+                class="text-xs font-semibold px-2 py-1 rounded-full bg-amber-200 text-amber-900">0</span>
+              <span id="payrollExceptionsChevron"
+                class="text-sm font-bold text-amber-900 transition-transform">⌄</span>
+            </div>
+          </button>
+
+          <div id="payrollExceptionsBody" class="hidden border-t border-amber-200">
+            <div class="px-4 py-2 bg-amber-100/50 text-[11px] text-amber-800">
+              Review these items before finalizing payroll.
+            </div>
+            <div id="payrollExceptionsList"
+              class="divide-y divide-amber-200 max-h-80 overflow-y-auto"></div>
           </div>
-          <div id="payrollExceptionsList" class="divide-y divide-amber-200"></div>
         </div>
 
         <!-- PAYROLL ACTIONS -->
@@ -3645,9 +3665,44 @@ function renderPayrollCurrent(){
   if(!r){body.innerHTML='<tr><td colspan="15" class="px-4 py-10 text-center text-slate-400">Select a payroll period and generate payroll.</td></tr>';document.getElementById('payrollExceptionsCard').classList.add('hidden');['payrollFinalizeBtn','payrollReleaseBtn','payrollExcelBtn','payrollDeleteBtn','payrollAdjustmentsBtn'].forEach(id=>document.getElementById(id).classList.add('hidden'));renderPayrollReviewSummary();return;}
   const reviewed=getPayrollReviewedIds();
   body.innerHTML=visible.length?visible.map(i=>`<tr class="hover:bg-slate-50"><td class="px-3 py-3"><div class="flex items-center gap-2"><div class="font-semibold">${escapeHtml(i.employee_name)}</div>${reviewed.has(i.id)?'<span class="text-[9px] font-bold px-1.5 py-0.5 rounded bg-emerald-100 text-emerald-700">REVIEWED</span>':''}</div><div class="text-[10px] text-slate-400">${escapeHtml(i.employee_number)} • ${escapeHtml(i.department)}</div></td><td class="px-3 py-3 text-right">${i.days_worked}</td><td class="px-3 py-3 text-right">${Number(i.paid_leave_days).toFixed(1)}</td><td class="px-3 py-3 text-right">${Number(i.unpaid_leave_days).toFixed(1)}</td><td class="px-3 py-3 text-right">${Number(i.absence_days).toFixed(1)}</td><td class="px-3 py-3 text-right">${i.late_minutes}m</td><td class="px-3 py-3 text-right">${i.undertime_minutes}m</td><td class="px-3 py-3 text-right">${Number(i.regular_hours).toFixed(2)}</td><td class="px-3 py-3 text-right">${Number(i.ot_hours).toFixed(2)}</td><td class="px-3 py-3 text-right">${formatCurrency(i.ot_pay)}</td><td class="px-3 py-3 text-right">${formatCurrency(i.basic_pay)}</td><td class="px-3 py-3 text-right font-semibold">${formatCurrency(i.gross_pay)}</td><td class="px-3 py-3 text-right">${formatCurrency(i.total_deductions)}</td><td class="px-3 py-3 text-right font-semibold text-emerald-700">${formatCurrency(i.net_pay)}</td><td class="px-3 py-3 text-center whitespace-nowrap"><button onclick="viewPayrollDetails('${i.id}')" class="text-[11px] px-2 py-1 rounded border border-slate-300 hover:bg-slate-100">Review</button> ${r.status==='For Verification'?`<button onclick="openPayrollAdjustmentForEmployee('${i.employee_id}')" class="text-[11px] px-2 py-1 rounded border border-violet-300 text-violet-700 hover:bg-violet-50">Adjust</button>`:''} <button onclick="printPayrollPayslip('${i.id}')" class="text-[11px] px-2 py-1 rounded border border-sky-300 text-sky-700 hover:bg-sky-50">View Payslip</button> <button onclick="downloadPayrollPayslipPdf('${i.id}')" class="text-[11px] px-2 py-1 rounded border border-violet-300 text-violet-700 hover:bg-violet-50">PDF</button></td></tr>`).join(''):'<tr><td colspan="15" class="px-4 py-10 text-center text-slate-400">No matching employees.</td></tr>';
-  const ex=[];items.forEach(i=>(i.exceptions||[]).forEach(x=>ex.push({employee:i.employee_name,message:x})));const card=document.getElementById('payrollExceptionsCard');card.classList.toggle('hidden',ex.length===0);document.getElementById('payrollExceptionCount').textContent=ex.length;document.getElementById('payrollExceptionsList').innerHTML=ex.map(x=>`<div class="px-4 py-2 text-xs flex justify-between gap-4"><span class="font-medium text-amber-900">${escapeHtml(x.employee)}</span><span class="text-amber-800">${escapeHtml(x.message)}</span></div>`).join('');
+  const ex=[];items.forEach(i=>(i.exceptions||[]).forEach(x=>ex.push({employee:i.employee_name,message:x})));
+  const card=document.getElementById('payrollExceptionsCard');
+  const exceptionsBody=document.getElementById('payrollExceptionsBody');
+  const exceptionsChevron=document.getElementById('payrollExceptionsChevron');
+  const exceptionsSummary=document.getElementById('payrollExceptionsSummary');
+
+  card.classList.toggle('hidden',ex.length===0);
+
+  if(ex.length){
+    document.getElementById('payrollExceptionCount').textContent=ex.length;
+    exceptionsSummary.textContent=`${ex.length} exception(s) found. Click to view details.`;
+
+    /* Keep the list compact by default whenever the payroll is rendered. */
+    exceptionsBody.classList.add('hidden');
+    exceptionsChevron.textContent='⌄';
+
+    document.getElementById('payrollExceptionsList').innerHTML=ex.map(x=>`<div class="px-4 py-2 text-xs flex justify-between gap-4"><span class="font-medium text-amber-900">${escapeHtml(x.employee)}</span><span class="text-amber-800 text-right">${escapeHtml(x.message)}</span></div>`).join('');
+  }
   const locked=['Finalized','Released'].includes(r.status);document.getElementById('payrollFinalizeBtn').classList.toggle('hidden',locked||r.status!=='For Verification');document.getElementById('payrollReleaseBtn').classList.toggle('hidden',r.status!=='Finalized');document.getElementById('payrollExcelBtn').classList.remove('hidden');document.getElementById('payrollDeleteBtn').classList.toggle('hidden',locked);document.getElementById('payrollAdjustmentsBtn').classList.toggle('hidden',locked||r.status!=='For Verification');renderPayrollReviewSummary();renderPayrollAdjustments();
 }
+function togglePayrollExceptions(){
+  const body=document.getElementById('payrollExceptionsBody');
+  const chevron=document.getElementById('payrollExceptionsChevron');
+  const summary=document.getElementById('payrollExceptionsSummary');
+  if(!body || !chevron) return;
+
+  const isHidden=body.classList.contains('hidden');
+  body.classList.toggle('hidden',!isHidden);
+  chevron.textContent=isHidden ? '⌃' : '⌄';
+
+  const count=Number(document.getElementById('payrollExceptionCount')?.textContent||0);
+  if(summary){
+    summary.textContent=isHidden
+      ? `${count} exception(s) found. Click again to hide details.`
+      : `${count} exception(s) found. Click to view details.`;
+  }
+}
+
 function closePayrollDetails(){document.getElementById('payrollDetailsModal').classList.add('hidden');}
 function payrollDetailRows(rows){return rows.map(([label,value])=>`<div class="flex justify-between gap-6 py-2 border-b border-slate-100 text-sm"><span class="text-slate-600">${label}</span><span class="font-semibold text-slate-900 text-right">${value}</span></div>`).join('');}
 function viewPayrollDetails(id){
