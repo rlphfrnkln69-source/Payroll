@@ -1050,6 +1050,76 @@
   </div>
 </div>
 
+<!-- ATTENDANCE RECORD DETAILS MODAL -->
+<div id="attendanceRecordDetailsModal" class="hidden fixed inset-0 z-50 items-center justify-center bg-black/60 px-4 overflow-y-auto py-8">
+  <div class="bg-white border border-slate-300 rounded-xl max-w-3xl w-full shadow-2xl overflow-hidden">
+    <div class="flex items-center justify-between px-6 py-4 border-b border-slate-200">
+      <div>
+        <h3 id="attendanceRecordDetailsTitle" class="text-slate-900 font-semibold text-lg">Attendance Record Details</h3>
+        <p id="attendanceRecordDetailsSubtitle" class="text-xs text-slate-500 mt-0.5"></p>
+      </div>
+      <button id="closeAttendanceRecordDetailsBtn" type="button" class="text-slate-400 hover:text-slate-700 font-bold text-lg">✕</button>
+    </div>
+
+    <div class="p-6 space-y-5 max-h-[75vh] overflow-y-auto">
+      <div class="grid grid-cols-2 md:grid-cols-4 gap-3">
+        <div class="rounded-xl border border-slate-300 bg-slate-50 p-4">
+          <p class="text-xs text-slate-500 mb-1">Total Hours Worked</p>
+          <p id="attendanceDetailWorkedHours" class="text-xl font-semibold font-mono-tabular text-slate-900">0.00</p>
+        </div>
+        <div class="rounded-xl border border-amber-300 bg-amber-50 p-4">
+          <p class="text-xs text-amber-700 mb-1">Late</p>
+          <p id="attendanceDetailLate" class="text-xl font-semibold font-mono-tabular text-amber-700">0h 00m</p>
+        </div>
+        <div class="rounded-xl border border-slate-300 bg-slate-50 p-4">
+          <p class="text-xs text-slate-500 mb-1">Undertime</p>
+          <p id="attendanceDetailUndertime" class="text-xl font-semibold font-mono-tabular text-slate-900">0h 00m</p>
+        </div>
+        <div class="rounded-xl border border-sky-300 bg-sky-50 p-4">
+          <p class="text-xs text-sky-700 mb-1">Overtime</p>
+          <p id="attendanceDetailOvertime" class="text-xl font-semibold font-mono-tabular text-sky-700">0.00 hr</p>
+        </div>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div class="rounded-xl border border-slate-200 bg-white p-4 space-y-3">
+          <h4 class="text-sm font-semibold text-slate-900 border-b border-slate-200 pb-2">Schedule</h4>
+          <div class="grid grid-cols-2 gap-3 text-sm">
+            <div><p class="text-xs text-slate-500">Scheduled Time In</p><p id="attendanceDetailScheduledIn" class="font-medium text-slate-900 mt-1">—</p></div>
+            <div><p class="text-xs text-slate-500">Scheduled Time Out</p><p id="attendanceDetailScheduledOut" class="font-medium text-slate-900 mt-1">—</p></div>
+            <div><p class="text-xs text-slate-500">Break</p><p id="attendanceDetailBreak" class="font-medium text-slate-900 mt-1">—</p></div>
+            <div><p class="text-xs text-slate-500">Schedule Type</p><p id="attendanceDetailScheduleType" class="font-medium text-slate-900 mt-1">—</p></div>
+          </div>
+        </div>
+
+        <div class="rounded-xl border border-slate-200 bg-white p-4 space-y-3">
+          <h4 class="text-sm font-semibold text-slate-900 border-b border-slate-200 pb-2">Actual Attendance</h4>
+          <div class="grid grid-cols-2 gap-3 text-sm">
+            <div><p class="text-xs text-slate-500">Actual Time In</p><p id="attendanceDetailActualIn" class="font-medium text-slate-900 mt-1">—</p></div>
+            <div><p class="text-xs text-slate-500">Actual Time Out</p><p id="attendanceDetailActualOut" class="font-medium text-slate-900 mt-1">—</p></div>
+            <div class="col-span-2"><p class="text-xs text-slate-500">Attendance Status</p><p id="attendanceDetailStatus" class="mt-1"></p></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="rounded-xl border border-slate-200 bg-slate-50 p-4">
+        <h4 class="text-sm font-semibold text-slate-900 border-b border-slate-200 pb-2 mb-3">Record Information</h4>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
+          <div><p class="text-xs text-slate-500">Source</p><p id="attendanceDetailSource" class="font-medium text-slate-900 mt-1">—</p></div>
+          <div><p class="text-xs text-slate-500">Date</p><p id="attendanceDetailDate" class="font-medium text-slate-900 mt-1">—</p></div>
+          <div><p class="text-xs text-slate-500">Reason</p><p id="attendanceDetailReason" class="text-slate-700 mt-1 whitespace-pre-wrap">—</p></div>
+          <div><p class="text-xs text-slate-500">Remarks</p><p id="attendanceDetailRemarks" class="text-slate-700 mt-1 whitespace-pre-wrap">—</p></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="flex justify-end gap-3 px-6 py-4 border-t border-slate-200 bg-slate-50">
+      <button id="attendanceDetailEditBtn" type="button" class="hidden px-4 py-2 text-sm font-semibold rounded-lg border border-slate-300 text-slate-700 hover:bg-white">Edit Manual Log</button>
+      <button id="attendanceDetailCloseBtn" type="button" class="px-4 py-2 text-sm font-semibold rounded-lg bg-slate-900 hover:bg-slate-800 text-white">Close</button>
+    </div>
+  </div>
+</div>
+
 <!-- MANUAL ATTENDANCE MODAL -->
 <div id="manualAttendanceModal" class="hidden fixed inset-0 z-50 items-center justify-center bg-black/60 px-4 overflow-y-auto py-8">
   <div class="bg-white border border-slate-300 rounded-xl max-w-2xl w-full p-6 space-y-5 shadow-2xl">
@@ -2312,9 +2382,64 @@ function renderAttendanceTable() {
       <td class="px-3 py-3 text-right font-mono-tabular">${r.overtime_hours.toFixed(2)}</td>
       <td class="px-3 py-3"><span class="text-xs px-2 py-1 rounded-full border ${statusClass}">${escapeHtml(r.status)}</span></td>
       <td class="px-3 py-3 max-w-[280px]">${escapeHtml(r.remarks||r.reason||'')}</td>
-      <td class="px-3 py-3 text-center">${r._log ? `<button onclick="editManualAttendance('${r.id}')" class="text-xs px-2.5 py-1.5 rounded border border-slate-300 text-slate-700 hover:bg-slate-100">Edit</button>` : `<button onclick="openManualAttendanceFor('${r.employee_id}','${r.schedule_date}')" class="text-xs px-2.5 py-1.5 rounded border border-slate-300 text-slate-700 hover:bg-slate-100">Add Log</button>`}</td>
+      <td class="px-3 py-3 text-center whitespace-nowrap space-x-1">
+        <button type="button" onclick="openAttendanceRecordDetails('${r.employee_id}','${r.schedule_date}')" class="text-xs px-2.5 py-1.5 rounded border border-slate-300 text-slate-700 hover:bg-slate-100">View Details</button>
+        ${r._log ? `<button type="button" onclick="editManualAttendance('${r.id}')" class="text-xs px-2.5 py-1.5 rounded border border-slate-300 text-slate-700 hover:bg-slate-100">Edit</button>` : `<button type="button" onclick="openManualAttendanceFor('${r.employee_id}','${r.schedule_date}')" class="text-xs px-2.5 py-1.5 rounded border border-slate-300 text-slate-700 hover:bg-slate-100">Add Log</button>`}
+      </td>
     </tr>`;
   }).join('');
+}
+
+function attendanceStatusBadge(status) {
+  const s=String(status||'Unknown');
+  const cls=s.includes('Absent')?'text-rose-700 bg-rose-50 border-rose-200':s.includes('Late')?'text-amber-700 bg-amber-50 border-amber-200':s.includes('Rest')?'text-sky-700 bg-sky-50 border-sky-200':'text-emerald-700 bg-emerald-50 border-emerald-200';
+  return `<span class="inline-flex items-center text-xs px-2.5 py-1 rounded-full border ${cls}">${escapeHtml(s)}</span>`;
+}
+
+function openAttendanceRecordDetails(employeeId,date) {
+  const r=attendanceCache.find(x=>x.employee_id===employeeId && x.schedule_date===date);
+  if(!r) { showToast('Attendance record could not be found.','warning'); return; }
+  const e=r.employee||employeesCache.find(x=>x.id===employeeId)||{};
+  const name=`${e.first_name||''}${e.middle_name?' '+e.middle_name:''} ${e.last_name||''}`.trim() || 'Employee';
+  const schedule=r._schedule||{};
+  const breakStart=schedule.break_start?.slice(0,5)||'';
+  const breakEnd=schedule.break_end?.slice(0,5)||'';
+  const breakLabel=breakStart&&breakEnd ? `${formatTimeLabel(breakStart)} – ${formatTimeLabel(breakEnd)}` : 'No scheduled break';
+  const scheduleType=r.status==='Rest Day'||schedule.is_rest_day ? 'Rest Day' : (r.scheduled_in&&r.scheduled_out ? 'Scheduled Workday' : 'No Schedule');
+  document.getElementById('attendanceRecordDetailsTitle').textContent=`${name} – Attendance Details`;
+  document.getElementById('attendanceRecordDetailsSubtitle').textContent=`${formatDateLabel(r.schedule_date)} • ID: ${e.employee_number||'N/A'}`;
+  document.getElementById('attendanceDetailWorkedHours').textContent=Number(r.worked_hours||0).toFixed(2);
+  document.getElementById('attendanceDetailLate').textContent=formatDuration(r.late_minutes);
+  document.getElementById('attendanceDetailUndertime').textContent=formatDuration(r.undertime_minutes);
+  document.getElementById('attendanceDetailOvertime').textContent=`${Number(r.overtime_hours||0).toFixed(2)} hr`;
+  document.getElementById('attendanceDetailScheduledIn').textContent=r.scheduled_in ? formatTimeLabel(r.scheduled_in) : 'Rest Day / N/A';
+  document.getElementById('attendanceDetailScheduledOut').textContent=r.scheduled_out ? formatTimeLabel(r.scheduled_out) : 'Rest Day / N/A';
+  document.getElementById('attendanceDetailBreak').textContent=breakLabel;
+  document.getElementById('attendanceDetailScheduleType').textContent=scheduleType;
+  document.getElementById('attendanceDetailActualIn').textContent=r.actual_in ? formatTimeLabel(r.actual_in) : 'N/A';
+  document.getElementById('attendanceDetailActualOut').textContent=r.actual_out ? formatTimeLabel(r.actual_out) : 'N/A';
+  document.getElementById('attendanceDetailStatus').innerHTML=attendanceStatusBadge(r.status);
+  document.getElementById('attendanceDetailSource').textContent=r.source||'Schedule';
+  document.getElementById('attendanceDetailDate').textContent=formatDateLabel(r.schedule_date);
+  document.getElementById('attendanceDetailReason').textContent=r.reason||'—';
+  document.getElementById('attendanceDetailRemarks').textContent=r.remarks||'—';
+  const editBtn=document.getElementById('attendanceDetailEditBtn');
+  if(r._log) {
+    editBtn.classList.remove('hidden');
+    editBtn.onclick=()=>{ closeAttendanceRecordDetails(); editManualAttendance(r.id); };
+  } else {
+    editBtn.classList.add('hidden');
+    editBtn.onclick=null;
+  }
+  const modal=document.getElementById('attendanceRecordDetailsModal');
+  modal.classList.remove('hidden');
+  modal.classList.add('flex');
+}
+
+function closeAttendanceRecordDetails() {
+  const modal=document.getElementById('attendanceRecordDetailsModal');
+  modal.classList.add('hidden');
+  modal.classList.remove('flex');
 }
 
 function openManualAttendanceFor(employeeId,date) { openManualAttendanceModal(); document.getElementById('manualAttendanceEmployee').value=employeeId; document.getElementById('manualAttendanceDate').value=date; }
@@ -3398,6 +3523,9 @@ function registerEventListeners() {
   document.getElementById('cancelManualAttendanceBtn').addEventListener('click', closeManualAttendanceModal);
   document.getElementById('manualAttendanceForm').addEventListener('submit', saveManualAttendance);
   document.getElementById('attendanceGenerateReportBtn').addEventListener('click', generateAttendanceReport);
+  document.getElementById('closeAttendanceRecordDetailsBtn').addEventListener('click', closeAttendanceRecordDetails);
+  document.getElementById('attendanceDetailCloseBtn').addEventListener('click', closeAttendanceRecordDetails);
+  document.getElementById('attendanceRecordDetailsModal').addEventListener('click', (e) => { if(e.target.id === 'attendanceRecordDetailsModal') closeAttendanceRecordDetails(); });
 
 
   // Employee Management UI triggers
